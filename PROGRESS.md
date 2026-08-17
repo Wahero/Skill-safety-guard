@@ -37,8 +37,8 @@
 ### Phase 3 剩余
 - [x] F-037 LLM 辅助提示词注入检测（Pro 限定）✅
 - [x] F-039/F-040 MCP 注入/传输安全 ✅
-- [ ] F-043 性能优化
-- [ ] F-044 完整用户文档
+- [x] F-043 性能优化 ✅（2.4s → 0.6s，规则编译缓存 + Pi 版本缓存 + --no-pi）
+- [x] F-044 完整用户文档 ✅（USAGE.md）
 
 ### Phase 4（后置）
 - [ ] 多框架适配（OpenClaude/OpenCode/Claude Code）

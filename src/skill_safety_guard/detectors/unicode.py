@@ -15,12 +15,7 @@ class UnicodeDetector(BaseDetector):
 
     def detect_file(self, file_path: Path, content: str) -> List[Finding]:
         findings = []
-        for rule in self.rules:
-            try:
-                pattern = re.compile(rule["pattern"])
-            except re.error:
-                continue
-
+        for rule, pattern in self._iter_compiled_rules():
             for line_no, line in enumerate(content.splitlines(), start=1):
                 # 跳過過長的行（性能保護）
                 if len(line) > 50000:

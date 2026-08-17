@@ -58,6 +58,34 @@ class BaseDetector(ABC):
     def __init__(self, rules: List[Dict], whitelist: Dict = None):
         self.rules = rules
         self.whitelist = whitelist or {}
+        # 編譯規則緩存（性能優化 F-043）
+        # 子類用 self._iter_compiled_rules() 遍歷，避免重複 compile
+        self._rule_cache = {}
+
+    def _get_compiled_rule(self, rule: Dict):
+        """獲取（並緩存）已編譯的正則"""
+        import re
+
+        rule_id = rule.get("id", "")
+        if rule_id in self._rule_cache:
+            return self._rule_cache[rule_id]
+
+        try:
+            # 路徑類規則 case-insensitive，其他區分大小寫
+            flags = re.IGNORECASE if self.category in ("paths",) else 0
+            compiled = re.compile(rule["pattern"], flags)
+            self._rule_cache[rule_id] = compiled
+            return compiled
+        except re.error:
+            self._rule_cache[rule_id] = None
+            return None
+
+    def _iter_compiled_rules(self):
+        """遍歷 (rule, compiled_pattern) 對，含緩存"""
+        for rule in self.rules:
+            compiled = self._get_compiled_rule(rule)
+            if compiled is not None:
+                yield rule, compiled
 
     @abstractmethod
     def detect_file(self, file_path: Path, content: str) -> List[Finding]:

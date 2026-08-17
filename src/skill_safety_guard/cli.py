@@ -53,6 +53,7 @@ def parse_args(argv=None):
     )
     parser.add_argument("--report-fp", metavar="RULE_ID", help="報告誤報")
     parser.add_argument("--no-color", action="store_true", help="禁用彩色輸出")
+    parser.add_argument("--no-pi", action="store_true", help="跳過 Pi Agent 全局檢查（加快掃描）")
     parser.add_argument(
         "--min-confidence",
         choices=["high", "medium", "low"],
@@ -382,10 +383,15 @@ def _run_scan(args, target: Path, resolved: ScanTarget) -> int:
     skill_results = scan_target(target, args)
     progress(f"完成 Skill 掃描（{sum(len(r.findings) for r in skill_results.values())} 個發現）")
 
-    progress("正在檢查 Pi Agent 全局...")
-    pi_check = check_pi_version()
-    pi_check["auth_check"] = check_auth_permissions()
-    progress("完成 Pi 全局檢查")
+    # --no-pi：跳過 Pi 全局檢查（性能優化 F-043）
+    if args.no_pi:
+        pi_check = {"pi_available": False, "version": "", "vulnerabilities": [],
+                    "clean": True, "error": "跳過（--no-pi）", "auth_check": {}}
+    else:
+        progress("正在檢查 Pi Agent 全局...")
+        pi_check = check_pi_version()
+        pi_check["auth_check"] = check_auth_permissions()
+        progress("完成 Pi 全局檢查")
 
     # --all 模式：增加 MCP 依賴檢查（F-029~F-032 + F-039/F-040）
     mcp_result = None

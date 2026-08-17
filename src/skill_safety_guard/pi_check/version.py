@@ -7,8 +7,9 @@
 import re
 import subprocess
 import sys
+import time
 from pathlib import Path
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 
 # 已知漏洞數據庫（v0.1.0）
@@ -60,6 +61,11 @@ def get_pi_version() -> Dict:
         "error": str
     }
     """
+    # 緩存（性能優化 F-043）：避免每次掃描都調用 pi --version
+    cached = _read_version_cache()
+    if cached:
+        return cached
+
     # Windows 下需使用 shell=True 才能解析 .CMD 擴展名
     # Linux/Mac 直接執行二進制
     use_shell = sys.platform.startswith("win")
@@ -74,12 +80,14 @@ def get_pi_version() -> Dict:
         )
         output = (result.stdout + result.stderr).strip()
         version_str = output.split("\n")[0] if output else ""
-        return {
+        info = {
             "available": True,
             "version": version_str,
             "parsed": _parse_version(version_str),
             "error": "",
         }
+        _write_version_cache(info)
+        return info
     except FileNotFoundError:
         return {
             "available": False,
@@ -101,6 +109,51 @@ def get_pi_version() -> Dict:
             "parsed": (0, 0, 0),
             "error": str(e),
         }
+
+
+def _version_cache_path() -> Path:
+    """版本緩存文件路徑"""
+    cache_dir = Path.home() / ".skill-safety-guard"
+    return cache_dir / "pi_version.json"
+
+
+def _read_version_cache() -> Optional[Dict]:
+    """讀取版本緩存（1 小時內有效）"""
+    try:
+        cache_path = _version_cache_path()
+        if not cache_path.exists():
+            return None
+        import json as _json
+        data = _json.loads(cache_path.read_text(encoding="utf-8"))
+        # 檢查是否過期（1 小時）
+        if time.time() - data.get("cached_at", 0) > 3600:
+            return None
+        return {
+            "available": data.get("available", False),
+            "version": data.get("version", ""),
+            "parsed": tuple(data.get("parsed", [0, 0, 0])),
+            "error": data.get("error", ""),
+        }
+    except Exception:
+        return None
+
+
+def _write_version_cache(info: Dict) -> None:
+    """寫入版本緩存"""
+    try:
+        import json as _json
+        cache_path = _version_cache_path()
+        cache_path.parent.mkdir(parents=True, exist_ok=True)
+        data = {
+            "available": info.get("available", False),
+            "version": info.get("version", ""),
+            "parsed": list(info.get("parsed", (0, 0, 0))),
+            "error": info.get("error", ""),
+            "cached_at": time.time(),
+        }
+        cache_path.write_text(_json.dumps(data), encoding="utf-8")
+    except Exception:
+        pass
 
 
 def check_pi_version() -> Dict:

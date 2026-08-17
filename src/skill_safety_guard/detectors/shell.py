@@ -11,11 +11,7 @@ class ShellDetector(BaseDetector):
 
     def detect_file(self, file_path: Path, content: str) -> List[Finding]:
         findings = []
-        for rule in self.rules:
-            try:
-                pattern = re.compile(rule["pattern"])
-            except re.error:
-                continue
+        for rule, pattern in self._iter_compiled_rules():
             for line_no, line in enumerate(content.splitlines(), start=1):
                 if line_no > 5000:
                     break
