@@ -139,8 +139,12 @@ def _infer_tools_from_command(command: str) -> List[Dict]:
     return inferred
 
 
-def check_mcp_directory(directory: Path, rules: List[Dict]) -> Dict:
+def check_mcp_directory(directory: Path, rules: List[Dict], extra_rules: List[Dict] = None) -> Dict:
     """檢查目錄中的 MCP 配置
+
+    參數：
+    - rules: 基礎 MCP 規則（mcp.yaml）
+    - extra_rules: 額外規則（如 mcp_injection.yaml 的注入模式）
 
     返回：
     {
@@ -151,22 +155,22 @@ def check_mcp_directory(directory: Path, rules: List[Dict]) -> Dict:
         "risk_summary": {SHELL: n, FILE: n, ...}
     }
     """
-    import re as _re
-
     result = {
         "configs_found": 0,
         "servers": [],
         "tools": [],
         "findings": [],
         "risk_summary": {},
+        "transport_check": {},
         "scan_target": str(directory),
     }
 
     configs = find_mcp_configs(directory)
     result["configs_found"] = len(configs)
 
+    all_rules = list(rules) + list(extra_rules or [])
     compiled_rules = []
-    for rule in rules:
+    for rule in all_rules:
         try:
             compiled_rules.append((rule, re.compile(rule["pattern"], re.IGNORECASE)))
         except re.error:
@@ -192,7 +196,7 @@ def check_mcp_directory(directory: Path, rules: List[Dict]) -> Dict:
         servers = extract_servers(config)
         result["servers"].extend(servers)
 
-        # 對每個 server 的配置字符串做規則掃描
+        # 對每個 server 的配置字符串做規則掃描（含注入模式）
         config_text = json.dumps(config, ensure_ascii=False)
         for rule, pattern in compiled_rules:
             for match in pattern.finditer(config_text):
@@ -201,13 +205,20 @@ def check_mcp_directory(directory: Path, rules: List[Dict]) -> Dict:
                     "rule_name": rule["name"],
                     "severity": rule.get("severity", "medium"),
                     "confidence": rule.get("confidence", "medium"),
-                    "category": "mcp",
+                    "category": rule.get("category", "mcp"),
                     "description": rule.get("description", ""),
                     "remediation": rule.get("remediation", ""),
                     "file_path": str(config_path),
                     "line_number": 1,
                     "matched_text": match.group(0)[:80],
                 })
+
+        # F-040: 傳輸安全檢查
+        transport = _check_transport_security(config, config_path)
+        for finding in transport:
+            result["findings"].append(finding)
+        if transport:
+            result["transport_check"][str(config_path)] = len(transport)
 
         # 枚舉工具並分類
         tools = extract_tools_from_servers(servers)
@@ -218,6 +229,75 @@ def check_mcp_directory(directory: Path, rules: List[Dict]) -> Dict:
             result["risk_summary"][classification] = result["risk_summary"].get(classification, 0) + 1
 
     return result
+
+
+def _check_transport_security(config: Dict, config_path: Path) -> List[Dict]:
+    """F-040: MCP 傳輸安全檢查
+
+    檢查：
+    - 明文 HTTP（非 HTTPS）
+    - 內網地址 / 雲元數據
+    - 未加密的 stdio（默認安全，檢查配置）
+    - 混合傳輸（部分加密部分明文）
+    """
+    findings = []
+
+    for name, server in config.get("mcpServers", {}).items():
+        if not isinstance(server, dict):
+            continue
+
+        url = server.get("url", "")
+        transport = server.get("transport", "")
+
+        # 明文 HTTP
+        if isinstance(url, str) and url.startswith("http://"):
+            findings.append({
+                "rule_id": "mcp-transport-http",
+                "rule_name": f"服務器 {name} 使用明文 HTTP",
+                "severity": "high",
+                "confidence": "high",
+                "category": "mcp",
+                "description": f"MCP 服務器 {name} 使用明文 HTTP（無 TLS 加密）",
+                "remediation": "改用 HTTPS 或 stdio",
+                "file_path": str(config_path),
+                "line_number": 1,
+                "matched_text": url[:80],
+            })
+
+        # 內網地址 / 雲元數據
+        if isinstance(url, str):
+            lower = url.lower()
+            if any(k in lower for k in ["169.254.169.254", "metadata.google", "100.100.100.200",
+                                         "127.0.0.1", "localhost"]):
+                findings.append({
+                    "rule_id": "mcp-transport-internal",
+                    "rule_name": f"服務器 {name} 指向內網/元數據地址",
+                    "severity": "critical",
+                    "confidence": "high",
+                    "category": "mcp",
+                    "description": f"MCP 服務器 {name} 連接內網或雲元數據地址（SSRF 風險）",
+                    "remediation": "禁止訪問內網/元數據地址",
+                    "file_path": str(config_path),
+                    "line_number": 1,
+                    "matched_text": url[:80],
+                })
+
+        # 混合傳輸（HTTP + HTTPS 共存）
+        if isinstance(transport, str) and transport.lower() not in ["", "stdio", "sse", "streamable-http", "http"]:
+            findings.append({
+                "rule_id": "mcp-transport-unknown",
+                "rule_name": f"服務器 {name} 使用未知傳輸方式",
+                "severity": "low",
+                "confidence": "medium",
+                "category": "mcp",
+                "description": f"傳輸方式 {transport} 不在已知列表（stdio/sse/streamable-http/http）",
+                "remediation": "確認傳輸方式安全性",
+                "file_path": str(config_path),
+                "line_number": 1,
+                "matched_text": transport[:80],
+            })
+
+    return findings
 
 
 def format_mcp_report(mcp_result: Dict) -> str:

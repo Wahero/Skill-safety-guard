@@ -58,7 +58,7 @@ rules:
 
   - id: mcp-tool-shell
     name: MCP 工具名暗示 shell 操作
-    pattern: "(?i)(exec|shell|bash|zsh|command|run_cmd|system|terminal)"
+    pattern: "(?i)(exec|shell|bash|zsh|run_cmd|run_command|system_cmd|terminal|spawn|execute_command)"
     severity: high
     confidence: medium
     category: mcp
@@ -67,7 +67,7 @@ rules:
 
   - id: mcp-tool-file-write
     name: MCP 工具名暗示文件寫入
-    pattern: "(?i)(write_file|create_file|append_file|delete_file|remove_file|mv|cp|edit_file|save)"
+    pattern: "(?i)(write_file|create_file|append_file|delete_file|remove_file|edit_file|copy_file|move_file|save_file)"
     severity: high
     confidence: medium
     category: mcp
@@ -123,7 +123,7 @@ rules:
 
   - id: mcp-resource-root
     name: MCP 資源指向根目錄/系統目錄
-    pattern: "(/etc/|/usr/|/var/|C:\\\\Windows|/system|/boot/)"
+    pattern: "(/etc/|/usr/(?!local|share)|/var/(?!lib|log|tmp)|/system/|/boot/)"
     severity: critical
     confidence: high
     category: mcp
@@ -132,7 +132,7 @@ rules:
 
   - id: mcp-resource-all-files
     name: MCP 資源指向整個文件系統
-    pattern: "(?i)(file:///|/.*|\\\\\\\\|all\\s+files|entire\\s+system)"
+    pattern: "(?i)(all[ ]+files|entire[ ]+system|read[ ]+any[ ]+file)"
     severity: high
     confidence: medium
     category: mcp

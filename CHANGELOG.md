@@ -4,6 +4,34 @@ All notable changes to skill-safety-guard will be documented in this file.
 
 ## [Unreleased]
 
+## [3.0.0] - 2026-08-17
+
+### Added (v3.0.0 / Phase 3)
+**MCP 注入模式檢測（F-039）**：
+- 22 條注入模式規則
+- SQL 注入（7 種：拼接/UNION/注釋/引號逃逸/時間盲注/堆疊/報錯）
+- 命令注入（7 種：分號/子命令/管道/參數/env讀取/寫後執行/SSRF）
+- 路徑遍歷（5 種：../、編碼/絕對路徑/符號鏈接/敏感文件）
+- 邏輯注入（3 種：認證繞過/權限覆蓋/競態）
+
+**MCP 傳輸安全（F-040）**：
+- 明文 HTTP 檢測
+- 內網/雲元數據地址（SSRF）
+- 未知傳輸方式
+
+**LLM 輔助提示詞注入檢測（F-037，Pro 限定）**：
+- --pro 參數（需 Pro 許可證）
+- 支持 DeepSeek API / OpenAI API / Pi auth.json key
+- 識別 5 類注入：直接/隱式/多步/數據外泄/持久化
+- 結果併入 Markdown（第四層）/ JSON / SARIF
+
+### 規則總數
+v1.6.0: 158 → v3.0.0: **181**（+23）
+
+### Tests
+- MCP 乾淨 fixture：0 誤報（修復 mcp-tool-file-write 等過寬規則）
+- 全部 15 個 fixtures 通過
+
 ## [1.6.0] - 2026-08-17
 
 ### Added (v1.6.0)

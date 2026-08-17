@@ -1,0 +1,224 @@
+# skill-safety-guard 規則庫：MCP 注入模式檢測（F-039）
+#
+# 22 種 MCP 注入模式（參考 mcp-security-audit）
+# 分四類：
+#   - SQL 注入（7 種）
+#   - 命令注入（7 種）
+#   - 路徑遍歷（5 種）
+#   - 邏輯注入（3 種）
+#
+# 這些模式同時檢測：
+#   1. MCP 工具描述中的注入意圖
+#   2. MCP 配置中的可疑參數
+#   3. 工具名暗示的注入能力
+
+rules:
+  # === SQL 注入 ===
+
+  - id: mcp-sql-concat
+    name: SQL 字符串拼接（注入風險）
+    pattern: "(?i)(SELECT|INSERT|UPDATE|DELETE)\\s+.*\\+\\s*['\"\"]|f(['\"\"]SELECT\\s+)|\\$\\{.*\\}\\s*(WHERE|ORDER BY)"
+    severity: critical
+    confidence: high
+    category: mcp_injection
+    description: |
+      SQL 查詢使用字符串拼接（而非參數化查詢）。
+      工具描述或配置中出現此模式 = 存在 SQL 注入風險。
+    remediation: 使用參數化查詢 / prepared statements
+
+  - id: mcp-sql-union
+    name: SQL UNION 注入
+    pattern: "(?i)\\bUNION\\s+(ALL\\s+)?SELECT\\b"
+    severity: critical
+    confidence: high
+    category: mcp_injection
+    description: UNION SELECT 是經典 SQL 注入載體
+    remediation: 檢查是否存在此工具的查詢構造
+
+  - id: mcp-sql-comment-inject
+    name: SQL 注釋注入
+    pattern: "(?i)(SELECT|WHERE|AND|OR)\\s+.*['\\\"]\\s*(--|#|/\\*)"
+    severity: high
+    confidence: medium
+    category: mcp_injection
+    description: 使用 SQL 注釋（--、#、/*）截斷查詢（注釋注入）
+    remediation: 參數化所有查詢
+
+  - id: mcp-sql-quote
+    name: SQL 單引號逃逸
+    pattern: "(?i)(['\\\"]\\s*(OR|AND)\\s+['\\\"]1['\\\"]\\s*=\\s*['\\\"]1|'\\s*OR\\s*'1'\\s*=\\s*'1)"
+    severity: critical
+    confidence: high
+    category: mcp_injection
+    description: 經典 ' OR '1'='1 認證繞過模式
+    remediation: 參數化查詢 + 輸入驗證
+
+  - id: mcp-sql-time-blind
+    name: SQL 時間盲注
+    pattern: "(?i)(SLEEP|BENCHMARK|pg_sleep|WAITFOR\\s+DELAY)\\s*\\("
+    severity: high
+    confidence: high
+    category: mcp_injection
+    description: 時間延遲函數（SQL 時間盲注）
+    remediation: 輸入驗證 + 參數化
+
+  - id: mcp-sql-stack
+    name: SQL 堆疊查詢
+    pattern: "(?i)(SELECT|INSERT|UPDATE|DELETE)\\s+[^;]+;\\s*(SELECT|INSERT|UPDATE|DELETE|DROP|ALTER|CREATE)"
+    severity: critical
+    confidence: high
+    category: mcp_injection
+    description: 堆疊查詢（多條 SQL 語句）
+    remediation: 禁止多語句查詢
+
+  - id: mcp-sql-error-based
+    name: SQL 報錯注入
+    pattern: "(?i)(extractvalue|updatexml|exp\\s*\\(|gtid_subset|GTID\\s*\\()"
+    severity: medium
+    confidence: medium
+    category: mcp_injection
+    description: 報錯注入函數（MySQL）
+    remediation: 隱藏錯誤信息 + 參數化
+
+  # === 命令注入 ===
+
+  - id: mcp-cmd-semicolon
+    name: Shell 命令拼接（分號）
+    pattern: "(?i)(exec|system|shell|run|`)\\s*\\(?[^)]*;[^)]*\\)|(;\\s*|&&\\s*|\\|\\|\\s*)(rm|curl|wget|nc|bash|sh|python|node|powershell)"
+    severity: critical
+    confidence: high
+    category: mcp_injection
+    description: 命令拼接（分號/&&/|| 連接多命令）
+    remediation: 禁止拼接 shell 命令
+
+  - id: mcp-cmd-subshell
+    name: Shell 子命令替換
+    pattern: "\\$\\([^)]*\\)|`[^`]*`"
+    severity: critical
+    confidence: high
+    category: mcp_injection
+    description: 子命令替換（$(...)、反引號）——命令注入載體
+    remediation: 禁止 shell 命令拼接
+
+  - id: mcp-cmd-pipe-exec
+    name: 管道到執行
+    pattern: "(?i)\\|\\s*(bash|sh|python|node|perl|ruby|php)"
+    severity: critical
+    confidence: high
+    category: mcp_injection
+    description: 管道輸出到解釋器執行
+    remediation: 立即拒絕
+
+  - id: mcp-cmd-args-inject
+    name: 參數注入
+    pattern: "(?i)(--eval|--execute|-e\\s+['\"\"]|--command|-c\\s+['\"\"]).*(rm|curl|wget|nc|cat\\s+/etc)"
+    severity: high
+    confidence: medium
+    category: mcp_injection
+    description: 通過參數執行命令（-c / -e / --exec）
+    remediation: 確認參數來源可信
+
+  - id: mcp-cmd-env-read
+    name: 讀取環境變量後執行
+    pattern: "(?i)(read|get|fetch)\\s*(env|environment|ENV|credential|secret).*(exec|run|system|eval)"
+    severity: critical
+    confidence: medium
+    category: mcp_injection
+    description: 讀取憑證/環境變量後執行（憑證外洩 + 命令執行）
+    remediation: 立即拒絕
+
+  - id: mcp-cmd-write-exec
+    name: 寫文件後執行
+    pattern: "(?i)(write|create|save|dump).*(to|->)\\s*[^;]*;.*(exec|run|source|include|require)"
+    severity: high
+    confidence: medium
+    category: mcp_injection
+    description: 寫入文件後執行（WebShell 模式）
+    remediation: 檢查文件寫入目標
+
+  - id: mcp-cmd-http-ssrf
+    name: HTTP 請求到內網/雲元數據
+    pattern: "(?i)(http|https|fetch|request).*(169\\.254\\.169\\.254|metadata\\.google\\.internal|100\\.100\\.100\\.200|localhost|127\\.0\\.0\\.1)"
+    severity: critical
+    confidence: high
+    category: mcp_injection
+    description: |
+      SSRF 風險：請求雲元數據服務（169.254.169.254）
+      或內網地址。可用於竊取雲憑證。
+    remediation: 禁止訪問元數據服務/內網地址
+
+  # === 路徑遍歷 ===
+
+  - id: mcp-traversal-dotdot
+    name: 路徑遍歷（../）
+    pattern: "(?i)(\\.\\./|\\.\\.\\\\|%2e%2e%2f|%2e%2e%5c)"
+    severity: critical
+    confidence: high
+    category: mcp_injection
+    description: 路徑遍歷（../ 逃逸到上級目錄）
+    remediation: 規範化路徑 + 禁止 ../
+
+  - id: mcp-traversal-encoded
+    name: 編碼路徑遍歷
+    pattern: "(?i)(%2e%2e|%252e|%c0%ae|%e0%80%ae)"
+    severity: critical
+    confidence: high
+    category: mcp_injection
+    description: 編碼的路徑遍歷（繞過過濾）
+    remediation: 雙重解碼檢查 + 路徑規範化
+
+  - id: mcp-traversal-abs
+    name: 絕對路徑訪問
+    pattern: "(?i)(file:///|C:\\\\|/etc/|/root/|/home/)"
+    severity: high
+    confidence: medium
+    category: mcp_injection
+    description: 絕對路徑訪問系統目錄
+    remediation: 限制文件訪問根目錄
+
+  - id: mcp-traversal-symlink
+    name: 符號鏈接逃逸
+    pattern: "(?i)(symlink|readlink|realpath).*(outside|escape|../../)"
+    severity: medium
+    confidence: medium
+    category: mcp_injection
+    description: 符號鏈接逃逸文件沙箱
+    remediation: 禁止創建/跟隨外部符號鏈接
+
+  - id: mcp-traversal-sensitive
+    name: 遍歷到敏感文件
+    pattern: "(?i)(\\.\\./.*(passwd|shadow|ssh|aws|env|credential|token|auth)|\\b/etc/passwd\\b)"
+    severity: critical
+    confidence: high
+    category: mcp_injection
+    description: 路徑遍歷指向敏感文件
+    remediation: 立即拒絕
+
+  # === 邏輯注入 ===
+
+  - id: mcp-logic-auth-bypass
+    name: 認證繞過邏輯
+    pattern: "(?i)(bypass|skip|disable|ignore)\\s+(auth|authentication|login|token|credential|permission|access)\\s*(check|verification|validation)?"
+    severity: critical
+    confidence: high
+    category: mcp_injection
+    description: 認證/權限檢查繞過邏輯
+    remediation: 立即拒絕
+
+  - id: mcp-logic-permission-override
+    name: 權限覆蓋
+    pattern: "(?i)(override|escalate|elevate|grant|force)\\s+(permission|privilege|admin|root|sudo|access)"
+    severity: critical
+    confidence: high
+    category: mcp_injection
+    description: 權限提升/覆蓋邏輯
+    remediation: 立即拒絕
+
+  - id: mcp-logic-race
+    name: 競態條件利用
+    pattern: "(?i)(TOCTOU|race\\s+condition|check.*then.*(write|delete|chmod)|access.*open)"
+    severity: medium
+    confidence: low
+    category: mcp_injection
+    description: 檢查後使用（TOCTOU）競態條件
+    remediation: 原子操作

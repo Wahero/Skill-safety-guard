@@ -49,4 +49,6 @@ def load_all_rules() -> Dict[str, List[Dict]]:
         "critical_paths": load_rules_file("critical_paths.yaml"),
         "installed_extensions": load_rules_file("installed_extensions.yaml"),
         "prompt_injection": load_rules_file("prompt_injection.yaml"),
+        "mcp": load_rules_file("mcp.yaml"),
+        "mcp_injection": load_rules_file("mcp_injection.yaml"),
     }

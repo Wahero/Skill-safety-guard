@@ -64,6 +64,7 @@ def parse_args(argv=None):
     parser.add_argument("--generate-pro-key", action="store_true", help="生成測試用 Pro 密鑰")
     parser.add_argument("--license-status", action="store_true", help="顯示許可證狀態")
     parser.add_argument("--audit-extensions", action="store_true", help="掃描已安裝擴展目錄")
+    parser.add_argument("--pro", action="store_true", help="啟用 Pro 功能（LLM 輔助檢測）")
     return parser.parse_args(argv)
 
 
@@ -386,7 +387,7 @@ def _run_scan(args, target: Path, resolved: ScanTarget) -> int:
     pi_check["auth_check"] = check_auth_permissions()
     progress("完成 Pi 全局檢查")
 
-    # --all 模式：增加 MCP 依賴檢查（F-029~F-032）
+    # --all 模式：增加 MCP 依賴檢查（F-029~F-032 + F-039/F-040）
     mcp_result = None
     if args.all:
         progress("正在檢查 MCP 依賴...")
@@ -394,8 +395,30 @@ def _run_scan(args, target: Path, resolved: ScanTarget) -> int:
         from .rules_loader import load_rules_file
 
         mcp_rules = load_rules_file("mcp.yaml")
-        mcp_result = check_mcp_directory(target, mcp_rules)
+        mcp_injection_rules = load_rules_file("mcp_injection.yaml")
+        mcp_result = check_mcp_directory(target, mcp_rules, mcp_injection_rules)
         progress(f"完成 MCP 檢查（{len(mcp_result['findings'])} 個發現，{len(mcp_result['tools'])} 個工具）")
+
+    # Pro 模式：LLM 輔助提示詞注入檢測（F-037）
+    llm_result = None
+    if args.pro:
+        # 檢查許可證
+        lic = load_license()
+        if not lic.is_pro():
+            print("  [PRO] LLM 輔助檢測需要 Pro 許可證")
+            print("  生成測試密鑰: safety-check --generate-pro-key")
+        else:
+            progress("正在執行 LLM 輔助提示詞注入檢測...")
+            from .llm_check import llm_check_skill_file, format_llm_report
+
+            # 掃描目標中的 SKILL.md
+            skill_md = target / "SKILL.md" if target.is_dir() else target
+            if skill_md and skill_md.exists():
+                llm_result = llm_check_skill_file(skill_md)
+                if llm_result.get("analyzed"):
+                    progress(f"完成 LLM 檢測（{len(llm_result.get('findings', []))} 個發現）")
+                elif not llm_result.get("llm_available"):
+                    progress("LLM 不可用（未配置 DEEPSEEK_API_KEY）")
 
     # 應用置信度過濾（F-015）
     if args.min_confidence != "low":
@@ -436,6 +459,9 @@ def _run_scan(args, target: Path, resolved: ScanTarget) -> int:
         # MCP 結果併入 JSON（F-032）
         if mcp_result:
             output["mcp_check"] = mcp_result
+        # LLM 結果併入 JSON（F-037）
+        if llm_result:
+            output["llm_check"] = llm_result
         print(json.dumps(output, ensure_ascii=False, indent=2))
     elif args.output == "sarif":
         all_finding_dicts = []
@@ -458,6 +484,21 @@ def _run_scan(args, target: Path, resolved: ScanTarget) -> int:
         if mcp_result:
             for f in mcp_result["findings"]:
                 all_finding_dicts.append(f)
+        # LLM findings 也併入 SARIF
+        if llm_result:
+            for f in llm_result.get("findings", []):
+                all_finding_dicts.append({
+                    "rule_id": f"llm-{f.get('type', 'finding')}",
+                    "rule_name": f.get("description", "LLM finding")[:60],
+                    "severity": {"high": "critical", "medium": "high", "low": "medium"}.get(f.get("confidence"), "medium"),
+                    "confidence": f.get("confidence", "medium"),
+                    "category": "llm_injection",
+                    "description": f.get("description", ""),
+                    "remediation": f.get("remediation", ""),
+                    "file_path": str(target),
+                    "line_number": 1,
+                    "matched_text": f.get("location", "")[:80],
+                })
         print(findings_to_sarif_string(all_finding_dicts, str(target)))
     else:
         report = generate_report(str(target), pi_check, skill_results, overall_grade)
@@ -465,6 +506,10 @@ def _run_scan(args, target: Path, resolved: ScanTarget) -> int:
         if mcp_result:
             from .mcp_check import format_mcp_report
             report = report + "\n---\n\n## 第三層：MCP 依賴檢查\n\n" + format_mcp_report(mcp_result)
+        # LLM 報告併入 Markdown（F-037）
+        if llm_result:
+            from .llm_check import format_llm_report
+            report = report + "\n---\n\n## 第四層：LLM 輔助檢測（Pro）\n\n" + format_llm_report(llm_result)
         decision_block = format_decision_block(resolved.display_name, decision)
         report = decision_block + report
         if args.confidence_detail:
