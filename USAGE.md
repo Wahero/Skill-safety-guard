@@ -287,8 +287,14 @@ python scripts/safety-check --vuln-frequency weekly   # 每周（默认）
 python scripts/safety-check --vuln-frequency monthly  # 每月
 python scripts/safety-check --vuln-frequency off      # 关闭
 
-# 查看漏洞库状态（含频率和下次检查时间）
+# 查看漏洞库状态（数量/更新日期/本地缓存/漏洞清单）
 python scripts/safety-check --vuln-status
+# 输出：
+#   📊 漏洞条目: 3
+#   🕐 数据库更新日期: 2026-08-17
+#   ⏱ 本地最后检查: 2026-08-17 21:08
+#   💾 本地缓存文件: 存在（2026-08-17 21:08）
+#   🎯 漏洞清单: CVE-2026-54326, CVE-2026-54327, CVE-2026-54328
 ```
 
 ### 手动更新漏洞库

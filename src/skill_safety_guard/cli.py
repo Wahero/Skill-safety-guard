@@ -402,17 +402,44 @@ def main(argv=None):
 
     # 查看漏洞庫狀態
     if args.vuln_status:
-        from .vuln_feed import get_vuln_source_info, get_frequency, get_ttl, _read_update_meta
+        from .vuln_feed import (
+            get_vuln_source_info, get_frequency, get_ttl, _read_update_meta,
+            get_all_cves, load_vulnerabilities,
+        )
         info = get_vuln_source_info()
         print("\n[VULN STATUS] 漏洞庫狀態")
-        print(f"  漏洞條目: {info['count']}")
-        print(f"  來源: {info['source']}")
-        print(f"  上次更新: {info['last_updated']}")
-        print(f"  更新頻率: {info['frequency']}（TTL: {get_ttl() // 3600} 小時）")
+        print(f"  📊 漏洞條目: {info['count']}")
+        print(f"  📡 數據來源: {info['source']}")
+        print(f"  🕐 數據庫更新日期: {info['last_updated']}")
+        print(f"  🔄 自動更新頻率: {info['frequency']}（TTL: {get_ttl() // 3600} 小時）")
+
+        # 本地緩存最後檢查時間
         meta = _read_update_meta()
         if meta:
-            last = time.strftime('%Y-%m-%d %H:%M', time.localtime(meta.get('last_update', 0)))
-            print(f"  上次自動檢查: {last}")
+            last_check = time.strftime('%Y-%m-%d %H:%M', time.localtime(meta.get('last_update', 0)))
+            print(f"  ⏱ 本地最後檢查: {last_check}")
+        else:
+            print(f"  ⏱ 本地最後檢查: 從未（使用內置/緩存庫）")
+
+        # 本地緩存狀態
+        from .vuln_feed import LOCAL_VULNS_CACHE
+        if LOCAL_VULNS_CACHE.exists():
+            mtime = time.strftime('%Y-%m-%d %H:%M', time.localtime(LOCAL_VULNS_CACHE.stat().st_mtime))
+            print(f"  💾 本地緩存文件: 存在（{mtime}）")
+        else:
+            print(f"  💾 本地緩存文件: 無（使用內置庫）")
+
+        # 漏洞 ID 預覽
+        all_cves = get_all_cves()
+        if all_cves:
+            ids = [c.get('cve_id', '?') for c in all_cves]
+            print(f"  🎯 漏洞清單: {', '.join(ids)}")
+
+        # 到期提示
+        meta2 = _read_update_meta()
+        if meta2 and time.time() - meta2.get('last_update', 0) > get_ttl():
+            print()
+            print("  ⚠️ 漏洞庫已過期，建議執行: safety-check --update-vulns")
         print()
         return 0
 
