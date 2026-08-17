@@ -264,29 +264,62 @@ def generate_report(
     lines.append("---")
     lines.append("")
 
-    # 📌 掃描結論（尾段重點：誤報判定 + 最終建議）
+    # 📌 掃描結論（三部分：① 文字結論 + ② 結論說明 + ③ 漏洞數字卡片）
     lines.append("## 📌 掃描結論")
     lines.append("")
-    lines.append("### 誤報判定")
+
+    # ---- ① 文字結論 ----
+    if overall_grade in ["A", "B"]:
+        conclusion_text = "✅ 可以安裝：未發現需要阻擋安裝的風險項"
+    elif overall_grade == "C":
+        conclusion_text = "⚠️ 人工複查後可安裝：存在中風險發現，建議逐一確認後再決定"
+    elif overall_grade in ["D", "E"]:
+        conclusion_text = "🚫 不建議安裝：存在較高/高風險發現，需先解決"
+    else:
+        conclusion_text = "🚫 強烈建議不要安裝：風險等級過高"
+    lines.append("### ① 文字結論")
+    lines.append("")
+    lines.append(f"> **{grade_meaning.get(overall_grade, '?')}**（綜合等級 {overall_grade}）")
+    lines.append(">")
+    lines.append(f"> {conclusion_text}")
+    lines.append("")
+
+    # ---- ② 結論說明 ----
+    lines.append("### ② 結論說明")
+    lines.append("")
+    cat_stats = {}
+    for f in real_findings:
+        cat_stats[f.category] = cat_stats.get(f.category, 0) + 1
+    if cat_stats:
+        top_cat = max(cat_stats, key=cat_stats.get)
+        top_cat_name = category_names.get(top_cat, top_cat)
+        lines.append(f"- 掃描 {total_files} 個檔案，共 **{len(real_findings)} 個有效發現**（另有 {len(fp_findings)} 個誤報已排除）")
+        lines.append(f"- 主要風險來源：**{top_cat_name}**（{cat_stats[top_cat]} 個）")
+        if len(cat_stats) > 1:
+            others = ", ".join(
+                f"{category_names.get(c, c)} {n}"
+                for c, n in sorted(cat_stats.items(), key=lambda x: -x[1])[1:]
+            )
+            lines.append(f"- 其他風險類別：{others}")
+    else:
+        lines.append(f"- 掃描 {total_files} 個檔案，未發現有效風險（{len(fp_findings)} 個誤報已排除）")
     if fp_findings:
-        lines.append(f"- ✅ **{len(fp_findings)} 個發現判定為誤報**（已自動識別，不計入風險評分）：")
-        lines.append("")
+        lines.append(f"- 誤報說明：{len(fp_findings)} 個發現判定為誤報（環境變數讀取等安全模式），不影響結論：")
         for f in fp_findings:
             lines.append(f"  - `{f.rule_id}` @ {Path(f.file_path).name}:{f.line_number} — {f.fp_reason}")
-    else:
-        lines.append("- ℹ️ 未發現誤報模式（所有發現均按實際風險計入）")
     lines.append("")
-    lines.append("### 最終建議")
-    if overall_grade in ["A", "B"]:
-        lines.append("- ✅ **可以安裝**：未發現需要阻擋安裝的風險項")
-    elif overall_grade == "C":
-        lines.append("- ⚠️ **人工複查後可安裝**：存在中風險發現，建議逐一確認後再決定")
-    elif overall_grade in ["D", "E"]:
-        lines.append("- 🚫 **不建議安裝**：存在較高/高風險發現，需先解決")
-    else:
-        lines.append("- 🚫 **強烈建議不要安裝**：風險等級過高")
-    if fp_findings:
-        lines.append(f"- 💡 已判定的 {len(fp_findings)} 個誤報（如環境變數讀取等安全模式）不影響安裝決定")
+
+    # ---- ③ 漏洞數字卡片 ----
+    lines.append("### ③ 漏洞數字卡片")
+    lines.append("")
+    lines.append("| 嚴重度 | 數量 |")
+    lines.append("|--------|:----:|")
+    lines.append(f"| 🔴 Critical | {critical} |")
+    lines.append(f"| 🟠 High | {high} |")
+    lines.append(f"| 🟡 Medium | {medium} |")
+    lines.append(f"| 🟢 Low | {low} |")
+    lines.append(f"| ✅ 誤報（已排除） | {len(fp_findings)} |")
+    lines.append(f"| **合計有效發現** | **{len(real_findings)}** |")
     lines.append("")
     lines.append("---")
     lines.append("")
