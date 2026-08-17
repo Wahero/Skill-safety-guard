@@ -208,7 +208,8 @@ def get_vuln_source_info() -> Dict:
     """獲取漏洞庫狀態"""
     data = load_vulnerabilities()
     return {
-        "source": data.get("_source_repo", "unknown"),
+        # 兼容：OSV 更新寫 _source，遠程源寫 _source_repo
+        "source": data.get("_source") or data.get("_source_repo", "unknown"),
         "last_updated": data.get("_last_updated", "unknown"),
         "count": len(data.get("vulnerabilities", [])),
         "schema": data.get("_schema_version", "unknown"),
@@ -218,12 +219,15 @@ def get_vuln_source_info() -> Dict:
 
 # ============ 權威源拉取（OSV.dev + GitHub Advisory） ============
 
-def _osv_query(package: str, version: Optional[str] = None) -> Optional[Dict]:
+def _osv_query(package: str, version: Optional[str] = None, ecosystem: str = "npm") -> Optional[Dict]:
     """查詢 OSV.dev（權威源，自動排除 withdrawn）
+
+    注意：OSV.dev 的 query 必須包含 ecosystem 字段，否則返回 400 invalid query。
 
     返回：(data, source_name)
     """
-    payload = {"package": {"name": package}}
+    # 帶 ecosystem 的包查詢（OSV 要求）
+    payload = {"package": {"name": package, "ecosystem": ecosystem}}
     if version:
         payload["version"] = version
 
@@ -387,7 +391,7 @@ def fetch_authoritative_vulns() -> Optional[List[Dict]]:
     """
     findings = []
     for pkg in TRACKED_PACKAGES:
-        result = _osv_query(pkg["name"])
+        result = _osv_query(pkg["name"], ecosystem=pkg.get("type", "npm"))
         if not result:
             continue
         for v in result.get("vulns", []):
