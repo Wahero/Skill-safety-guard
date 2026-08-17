@@ -48,3 +48,7 @@ coverage/
 .pi-session/
 agent-output/
 artifacts-*/
+# 扫描报告（保留本地，不上传 GitHub）
+SCAN_REPORT_*.md
+scan-*.md
+scan-*.json
