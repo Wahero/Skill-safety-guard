@@ -68,6 +68,8 @@ def parse_args(argv=None):
     parser.add_argument("--pro", action="store_true", help="啟用 Pro 功能（LLM 輔助檢測）")
     parser.add_argument("--update-vulns", action="store_true", help="更新漏洞庫（每日漏洞情報）")
     parser.add_argument("--osv", action="store_true", help="啟用 OSV.dev 實時漏洞查詢")
+    parser.add_argument("--vuln-frequency", choices=["daily", "weekly", "monthly", "off"], help="設置漏洞庫自動更新頻率")
+    parser.add_argument("--vuln-status", action="store_true", help="查看漏洞庫狀態")
     return parser.parse_args(argv)
 
 
@@ -338,15 +340,44 @@ def main(argv=None):
     # 更新漏洞庫（每日漏洞情報）
     if args.update_vulns:
         from .vuln_feed import update_vulnerabilities, get_vuln_source_info
-        print("\n[VULN UPDATE] 檢查漏洞庫更新...")
+        print("\n[VULN UPDATE] 從權威源（OSV.dev）更新漏洞庫...")
         result = update_vulnerabilities(force=True)
         print(f"  狀態: {'✅ 已更新' if result.get('updated') else '⏭ 未更新'}")
         print(f"  原因: {result.get('reason', 'ok')}")
         if result.get('count'):
             print(f"  漏洞條目: {result['count']}")
+        if result.get('frequency'):
+            print(f"  更新頻率: {result['frequency']}")
         info = get_vuln_source_info()
         print(f"  當前來源: {info['source']}（更新於 {info['last_updated']}）")
         print(f"  當前規則: {info['count']} 條\n")
+        return 0
+
+    # 設置漏洞庫更新頻率
+    if args.vuln_frequency:
+        from .vuln_feed import set_frequency
+        result = set_frequency(args.vuln_frequency)
+        if result.get("ok"):
+            print(f"\n[VULN FREQUENCY] 更新頻率已設置為: {result['frequency']}")
+            print(f"  說明: {'每天' if result['frequency']=='daily' else '每週' if result['frequency']=='weekly' else '每月' if result['frequency']=='monthly' else '關閉'}自動更新漏洞庫\n")
+        else:
+            print(f"\n[ERROR] {result.get('error', '設置失敗')}\n")
+        return 0
+
+    # 查看漏洞庫狀態
+    if args.vuln_status:
+        from .vuln_feed import get_vuln_source_info, get_frequency, get_ttl, _read_update_meta
+        info = get_vuln_source_info()
+        print("\n[VULN STATUS] 漏洞庫狀態")
+        print(f"  漏洞條目: {info['count']}")
+        print(f"  來源: {info['source']}")
+        print(f"  上次更新: {info['last_updated']}")
+        print(f"  更新頻率: {info['frequency']}（TTL: {get_ttl() // 3600} 小時）")
+        meta = _read_update_meta()
+        if meta:
+            last = time.strftime('%Y-%m-%d %H:%M', time.localtime(meta.get('last_update', 0)))
+            print(f"  上次自動檢查: {last}")
+        print()
         return 0
 
     # 解析掃描目標（F-007 殺手場景：支援 URL/粘貼）
@@ -393,6 +424,13 @@ def _run_scan(args, target: Path, resolved: ScanTarget) -> int:
     def progress(msg: str):
         if args.output == "markdown" and not args.no_color:
             print(f"  → {msg}")
+
+    # 漏洞庫自動更新檢查（可配置頻率，後台更新不阻塞）
+    try:
+        from .vuln_feed import auto_update_if_due
+        auto_update_if_due()
+    except Exception:
+        pass
 
     # 正常掃描
     progress("正在掃描 Skill 內容...")

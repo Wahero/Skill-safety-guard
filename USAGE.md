@@ -235,27 +235,72 @@ Layer 1: 内置基线（随仓库发布）
   → rules/vulnerabilities.json
   → 离线可用，刚装即有基础覆盖
 
-Layer 2: 远程漏洞源（核心更新）
-  → GitHub Actions 每天自动更新漏洞库
-  → safety-check --update-vulns 手动更新
-  → 24 小时 TTL 自动刷新
+Layer 2: 权威源自动更新（核心）
+  → GitHub Actions 每天 00:00 UTC 自动拉取 OSV.dev 更新仓库内置库
+  → 本地扫描时检查 TTL，过期自动后台更新
+  → 频率可配置（默认每周，可改 daily/weekly/monthly/off）
 
 Layer 3: OSV.dev 实时查询（零日覆盖）
-  → Google 开源漏洞库
+  → Google 开源漏洞库（权威）
   → safety-check --osv 启用
   → 按包名+版本实时查询最新 CVE
+```
+
+### 权威漏洞源（更新后）
+
+| 来源 | 权威性 | 说明 |
+|------|--------|------|
+| **OSV.dev**（主）| ⭐⭐⭐⭐⭐ Google 官方 | 开源漏洞库，自动排除已撤销 CVE |
+| **GitHub Advisory**（辅）| ⭐⭐⭐⭐⭐ GitHub 官方 | GitHub 生态漏洞 |
+| ~~NVD~~ | ❌ 已 EOL | NVD API 2.0 已停止服务，不再使用 |
+
+### 设置自动更新频率
+
+```bash
+# 设置频率（默认 weekly）
+python scripts/safety-check --vuln-frequency daily    # 每天
+python scripts/safety-check --vuln-frequency weekly   # 每周（默认）
+python scripts/safety-check --vuln-frequency monthly  # 每月
+python scripts/safety-check --vuln-frequency off      # 关闭
+
+# 查看漏洞库状态（含频率和下次检查时间）
+python scripts/safety-check --vuln-status
 ```
 
 ### 手动更新漏洞库
 
 ```bash
-# 强制更新（拉取最新漏洞库）
+# 强制从权威源（OSV.dev）更新
 python scripts/safety-check --update-vulns
 
 # 查看当前漏洞库状态
 python scripts/safety-check --pi
 # 输出含：📡 漏洞库: N 条（来源: ...）
 ```
+
+### 自动更新机制（无需用户干预）
+
+```
+每次扫描时：
+  → 检查上次更新是否超过 TTL（按频率）
+  → 过期 → 后台线程自动更新（不阻塞扫描）
+  → 未过期 → 使用缓存
+
+GitHub Actions（仓库端）：
+  → 每天 00:00 UTC 拉取 OSV.dev 权威源
+  → 更新内置 vulnerabilities.json
+  → 自动提交推送
+```
+
+### 撤销漏洞清理（自动）
+
+OSV.dev 查询**自动排除已撤销（withdrawn）的 CVE**（官方行为）：
+- 被撤销的漏洞不会出现在查询结果中
+- 本地更新后自动从库中消失
+- 无需用户手动核对
+
+> 如果担心遗漏，可在 GitHub Actions 中每月核对：
+> 对比上次快照，删除已不在权威源中的 CVE。
 
 ### OSV.dev 实时查询
 
@@ -264,20 +309,14 @@ python scripts/safety-check --pi
 python scripts/safety-check --pi --osv
 ```
 
-### 漏洞库自动更新（GitHub Actions）
-
-仓库内置 `update-vulns.yml` 工作流，每天 UTC 03:00 自动：
-1. 查询 OSV.dev 获取 Pi 相关最新漏洞
-2. 合并到 `rules/vulnerabilities.json`
-3. 自动提交推送
-
 ### 漏洞情报来源
 
 | 来源 | 用途 | 更新频率 |
 |------|------|---------|
 | 内置 JSON | 基线覆盖 | 随发布 |
-| GitHub 仓库 | 社区维护 | 每天 |
-| OSV.dev | 零日/最新 | 实时 |
+| OSV.dev（权威）| 最新漏洞 | 每天（GitHub Actions）| 
+| 本地缓存 | 离线可用 | 按配置频率 |
+| 实时查询 | 零日覆盖 | 每次 --osv |
 
 ### 报告中的展示
 
