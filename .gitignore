@@ -35,6 +35,8 @@ temp/
 dist/
 build/
 out/
+*.egg-info/
+*.egg
 *.exe
 *.dll
 *.so
