@@ -33,6 +33,12 @@ whitelisted_patterns:
 whitelisted_paths:
   - '*/.gitignore'
   - '*/CHANGELOG.md'
+  # 安全審計文檔（描述漏洞，不是實際攻擊）
+  - '*/SECURITY_AUDIT.md'
+  - '*/SECURITY.md'
+  - '*/VULNERABILITY_*.md'
+  - '*/threat-model.md'
+  - '*/docs/security/*'
 
 # 置信度下調：命中後將置信度從 high 降為 low
 confidence_demotions:
