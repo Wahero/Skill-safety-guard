@@ -22,6 +22,20 @@ whitelisted_patterns:
     pattern: 'ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|ghp_TOKENPLACEHOLDER'
     reason: 文檔示例占位符
 
+  # 工具自身文檔中的示例（自掃時已知自指誤報）
+  - rule_id: cred-openai
+    pattern: 'sk-proj-abcdefghijklmnopqrstuvwxyz'
+    reason: TESTING.md 中的假金鑰示例（非真實密鑰）
+
+  - rule_id: shell-curl-bash
+    pattern: 'https://example\.com'
+    reason: TESTING.md 使用 RFC 2606 保留占位域名（https://example.com 裸域）的示例
+
+  - rule_id: shell-curl-bash
+    pattern: '危險 Shell 命令（`curl \| bash`'
+    match_context: true
+    reason: README.md 描述檢測能力的示例行（含中文註記，僅本工具 README 出現）
+
   # 測試 fixture 中的真實命中（測試模式下保留所有命中以便驗證）
   # 此項只在 test 模式下生效，生產模式忽略
   - rule_id: '*'
@@ -39,6 +53,26 @@ whitelisted_paths:
   - '*/VULNERABILITY_*.md'
   - '*/threat-model.md'
   - '*/docs/security/*'
+  # 工具自身內容（自掃時已知自指誤報）：
+  # demo/ 是示例報告輸出；docs/scripts 是規則評估與生成腳本；
+  # rules/ 下的 yaml 是規則定義本身（模式即數據，掃描必然自指命中）
+  - '*/demo/outputs/*.md'
+  - '*/demo/index.html'
+  - '*/docs/CRITICAL_PATHS_EVALUATION.md'
+  - '*/scripts/generate_critical_paths_rules.py'
+  - '*/rules/credentials.yaml'
+  - '*/rules/sensitive_paths.yaml'
+  - '*/rules/critical_paths.yaml'
+  - '*/rules/dangerous_shell.yaml'
+  - '*/rules/unicode_steganography.yaml'
+  - '*/rules/prompt_injection.yaml'
+  - '*/rules/mcp.yaml'
+  - '*/rules/mcp_injection.yaml'
+  - '*/rules/installed_extensions.yaml'
+  - '*/rules/whitelist.yaml'
+  # 掃描報告（描述漏洞，不是實際攻擊；與 SECURITY_AUDIT.md 同理）
+  - '*/SCAN_REPORT_*.md'
+  - '*/scan-pi-web-*.md'
 
 # 置信度下調：命中後將置信度從 high 降為 low
 confidence_demotions:

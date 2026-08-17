@@ -94,19 +94,22 @@ class BaseDetector(ABC):
 
     def _apply_whitelist(self, finding: Finding) -> bool:
         """返回 True 表示應過濾掉（白名單命中）"""
+        import re
+        import fnmatch
+
         wl_patterns = self.whitelist.get("whitelisted_patterns", [])
         for wl in wl_patterns:
             if wl.get("rule_id") == finding.rule_id or wl.get("rule_id") == "*":
-                import re
-
+                # 默認只匹配命中片段；match_context: true 時同時匹配完整上下文行
                 if re.search(wl["pattern"], finding.matched_text):
                     return True
-        # 路徑白名單
+                if wl.get("match_context") and re.search(wl["pattern"], finding.context_line):
+                    return True
+        # 路徑白名單（路徑正規化為正斜杠，兼容 Windows 反斜杠路徑）
         wl_paths = self.whitelist.get("whitelisted_paths", [])
+        norm_path = finding.file_path.replace("\\", "/")
         for wl_path in wl_paths:
-            import fnmatch
-
-            if fnmatch.fnmatch(finding.file_path, wl_path):
+            if fnmatch.fnmatch(norm_path, wl_path):
                 return True
         return False
 
