@@ -1,0 +1,180 @@
+# skill-safety-guard 規則庫：MCP 配置安全檢測（F-029~F-032）
+#
+# MCP (Model Context Protocol) 服務器為 Agent 提供工具/資源。
+# 惡意 MCP 配置可：
+#   - 讓 Agent 執行任意 shell 命令
+#   - 讀取/寫入文件系統
+#   - 訪問數據庫
+#   - 外發數據到攻擊者服務器
+#
+# 檢測方式：靜態分析 MCP 配置（.mcp.json / mcp.json / .cursor/mcp.json 等）
+# 不實際連接 MCP 服務器（安全、無副作用）
+
+rules:
+  # === 危險 MCP 服務器命令 ===
+
+  - id: mcp-npx-unknown
+    name: npx -y 未知名包作為 MCP 服務器
+    pattern: "npx\\s+(-y|--yes)\\s+(@[a-z0-9-]+/)?[a-z0-9-]{2,}"
+    severity: critical
+    confidence: high
+    category: mcp
+    description: |
+      MCP 服務器使用 npx -y 直接下載執行包。
+      -y 自動確認 = 無需用戶交互即可安裝執行。
+      若包名可疑/未知名，等同於自動執行任意代碼。
+    remediation: |
+      不要使用 npx -y 安裝未知名 MCP 服務器。
+      先手動檢查包是否存在、作者是否可信。
+
+  - id: mcp-curl-pipe
+    name: MCP 服務器使用 curl|bash
+    pattern: "curl[^\"']*\\|[^\"']*(ba)?sh"
+    severity: critical
+    confidence: high
+    category: mcp
+    description: MCP 服務器命令包含 curl|bash（下載即執行）
+    remediation: 立即拒絕
+
+  - id: mcp-shell-command
+    name: MCP 服務器使用 shell 命令
+    pattern: "(/bin/(ba)?sh|/usr/bin/(ba)?sh|cmd\\.exe|powershell|pwsh)\\s+(-c|-Command)"
+    severity: high
+    confidence: high
+    category: mcp
+    description: MCP 服務器直接調用 shell 解釋器執行命令
+    remediation: 確認是否有必要以 shell 方式運行
+
+  - id: mcp-localhost-expose
+    name: MCP 服務器綁定/連接到 localhost
+    pattern: "(localhost|127\\.0\\.0\\.1|0\\.0\\.0\\.0)\\s*[:：]\\s*[0-9]{2,5}"
+    severity: medium
+    confidence: medium
+    category: mcp
+    description: MCP 服務器連接到本地端口（可能是本地代理或服務）
+    remediation: 確認本地服務是否可信
+
+  # === 危險工具名/描述 ===
+
+  - id: mcp-tool-shell
+    name: MCP 工具名暗示 shell 操作
+    pattern: "(?i)(exec|shell|bash|zsh|command|run_cmd|system|terminal)"
+    severity: high
+    confidence: medium
+    category: mcp
+    description: MCP 工具名稱包含 shell 操作關鍵詞（允許執行命令）
+    remediation: 確認工具權限範圍
+
+  - id: mcp-tool-file-write
+    name: MCP 工具名暗示文件寫入
+    pattern: "(?i)(write_file|create_file|append_file|delete_file|remove_file|mv|cp|edit_file|save)"
+    severity: high
+    confidence: medium
+    category: mcp
+    description: MCP 工具名稱包含文件寫入關鍵詞
+    remediation: 確認文件訪問範圍（不應訪問敏感路徑）
+
+  - id: mcp-tool-file-read
+    name: MCP 工具名暗示文件讀取
+    pattern: "(?i)(read_file|read_dir|list_files|open_file|get_file|cat)"
+    severity: medium
+    confidence: medium
+    category: mcp
+    description: MCP 工具名稱包含文件讀取關鍵詞
+    remediation: 確認讀取範圍不包含敏感文件
+
+  - id: mcp-tool-db
+    name: MCP 工具名暗示數據庫操作
+    pattern: "(?i)(sql|db|database|query|postgres|mysql|mongo|redis|select|execute)"
+    severity: high
+    confidence: medium
+    category: mcp
+    description: MCP 工具名稱包含數據庫操作關鍵詞
+    remediation: 確認數據庫訪問權限（不應有憑證）
+
+  - id: mcp-tool-network
+    name: MCP 工具名暗示網絡操作
+    pattern: "(?i)(http|https|fetch|request|post|upload|download|webhook|api_call|send)"
+    severity: medium
+    confidence: medium
+    category: mcp
+    description: MCP 工具名稱包含網絡操作關鍵詞
+    remediation: 確認外發數據目的地
+
+  - id: mcp-tool-env
+    name: MCP 工具名暗示環境變量/憑證
+    pattern: "(?i)(env|environment|credential|secret|token|api_key|password|key\\.get|getenv)"
+    severity: critical
+    confidence: high
+    category: mcp
+    description: MCP 工具名稱暗示訪問環境變量或憑證
+    remediation: 立即拒絕。不應有工具訪問環境變量/憑證
+
+  # === 資源風險 ===
+
+  - id: mcp-resource-credential
+    name: MCP 資源指向憑證文件
+    pattern: "(?i)(~/?\\.ssh|\\.aws|credential|\\.env|token|secret|auth\\.json|passwd)"
+    severity: critical
+    confidence: high
+    category: mcp
+    description: MCP 資源列表包含憑證文件路徑
+    remediation: 立即拒絕
+
+  - id: mcp-resource-root
+    name: MCP 資源指向根目錄/系統目錄
+    pattern: "(/etc/|/usr/|/var/|C:\\\\Windows|/system|/boot/)"
+    severity: critical
+    confidence: high
+    category: mcp
+    description: MCP 資源列表包含系統目錄
+    remediation: 立即拒絕
+
+  - id: mcp-resource-all-files
+    name: MCP 資源指向整個文件系統
+    pattern: "(?i)(file:///|/.*|\\\\\\\\|all\\s+files|entire\\s+system)"
+    severity: high
+    confidence: medium
+    category: mcp
+    description: MCP 資源範圍過大（整個文件系統）
+    remediation: 收窄資源範圍
+
+  # === 傳輸安全（F-034 提前）===
+
+  - id: mcp-transport-http
+    name: MCP 服務器使用明文 HTTP
+    pattern: "http://[a-zA-Z0-9.-]+"
+    severity: medium
+    confidence: high
+    category: mcp
+    description: MCP 服務器使用明文 HTTP（無加密傳輸）
+    remediation: 改用 HTTPS 或 stdio
+
+  - id: mcp-transport-stdio-recommend
+    name: MCP stdio vs HTTP 傳輸
+    pattern: "(?i)(\\btransport\\b|\\bstdio\\b|\\bstreamable\\s+http\\b)"
+    severity: low
+    confidence: low
+    category: mcp
+    description: MCP 傳輸方式標識（stdio 較安全，HTTP 需確認加密）
+    remediation: 確認傳輸方式
+
+  # === 危險 URL ===
+
+  - id: mcp-url-suspicious
+    name: MCP 配置包含可疑 URL
+    pattern: "(?i)(https?://)?\\S*(pastebin|pastes\\.io|transfer\\.sh|0x0\\.st|evil|malicious|attacker|hack)\\.\\S+"
+    severity: critical
+    confidence: medium
+    category: mcp
+    description: MCP 配置包含可疑/文件分享/攻擊域名
+    remediation: 立即拒絕
+
+  - id: mcp-ip-raw
+    name: MCP 配置包含原始 IP 地址
+    pattern: "\\b(?:[0-9]{1,3}\\.){3}[0-9]{1,3}\\b"
+    severity: medium
+    confidence: low
+    category: mcp
+    description: MCP 配置包含原始 IP（可能是直接連接到攻擊服務器）
+    remediation: 確認 IP 歸屬

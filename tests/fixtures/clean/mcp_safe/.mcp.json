@@ -1,0 +1,17 @@
+{
+  "mcpServers": {
+    "formatter": {
+      "command": "node",
+      "args": ["/usr/local/bin/code-formatter.js"],
+      "tools": [
+        {"name": "format_code", "description": "Format code with prettier"},
+        {"name": "lint_check", "description": "Run eslint on project"}
+      ]
+    },
+    "local-git-helper": {
+      "command": "node",
+      "args": ["/usr/local/bin/git-helper.js"],
+      "tools": ["git_status", "git_diff", "git_commit"]
+    }
+  }
+}

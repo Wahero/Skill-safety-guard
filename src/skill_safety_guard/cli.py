@@ -361,7 +361,7 @@ def main(argv=None):
 
 
 def _run_scan(args, target: Path, resolved: ScanTarget) -> int:
-    """執行掃描"""
+    """執行掃描（F-025: --all 完整掃描）"""
 
     if args.pi:
         pi_data = scan_pi_only(args)
@@ -371,10 +371,31 @@ def _run_scan(args, target: Path, resolved: ScanTarget) -> int:
             print(generate_report(str(target), pi_data["pi_check"], {}, "A"))
         return 0
 
+    # 進度顯示（F-026）
+    def progress(msg: str):
+        if args.output == "markdown" and not args.no_color:
+            print(f"  → {msg}")
+
     # 正常掃描
+    progress("正在掃描 Skill 內容...")
     skill_results = scan_target(target, args)
+    progress(f"完成 Skill 掃描（{sum(len(r.findings) for r in skill_results.values())} 個發現）")
+
+    progress("正在檢查 Pi Agent 全局...")
     pi_check = check_pi_version()
     pi_check["auth_check"] = check_auth_permissions()
+    progress("完成 Pi 全局檢查")
+
+    # --all 模式：增加 MCP 依賴檢查（F-029~F-032）
+    mcp_result = None
+    if args.all:
+        progress("正在檢查 MCP 依賴...")
+        from .mcp_check import check_mcp_directory, format_mcp_report
+        from .rules_loader import load_rules_file
+
+        mcp_rules = load_rules_file("mcp.yaml")
+        mcp_result = check_mcp_directory(target, mcp_rules)
+        progress(f"完成 MCP 檢查（{len(mcp_result['findings'])} 個發現，{len(mcp_result['tools'])} 個工具）")
 
     # 應用置信度過濾（F-015）
     if args.min_confidence != "low":
@@ -395,10 +416,27 @@ def _run_scan(args, target: Path, resolved: ScanTarget) -> int:
     overall_grade = calculate_risk_grade(all_findings)
 
     # 殺手場景決策（F-010）
-    decision = make_install_decision(overall_grade, all_findings)
+    # 將 MCP findings 也計入風險評估（F-032）
+    mcp_findings_for_grade = []
+    if mcp_result:
+        from .detectors.base import Finding as MCPFinding
+        for f in mcp_result["findings"]:
+            mcp_findings_for_grade.append(MCPFinding(
+                rule_id=f["rule_id"], rule_name=f["rule_name"],
+                severity=f["severity"], confidence=f["confidence"],
+                category="mcp", description=f["description"],
+                remediation=f["remediation"], file_path=f["file_path"],
+                line_number=f["line_number"], matched_text=f["matched_text"],
+            ))
+    all_findings_for_decision = all_findings + mcp_findings_for_grade
+    decision = make_install_decision(overall_grade, all_findings_for_decision)
 
     if args.output == "json":
-        print(format_json_output(str(target), pi_check, skill_results, overall_grade, decision))
+        output = json.loads(format_json_output(str(target), pi_check, skill_results, overall_grade, decision))
+        # MCP 結果併入 JSON（F-032）
+        if mcp_result:
+            output["mcp_check"] = mcp_result
+        print(json.dumps(output, ensure_ascii=False, indent=2))
     elif args.output == "sarif":
         all_finding_dicts = []
         for r in skill_results.values():
@@ -416,9 +454,17 @@ def _run_scan(args, target: Path, resolved: ScanTarget) -> int:
                         "line_number": f.line_number,
                         "matched_text": f.matched_text,
                     })
+        # MCP findings 也併入 SARIF
+        if mcp_result:
+            for f in mcp_result["findings"]:
+                all_finding_dicts.append(f)
         print(findings_to_sarif_string(all_finding_dicts, str(target)))
     else:
         report = generate_report(str(target), pi_check, skill_results, overall_grade)
+        # MCP 報告併入 Markdown（F-032）
+        if mcp_result:
+            from .mcp_check import format_mcp_report
+            report = report + "\n---\n\n## 第三層：MCP 依賴檢查\n\n" + format_mcp_report(mcp_result)
         decision_block = format_decision_block(resolved.display_name, decision)
         report = decision_block + report
         if args.confidence_detail:

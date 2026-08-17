@@ -4,6 +4,32 @@ All notable changes to skill-safety-guard will be documented in this file.
 
 ## [Unreleased]
 
+## [1.6.0] - 2026-08-17
+
+### Added (v1.6.0)
+**MCP 依賴檢查（F-029~F-032）**：
+- MCP 配置靜態分析（.mcp.json, mcp.json, .cursor/mcp.json 等）
+- 服務器枚舉：名稱/命令/參數/傳輸方式
+- 工具枚舉：聲明工具 + 從命令推斷
+- 工具風險分類：SHELL/FILE/DATABASE/NETWORK/CREDENTIAL/SAFE
+- 16 條 MCP 安全規則（npx -y、curl|bash、工具名暗示、憑證資源、HTTP 明文等）
+- MCP 結果併入報告（Markdown 第三層 + JSON + SARIF）
+
+**--all 完整掃描（F-025）**：
+- Pi 全局 + Skill 內容 + MCP 依賴一次完成
+- MCP findings 計入綜合風險等級
+
+**掃描進度顯示（F-026）**：
+- "正在掃描 Skill 內容..." → "正在檢查 Pi Agent 全局..." → "正在檢查 MCP 依賴..."
+
+### Changed
+- 報告 footer 版本號更新為 v1.5.0
+
+### Tests
+- 新增惡意樣本：tests/fixtures/malicious/mcp_servers/.mcp.json
+- 新增乾淨樣本：tests/fixtures/clean/mcp_safe/.mcp.json
+- 全部通過，無誤報
+
 ## [1.4.0] - 2026-08-17
 
 ### Added (v1.4.0)

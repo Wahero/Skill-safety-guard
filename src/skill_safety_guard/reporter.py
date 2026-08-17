@@ -248,7 +248,7 @@ def generate_report(
     lines.append("")
     lines.append("---")
     lines.append("")
-    lines.append("*本報告由 skill-safety-guard v0.1.0 自動生成*  ")
+    lines.append("*本報告由 skill-safety-guard v1.5.0 自動生成*  ")
     lines.append("*規則庫開源：https://github.com/Wahero/Skill-safety-guard/blob/main/rules/*  ")
     lines.append("*發現誤報？執行 `/safety-check --report-fp <rule-id>`*")
 
