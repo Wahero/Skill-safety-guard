@@ -4,6 +4,48 @@ All notable changes to skill-safety-guard will be documented in this file.
 
 ## [Unreleased]
 
+## [1.4.0] - 2026-08-17
+
+### Added (v1.4.0)
+**編輯器配置檢測（6 條）**：
+- VSCode：~/.config/Code/User/settings.json, keybindings.json
+- Vim：~/.vimrc, ~/.vim/{plugin,autoload,ftplugin}/
+- Emacs：~/.emacs.d/init.el, ~/.emacs
+- Neovim：~/.config/nvim/init.vim, init.lua
+- nano：~/.nanorc
+
+**Git 配置檢測（4 條）**：
+- ~/.gitconfig
+- ~/.git-credentials
+- core.sshCommand/hooksPath/gitProxy/credential.helper 賦值
+- include.path 配置注入
+
+**歷史記錄篡改檢測（6 條）**：
+- ~/.bash_history, ~/.zsh_history, ~/.python_history
+- ~/.viminfo, ~/.wget-hsts
+- Shell 命令：`history -c && rm`、`unset HISTFILE`、`echo > ~/.bash_history`
+
+**數據庫客戶端配置（4 條）**：
+- ~/.pgpass (PostgreSQL 明文密碼)
+- ~/.my.cnf (MySQL 客戶端配置)
+- ~/.rediscli_history
+- ~/.mongoshrc.js（MongoDB Shell 啟動執行 JavaScript）
+
+**Rootkit 向量（8 條）**：
+- /etc/ld.so.preload（最高危險 - 所有進程預加載）
+- /etc/ld.so.conf, /etc/ld.so.conf.d/
+- /etc/hosts（DNS 劫持）
+- /etc/resolv.conf（DNS 服務器劫持）
+- /etc/environment（系統環境變量）
+- /etc/profile.d/（全用戶 shell 初始化）
+
+**規則總數**：v1.3.0 39 → v1.4.0 **67** (+28)
+
+### Tests
+- 新增惡意樣本：tests/fixtures/malicious/editor_git_rootkit/SKILL.md
+- 9 個攻擊類別、30+ 攻擊向量
+- 掃描結果：**43 findings**, 32 critical_paths
+
 ## [1.3.0] - 2026-08-17
 
 ### Added (v1.3.0)
