@@ -213,7 +213,14 @@ Happy to discuss the detection strategy (what regex can/can't do vs AST-based to
 - 与 NVIDIA SkillSpector 对比表
 - 性能数据
 
-> 下一步：部署到 GitHub Pages（10 分钟），获得可分享的演示链接。
+> 注意：GitHub Pages 需要付费计划（当前账号不支持）。演示页可本地打开：
+> ```bash
+> # 本地预览演示页
+> start demo/index.html  # Windows
+> open demo/index.html   # Mac
+> xdg-open demo/index.html  # Linux
+> ```
+> 或在浏览器直接打开 demo/index.html
 
 ---
 
