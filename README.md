@@ -2,8 +2,9 @@
 
 > **個人開發者安裝 Skill / MCP 前的安全守護者**
 
-[![Version](https://img.shields.io/badge/version-0.1.0-orange.svg)]()
-[![Phase](https://img.shields.io/badge/phase-0%20verified-blue.svg)]()
+[![Version](https://img.shields.io/badge/version-2.0.0-orange.svg)]()
+[![Rules](https://img.shields.io/badge/rules-158-blue.svg)]()
+[![Phase](https://img.shields.io/badge/phase-2%20complete-green.svg)]()
 [![License](https://img.shields.io/badge/license-MIT-green.svg)]()
 
 ---
@@ -96,22 +97,58 @@ python -m skill_safety_guard --report-fp shell-curl-bash
 
 ---
 
-## 檢測能力（v0.1.0 / Phase 0 通過）
+## 檢測能力（v2.0.0 / 158 條規則 / 8 類檢測）
 
-### 第二層：Skill 內容
+### 🚨 關鍵系統參數修改（最高優先級）
 
-| 類別 | 檢測項 | 樣本檢出率 | 樣本誤報率 |
-|------|--------|-----------|-----------|
-| 🔑 憑證 | OpenAI / AWS / GitHub / Anthropic / Slack / Stripe | 100% (3/3) | ≤5% |
-| 💀 危險 Shell | `curl\|bash`、反向 Shell、`rm -rf /`、`dd` | 100% (3/3) | ≤10% |
-| 📁 敏感路徑 | `~/.ssh`、`/etc/passwd`、`.env`、`.git/config` | 100% (3/3) | ≤5% |
+| 類別 | 覆蓋 |
+|------|------|
+| **AI Agent 配置** | Pi / Claude / Cursor / Codex / Continue / Aider / OpenCode / Cline / Cody |
+| **Shell init** | ~/.bashrc, ~/.zshrc, ~/.profile（寫入/重定向/刪除）|
+| **包管理器** | npm / Yarn / pip / Cargo / gem / Composer / Maven / Gradle / Bower |
+| **持久化** | macOS LaunchAgents/Daemons, Linux autostart, Systemd |
+| **編輯器** | VSCode / Vim / Emacs / Neovim / nano |
+| **Git** | .gitconfig（含 core.sshCommand / hooksPath / credential.helper）|
+| **歷史篡改** | bash/zsh/python_history, history -c |
+| **Rootkit** | /etc/ld.so.preload, /etc/hosts, /etc/resolv.conf |
+| **數據庫** | .pgpass, .my.cnf, .mongoshrc.js |
+
+### 🔑 憑證洩露
+
+| 檢測項 |
+|--------|
+| OpenAI / Anthropic / AWS / GitHub / Slack / Stripe / Google / JWT / PEM 私鑰 |
+
+### 💀 危險 Shell 命令
+
+| 檢測項 |
+|--------|
+| `curl\|bash`、反向 Shell、`rm -rf /`、`dd`、fork bomb、base64 混淆、chmod 777 |
+
+### 💉 提示詞注入
+
+| 檢測項 |
+|--------|
+| Ignore previous instructions、系統提示提取、越獄、角色劫持、數據外洩（中英文）|
+
+### 🔌 MCP 依賴檢查（--all）
+
+| 檢測項 |
+|--------|
+| npx -y 未知名包、curl\|bash、工具名暗示憑證/Shell/文件、HTTP 明文、可疑 URL |
+
+### 🕵️ Unicode 隱寫
+
+| 檢測項 |
+|--------|
+| 零寬字符、Tag 字符區塊、不可見運算符、混合隱寫 |
 
 ### 第一層：Pi Agent 全局
 
 | 檢測項 | 說明 |
 |--------|------|
 | ⚠️ Pi 版本 CVE | 檢查版本是否在 CVE-2026-54326/54327 受影響範圍 |
-| 🔒 auth.json 權限 | 檢查 `~/.pi/agent/auth.json` 是否為 600 |
+| 🔒 auth.json 權限 | 檢查權限（Windows ACL / Linux POSIX）|
 
 ---
 
@@ -119,10 +156,16 @@ python -m skill_safety_guard --report-fp shell-curl-bash
 
 | 版本 | 狀態 | 內容 |
 |------|------|------|
-| **v0.1.0** | ✅ Phase 0 通過 | 骨架 + P0 檢測 + 測試套件 |
-| v1.0 | 🚧 Phase 1 開發中 | 安裝前掃描殺手場景 + 完整 P0 |
-| v2.0 | 📋 Phase 2 規劃 | Unicode + 規則版提示詞注入 |
-| v3.0 | 📋 Phase 3 規劃 | Freemium + LLM 檢測 + Pro $4.99/月 |
+| **v0.1.0** | ✅ 已完成 | Phase 0 通過 + 基礎 MVP |
+| **v1.0.0** | ✅ 已完成 | 安裝前掃描殺手場景（URL/粘貼/決策）|
+| **v1.1.0** | ✅ 已完成 | Unicode 隱寫 + Demo 包 |
+| **v1.2.0** | ✅ 已完成 | 全局 AGENTS.md 檢測 |
+| **v1.3.0** | ✅ 已完成 | AI Agent 全覆蓋 + 包管理 + 持久化 |
+| **v1.4.0** | ✅ 已完成 | 編輯器 + Git + 歷史 + Rootkit |
+| **v1.5.0** | ✅ 已完成 | Freemium + SARIF + 提示詞注入 |
+| **v1.6.0** | ✅ 已完成 | MCP 依賴檢查 + --all 完整掃描 |
+| **v2.0.0** | 🚀 最新 | Phase 2 全部完成（8 類檢測，158 條規則）|
+| v3.0 | 📋 規劃 | LLM 輔助檢測 + MCP 注入深度檢測 |
 
 詳細規劃見 [`docs/PRD_v4_聚焦个人开发者版.MD`](docs/PRD_v4_聚焦个人开发者版.MD)。
 
