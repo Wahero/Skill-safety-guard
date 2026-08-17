@@ -4,7 +4,7 @@ import sys
 import json
 import time
 from pathlib import Path
-from typing import Dict
+from typing import Dict, Optional
 
 from .rules_loader import load_all_rules, load_whitelist
 from .detectors import CredentialsDetector, ShellDetector, PathsDetector, UnicodeDetector, CriticalPathsDetector
@@ -51,6 +51,12 @@ def parse_args(argv=None):
         default="markdown",
         help="輸出格式（sarif 用於 GitHub Code Scanning）",
     )
+    parser.add_argument(
+        "--output-file",
+        metavar="PATH",
+        default=None,
+        help="把報告寫入指定檔案（預設：GitHub URL 掃描時自動寫入當前目錄 scan-report-<repo>.md）",
+    )
     parser.add_argument("--report-fp", metavar="RULE_ID", help="報告誤報")
     parser.add_argument("--no-color", action="store_true", help="禁用彩色輸出")
     parser.add_argument("--no-pi", action="store_true", help="跳過 Pi Agent 全局檢查（加快掃描）")
@@ -73,6 +79,35 @@ def parse_args(argv=None):
     parser.add_argument("--vuln-sources", action="store_true", help="查看所有漏洞源（含國內源）")
     parser.add_argument("--vuln-proxy", metavar="URL", help="設置 GitHub 加速代理（如 https://ghproxy.net/）")
     return parser.parse_args(argv)
+
+
+def resolve_output_file(args, resolved) -> Optional[Path]:
+    """解析報告輸出檔案路徑
+
+    優先序：
+    1. 用戶顯式指定 --output-file
+    2. GitHub URL 掃描 → 自動生成 scan-report-<repo>.md 到當前工作目錄
+    3. 其他情況 → None（只印 stdout，不寫檔）
+    """
+    if getattr(args, "output_file", None):
+        return Path(args.output_file).resolve()
+    if args.output == "markdown" and resolved and resolved.kind.startswith("github"):
+        display = resolved.display_name  # e.g. github.com/user/repo
+        repo = display.split("/")[-1] if display else "scan"
+        return Path.cwd() / f"scan-report-{repo}.md"
+    return None
+
+
+def emit_output(text: str, output_file: Optional[Path]) -> None:
+    """印出報告；若指定 output_file 則同時寫入該檔案"""
+    print(text)
+    if output_file:
+        try:
+            output_file.parent.mkdir(parents=True, exist_ok=True)
+            output_file.write_text(text, encoding="utf-8")
+            print(f"\n📄 報告已存檔：{output_file}", file=sys.stderr)
+        except OSError as e:
+            print(f"\n[WARN] 報告寫檔失敗：{e}", file=sys.stderr)
 
 
 def handle_report_fp(rule_id: str) -> int:
@@ -466,13 +501,16 @@ def main(argv=None):
         print_tier_banner()
         print()
 
+    # 解析報告輸出檔案（GitHub URL → 自動寫入當前目錄）
+    output_file = resolve_output_file(args, resolved)
+
     try:
-        return _run_scan(args, target, resolved)
+        return _run_scan(args, target, resolved, output_file)
     finally:
         cleanup_target(resolved)
 
 
-def _run_scan(args, target: Path, resolved: ScanTarget) -> int:
+def _run_scan(args, target: Path, resolved: ScanTarget, output_file: Optional[Path] = None) -> int:
     """執行掃描（F-025: --all 完整掃描）"""
 
     if args.pi:
@@ -480,7 +518,7 @@ def _run_scan(args, target: Path, resolved: ScanTarget) -> int:
         if args.output == "json":
             print(format_json_output(str(target), pi_data["pi_check"], {}, "N/A"))
         else:
-            print(generate_report(str(target), pi_data["pi_check"], {}, "A"))
+            emit_output(generate_report(str(target), pi_data["pi_check"], {}, "A"), output_file)
         return 0
 
     # 進度顯示（F-026）
@@ -585,7 +623,7 @@ def _run_scan(args, target: Path, resolved: ScanTarget) -> int:
         # LLM 結果併入 JSON（F-037）
         if llm_result:
             output["llm_check"] = llm_result
-        print(json.dumps(output, ensure_ascii=False, indent=2))
+        emit_output(json.dumps(output, ensure_ascii=False, indent=2), output_file)
     elif args.output == "sarif":
         all_finding_dicts = []
         for r in skill_results.values():
@@ -622,7 +660,7 @@ def _run_scan(args, target: Path, resolved: ScanTarget) -> int:
                     "line_number": 1,
                     "matched_text": f.get("location", "")[:80],
                 })
-        print(findings_to_sarif_string(all_finding_dicts, str(target)))
+        emit_output(findings_to_sarif_string(all_finding_dicts, str(target)), output_file)
     else:
         report = generate_report(str(target), pi_check, skill_results, overall_grade)
         # MCP 報告併入 Markdown（F-032）
@@ -637,7 +675,7 @@ def _run_scan(args, target: Path, resolved: ScanTarget) -> int:
         report = decision_block + report
         if args.confidence_detail:
             report = report + "\n\n" + generate_confidence_explanation(all_findings)
-        print(report)
+        emit_output(report, output_file)
 
     # 記錄掃描使用
     record_scan()

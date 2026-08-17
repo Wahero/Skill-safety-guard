@@ -4,6 +4,13 @@ All notable changes to skill-safety-guard will be documented in this file.
 
 ## [Unreleased]
 
+### Added
+**GitHub URL 掃描自動生成 MD 報告（預設行為）**：
+- 掃描目標為 GitHub URL 時，自動把完整 Markdown 掃描報告寫入當前工作目錄，檔名 `scan-report-<repo>.md`
+- 新增 `--output-file <path>` 參數，可覆蓋預設路徑
+- 報告同時印到終端與寫入檔案
+- 本地路徑掃描不自動寫檔（需用 `--output-file` 顯式指定）
+
 ## [3.0.0] - 2026-08-17
 
 ### Added (v3.0.0 / Phase 3)

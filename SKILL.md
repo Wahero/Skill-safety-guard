@@ -23,12 +23,31 @@ license: MIT
 |------|------|------|
 | `/safety-check` | 掃描當前目錄 | `/safety-check` |
 | `/safety-check <path>` | 掃描指定路徑 | `/safety-check ./my-skill` |
-| `/safety-check <url>` | 🆕 掃描遠端 Skill（殺手功能） | `/safety-check https://github.com/x/y` |
+| `/safety-check <url>` | 🆕 掃描遠端 Skill（殺手功能），**自動生成 MD 報告到當前目錄** | `/safety-check https://github.com/x/y` |
+| `/safety-check <url> --output-file <path>` | 掃描遠端 Skill 並指定報告路徑 | `/safety-check <url> --output-file ./report.md` |
 | `/safety-check --pi` | 只掃描 Pi Agent 全局 | `/safety-check --pi` |
 | `/safety-check --all` | 完整掃描（Pi + Skill + 依賴） | `/safety-check --all` |
 | `/safety-check --output json` | JSON 輸出 | `/safety-check --output json` |
 | `/safety-check --report-fp <id>` | 🆕 報告誤報 | `/safety-check --report-fp shell-curl-bash` |
 | `/safety-check --help` | 幫助 | `/safety-check --help` |
+
+## 預設行為：GitHub URL → 自動生成 MD 報告
+
+> 🎯 **當掃描目標是 GitHub URL 時，預設自動把掃描結果寫成一份 Markdown 報告，存放在當前工作目錄**，檔名為 `scan-report-<repo>.md`。
+
+```bash
+# 範例：掃描遠端 Skill，報告自動存到當前目錄
+cd /my/working/dir
+safety-check https://github.com/Wahero/url-extract
+# → 產生 /my/working/dir/scan-report-url-extract.md
+```
+
+**規則：**
+- ✅ 目標是 GitHub URL（`github.com/...`）→ 自動寫入 `./scan-report-<repo>.md`
+- ✅ 可用 `--output-file <path>` 覆蓋預設路徑
+- ✅ 報告內容 = 完整 Markdown 掃描報告（風險等級 + 發現項 + 修復建議）
+- ℹ️ 本地路徑掃描不自動寫檔（避免污染目錄），需要時用 `--output-file`
+- ℹ️ 報告同時印到終端與寫入檔案，不會遺失即時輸出
 
 ## 安裝方式
 
