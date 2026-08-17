@@ -46,31 +46,31 @@ def _check_windows_acl(auth_path: Path) -> Dict:
 
         # icacls 輸出格式：第一行 = "文件路徑 ACL條目"，後續行 = 成功消息
         # 抽取所有 "username:(perms)" 模式的條目
-        acl_pattern = re.compile(r"([\w\\\.\-\-]+):\(([RWXDMF,\sN]+)\)")
+        acl_pattern = re.compile(r"([^\s]+):\(([^)]*)\)(?:\(([^)]*)\))?")
         user_acls = []
         for match in acl_pattern.finditer(output):
-            user_acls.append((match.group(1), match.group(2)))
+            user_acls.append((match.group(1), (match.group(2) + (match.group(3) or ""))))
 
-        # 檢查：當前用戶是否有 R/W
-        current_user_has_rw = False
+        # 檢查：當前用戶是否有訪問權限（含管理員組 / SYSTEM）
+        current_user_has_access = False
         for user, perms in user_acls:
             user_lower = user.lower()
             username_lower = username.lower()
-            # icacls 用戶可能是 "DOMAIN\username" 或 "username" 格式
             user_short = user_lower.split("\\")[-1]
-            if (
+            is_self = (
                 username_lower in user_lower
                 or user_lower in username_lower
                 or username_lower == user_short
                 or user_short == username_lower
-            ):
-                if "R" in perms and "W" in perms:
-                    current_user_has_rw = True
-                break
+            )
+            is_admin_group = "administrators" in user_lower
+            is_system = "system" in user_lower or user_lower.startswith("nt authority")
+            if (is_self or is_admin_group or is_system) and perms not in ("N", "RX"):
+                current_user_has_access = True
 
-        # 檢查：其他用戶是否有任何權限
+        # 檢查：危險用戶（Everyone / Users / Authenticated Users / Guests）是否有權限
         others_have_perms = False
-        dangerous_users = ["everyone", "users", "authenticated users", "administrators", "guests"]
+        dangerous_users = ["everyone", "users", "authenticated users", "guests"]
         for user, perms in user_acls:
             user_lower = user.lower()
             for danger in dangerous_users:
@@ -79,26 +79,26 @@ def _check_windows_acl(auth_path: Path) -> Dict:
                     break
 
         perm_str = "Windows ACL"
-        if current_user_has_rw and not others_have_perms:
+        if current_user_has_access and not others_have_perms:
             return {
                 "permissions": perm_str,
                 "permissions_ok": True,
                 "severity": "ok",
-                "description": f"Windows ACL 符合安全要求（僅 {username} 有讀寫權限）",
+                "description": "Windows ACL 符合安全要求（當前用戶/管理員有訪問權限，無 Everyone/Users）",
             }
-        elif current_user_has_rw and others_have_perms:
+        elif current_user_has_access and others_have_perms:
             return {
                 "permissions": perm_str,
                 "permissions_ok": False,
                 "severity": "high",
-                "description": "Windows ACL 過寬：其他用戶也有權限",
+                "description": "Windows ACL 過寬：Everyone/Users/Authenticated Users 有權限",
             }
         else:
             return {
                 "permissions": perm_str,
                 "permissions_ok": False,
                 "severity": "critical",
-                "description": "Windows ACL 配置錯誤：當前用戶無讀寫權限",
+                "description": "Windows ACL 配置錯誤：當前用戶無任何訪問權限",
             }
     except Exception as e:
         return {

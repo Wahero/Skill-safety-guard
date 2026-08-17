@@ -1,0 +1,125 @@
+# skill-safety-guard 規則庫：已安裝擴展靜態審計（F-038）
+#
+# 適用於：
+# - ~/.pi/agent/extensions/（Pi Agent 已安裝擴展）
+# - ~/.claude/extensions/（Claude Code 擴展）
+# - 其他 Agent 擴展目錄
+#
+# 已安裝擴展 = 已通過初始審計信任的代碼
+# 但這些擴展本身的源代碼可能含有惡意模式
+# 所以需要定期掃描
+#
+# 這個 YAML 文件的規則與其他略有不同：
+# 不是掃描 Skill 源代碼，而是掃描「用戶已信任的代碼」
+# 一旦命中，應該：
+#   1. 警告用戶
+#   2. 建議禁用/卸載擴展
+#   3. 不自動刪除（避免誤殺）
+
+rules:
+  # === 危險函數調用 ===
+
+  - id: ext-eval
+    name: JavaScript/Python eval() usage
+    pattern: "\\beval\\s*\\("
+    severity: medium
+    confidence: medium
+    category: installed_extensions
+    description: eval() 函數（執行字符串為代碼，常用於混淆）
+    remediation: 建議卸載此擴展或審查源碼
+
+  - id: ext-exec
+    name: exec() usage
+    pattern: "\\bexec\\s*\\("
+    severity: medium
+    confidence: medium
+    category: installed_extensions
+    description: exec() 函數（Python）
+    remediation: 建議卸載此擴展或審查源碼
+
+  - id: ext-child-process
+    name: child_process exec/spawn
+    pattern: "(child_process|exec|execSync|spawn|spawnSync)\\s*\\("
+    severity: high
+    confidence: high
+    category: installed_extensions
+    description: Node.js 子進程執行（可能執行外部命令）
+    remediation: 確認是否必要，建議手動審查
+
+  - id: ext-shell-exec
+    name: Shell command execution
+    pattern: "(os\\.system|subprocess\\.(call|run|Popen)|shell_exec|passthru|system\\s*\\()"
+    severity: high
+    confidence: high
+    category: installed_extensions
+    description: 各語言的 shell 命令執行函數
+    remediation: 確認是否必要，建議手動審查
+
+  - id: ext-curl-wget
+    name: Network download via curl/wget
+    pattern: "(curl\\s+(?!-)[^-]|wget\\s+[^&|;]+)"
+    severity: high
+    confidence: medium
+    category: installed_extensions
+    description: 擴展中包含 curl/wget 命令（可能下載惡意 payload）
+    remediation: 確認下載目標是否可信
+
+  - id: ext-base64-decode
+    name: Base64 decode and execute
+    pattern: "(base64\\s+-d|atob\\s*\\(|Buffer\\.from\\s*\\([^)]+['\"]base64['\"])"
+    severity: high
+    confidence: medium
+    category: installed_extensions
+    description: Base64 解碼（常用於隱藏惡意代碼）
+    remediation: 解碼後檢查實際內容
+
+  - id: ext-network-exfil
+    name: Network exfiltration pattern
+    pattern: "(requests\\.post|fetch\\s*\\([^)]+['\"](https?://)[^'\"]+['\"][^)]*method\\s*:\\s*['\"]POST|XMLHttpRequest|axios\\.post)"
+    severity: medium
+    confidence: low
+    category: installed_extensions
+    description: 網絡數據外發（POST 請求）
+    remediation: 確認發送的數據類型
+
+  # === 持久化機制（即使在已安裝擴展中也危險）===
+
+  - id: ext-write-to-home
+    name: Write to home directory in extension
+    pattern: "(writeFileSync|fs\\.writeFile|appendFileSync)\\s*\\([^)]*(homedir\\(\\)|process\\.env\\.(HOME|USERPROFILE))"
+    severity: critical
+    confidence: high
+    category: installed_extensions
+    description: |
+      擴展代碼嘗試寫入用戶主目錄。
+      已安裝擴展不應修改用戶全局配置。
+    remediation: 立即卸載此擴展
+
+  - id: ext-modify-process-env
+    name: Modify process.env in extension
+    pattern: "process\\.env\\.[A-Z_]+\\s*="
+    severity: medium
+    confidence: medium
+    category: installed_extensions
+    description: 擴展修改環境變量（可能影響後續 Agent 行為）
+    remediation: 審查環境變量設定
+
+  # === 數據外洩 ===
+
+  - id: ext-read-ssh-keys
+    name: Read SSH keys in extension
+    pattern: "(readFileSync|fs\\.readFile|open)\\s*\\([^)]*\\.ssh/(id_|authorized_keys)"
+    severity: critical
+    confidence: high
+    category: installed_extensions
+    description: 擴展讀取 SSH 私鑰
+    remediation: 立即卸載並撤銷相關 SSH 密鑰
+
+  - id: ext-read-aws-creds
+    name: Read AWS credentials in extension
+    pattern: "(readFileSync|fs\\.readFile|open)\\s*\\([^)]*\\.aws/(credentials|config)"
+    severity: critical
+    confidence: high
+    category: installed_extensions
+    description: 擴展讀取 AWS 憑證
+    remediation: 立即卸載並輪換 AWS 密鑰

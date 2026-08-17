@@ -2,15 +2,21 @@
 import argparse
 import sys
 import json
+import time
 from pathlib import Path
 from typing import Dict
 
 from .rules_loader import load_all_rules, load_whitelist
 from .detectors import CredentialsDetector, ShellDetector, PathsDetector, UnicodeDetector, CriticalPathsDetector
+from .license import (
+    can_scan, record_scan, activate_license, generate_license_key,
+    load_license, print_tier_banner, FREE_SCANS_PER_WEEK, PRO_PRICE_MONTHLY_USD,
+)
 from .detectors.base import Finding
 from .pi_check import check_pi_version, check_auth_permissions
 from .parser import parse_skill_file, validate_skill_frontmatter
 from .reporter import generate_report, calculate_risk_grade, generate_confidence_explanation
+from .sarif import findings_to_sarif_string
 from .scan_target_resolver import resolve_target, cleanup_target, ScanTarget
 
 
@@ -39,7 +45,12 @@ def parse_args(argv=None):
     )
     parser.add_argument("--pi", action="store_true", help="只掃描 Pi Agent 全局")
     parser.add_argument("--all", action="store_true", help="完整掃描（Pi + Skill + 依賴）")
-    parser.add_argument("--output", choices=["markdown", "json"], default="markdown", help="輸出格式")
+    parser.add_argument(
+        "--output",
+        choices=["markdown", "json", "sarif"],
+        default="markdown",
+        help="輸出格式（sarif 用於 GitHub Code Scanning）",
+    )
     parser.add_argument("--report-fp", metavar="RULE_ID", help="報告誤報")
     parser.add_argument("--no-color", action="store_true", help="禁用彩色輸出")
     parser.add_argument(
@@ -49,6 +60,10 @@ def parse_args(argv=None):
         help="只顯示高於此置信度的結果",
     )
     parser.add_argument("--confidence-detail", action="store_true", help="顯示置信度分級詳細原因")
+    parser.add_argument("--activate-pro", metavar="KEY", help="激活 Pro 許可證")
+    parser.add_argument("--generate-pro-key", action="store_true", help="生成測試用 Pro 密鑰")
+    parser.add_argument("--license-status", action="store_true", help="顯示許可證狀態")
+    parser.add_argument("--audit-extensions", action="store_true", help="掃描已安裝擴展目錄")
     return parser.parse_args(argv)
 
 
@@ -98,6 +113,8 @@ def scan_target(target: Path, args) -> Dict:
         path_det = PathsDetector(all_rules.get("paths", []), whitelist)
         unicode_det = UnicodeDetector(all_rules.get("unicode", []), whitelist)
         critical_det = CriticalPathsDetector(all_rules.get("critical_paths", []), whitelist)
+        installed_ext_det = CredentialsDetector(all_rules.get("installed_extensions", []), whitelist)  # reuse base
+        prompt_inj_det = CredentialsDetector(all_rules.get("prompt_injection", []), whitelist)  # reuse base
 
         # 檢測目標是文件還是目錄
         if target.is_file():
@@ -108,18 +125,23 @@ def scan_target(target: Path, args) -> Dict:
             except (UnicodeDecodeError, PermissionError):
                 content = ""
 
-            for det in [cred_det, shell_det, path_det, unicode_det, critical_det]:
-                result = DetectionResult(category=det.category, scanned_files=1)
+            for det, cat in [(cred_det, "credentials"), (shell_det, "shell"), (path_det, "paths"),
+                              (unicode_det, "unicode"), (critical_det, "critical_paths"),
+                              (installed_ext_det, "installed_extensions"), (prompt_inj_det, "prompt_injection")]:
+                det.category = cat
+                result = DetectionResult(category=cat, scanned_files=1)
                 findings = det.detect_file(target, content)
                 for f in findings:
                     if not det._apply_whitelist(f):
                         f = det._apply_confidence_demotion(f)
                         result.findings.append(f)
-                skill_results[det.category] = result
+                skill_results[cat] = result
         else:
-            for det in [cred_det, shell_det, path_det, unicode_det, critical_det]:
+            for det, cat in [(cred_det, "credentials"), (shell_det, "shell"), (path_det, "paths"),
+                              (unicode_det, "unicode"), (critical_det, "critical_paths")]:
+                det.category = cat
                 result = det.detect_directory(target)
-                skill_results[det.category] = result
+                skill_results[cat] = result
 
         # SKILL.md frontmatter 驗證
         skill_md = target / "SKILL.md" if target.is_dir() else None
@@ -280,6 +302,35 @@ def main(argv=None):
     if args.report_fp:
         return handle_report_fp(args.report_fp)
 
+    # 許可證管理命令（F-033~F-036）
+    if args.generate_pro_key:
+        key = generate_license_key()
+        print(f"\n[PRO KEY GENERATED] {key}\n")
+        print(f"啟動：safety-check --activate-pro {key}\n")
+        return 0
+
+    if args.activate_pro:
+        try:
+            lic = activate_license(args.activate_pro)
+            print(f"\n[PRO ACTIVATED] {lic.tier}")
+            print(f"  Expires: {time.strftime('%Y-%m-%d', time.localtime(lic.expires_at))}\n")
+            return 0
+        except ValueError as e:
+            print(f"[ERROR] {e}", file=sys.stderr)
+            return 1
+
+    if args.license_status:
+        lic = load_license()
+        can, info = can_scan()
+        print(f"\nTier: {info['tier'].upper()}")
+        if info["tier"] == "pro":
+            print(f"Expires: {time.strftime('%Y-%m-%d', time.localtime(info['expires_at']))}")
+        else:
+            used = info['limit'] - info['remaining']
+            print(f"Scans this week: {used}/{info['limit']}")
+        print(f"Can scan now: {can}\n")
+        return 0
+
     # 解析掃描目標（F-007 殺手場景：支援 URL/粘貼）
     resolved = resolve_target(args.target)
     if resolved is None:
@@ -288,6 +339,20 @@ def main(argv=None):
         return 2
 
     target = resolved.path
+
+    # 檢查使用限制
+    can, info = can_scan()
+    if not can:
+        print(f"[FREE TIER LIMIT REACHED] 0/{info['limit']} scans remaining this week")
+        print(f"  Resets: {time.strftime('%Y-%m-%d', time.localtime(info['resets_at']))}")
+        print(f"  Upgrade to Pro: $4.99/month")
+        print(f"  Generate key: safety-check --generate-pro-key")
+        return 3
+
+    # 打印 banner（僅人類可讀模式）
+    if args.output == "markdown":
+        print_tier_banner()
+        print()
 
     try:
         return _run_scan(args, target, resolved)
@@ -334,6 +399,24 @@ def _run_scan(args, target: Path, resolved: ScanTarget) -> int:
 
     if args.output == "json":
         print(format_json_output(str(target), pi_check, skill_results, overall_grade, decision))
+    elif args.output == "sarif":
+        all_finding_dicts = []
+        for r in skill_results.values():
+            if hasattr(r, "findings"):
+                for f in r.findings:
+                    all_finding_dicts.append({
+                        "rule_id": f.rule_id,
+                        "rule_name": f.rule_name,
+                        "severity": f.severity,
+                        "confidence": f.confidence,
+                        "category": f.category,
+                        "description": f.description,
+                        "remediation": f.remediation,
+                        "file_path": f.file_path,
+                        "line_number": f.line_number,
+                        "matched_text": f.matched_text,
+                    })
+        print(findings_to_sarif_string(all_finding_dicts, str(target)))
     else:
         report = generate_report(str(target), pi_check, skill_results, overall_grade)
         decision_block = format_decision_block(resolved.display_name, decision)
@@ -341,6 +424,9 @@ def _run_scan(args, target: Path, resolved: ScanTarget) -> int:
         if args.confidence_detail:
             report = report + "\n\n" + generate_confidence_explanation(all_findings)
         print(report)
+
+    # 記錄掃描使用
+    record_scan()
 
     grade_to_exit = {"A": 0, "B": 0, "C": 0, "D": 1, "E": 1, "F": 2}
     return grade_to_exit.get(overall_grade, 0)

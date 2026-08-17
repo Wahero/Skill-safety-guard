@@ -47,4 +47,6 @@ def load_all_rules() -> Dict[str, List[Dict]]:
         "paths": load_rules_file("sensitive_paths.yaml"),
         "unicode": load_rules_file("unicode_steganography.yaml"),
         "critical_paths": load_rules_file("critical_paths.yaml"),
+        "installed_extensions": load_rules_file("installed_extensions.yaml"),
+        "prompt_injection": load_rules_file("prompt_injection.yaml"),
     }
