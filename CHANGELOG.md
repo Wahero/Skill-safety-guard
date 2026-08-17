@@ -11,6 +11,11 @@ All notable changes to skill-safety-guard will be documented in this file.
 - 報告同時印到終端與寫入檔案
 - 本地路徑掃描不自動寫檔（需用 `--output-file` 顯式指定）
 
+**誤報自動識別 + 掃描結論區塊**：
+- `path-env-file` 規則誤報自動判定：命中 `os.environ.get()` / `os.getenv()` 等環境變數讀取模式時，判定為誤報（憑證不寫入原始碼是安全做法），不計入風險評分
+- 報告尾段新增「📌 掃描結論」區塊：誤報判定清單 + 最終安裝建議
+- 誤報項在報告中標示 ✅ 誤報判定，統計與風險等級自動排除誤報
+
 ## [3.0.0] - 2026-08-17
 
 ### Added (v3.0.0 / Phase 3)

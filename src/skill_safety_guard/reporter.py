@@ -1,4 +1,5 @@
 """Markdown 風險報告生成器（F-018）"""
+from pathlib import Path
 from typing import Dict, List
 from .detectors.base import Finding, DetectionResult
 
@@ -102,13 +103,17 @@ def format_finding(f: Finding) -> str:
     emoji = SEVERITY_EMOJI.get(f.severity, "⚪")
     conf_emoji = CONFIDENCE_EMOJI.get(f.confidence, "⚪")
 
+    fp_badge = ""
+    if f.fp_reason:
+        fp_badge = f"\n- ✅ **誤報判定**: {f.fp_reason}\n"
+
     return f"""### {emoji} {f.rule_name}
 - **規則 ID**: `{f.rule_id}`
 - **嚴重度**: {emoji} {f.severity.upper()} | **置信度**: {conf_emoji} {f.confidence}
 - **位置**: `{f.file_path}:{f.line_number}`
 - **命中**: `{f.matched_text}`
 - **說明**: {f.description}
-- **建議**: {f.remediation}
+- **建議**: {f.remediation}{fp_badge}
 
 ```text
 {f.context_line}
@@ -144,20 +149,23 @@ def generate_report(
         "F": "🔴🔴 極高風險，建議不要使用",
     }
 
-    # 統計
+    # 統計（誤報不計入風險）
+    real_findings = [f for f in all_findings if not f.fp_reason]
+    fp_findings = [f for f in all_findings if f.fp_reason]
     total_files = sum(r.scanned_files for r in skill_results.values())
     total_findings = len(all_findings)
-    critical = sum(1 for f in all_findings if f.severity == "critical")
-    high = sum(1 for f in all_findings if f.severity == "high")
-    medium = sum(1 for f in all_findings if f.severity == "medium")
-    low = sum(1 for f in all_findings if f.severity == "low")
+    critical = sum(1 for f in real_findings if f.severity == "critical")
+    high = sum(1 for f in real_findings if f.severity == "high")
+    medium = sum(1 for f in real_findings if f.severity == "medium")
+    low = sum(1 for f in real_findings if f.severity == "low")
 
+    fp_line = f"\n> **誤報判定**: {len(fp_findings)} 個（已排除，不計入風險）" if fp_findings else ""
     lines = [
         f"# Skill Safety-guard 風險報告",
         f"",
         f"> **掃描目標**: `{target}`  ",
         f"> **掃描文件數**: {total_files}  ",
-        f"> **發現問題數**: {total_findings}（🔴 {critical} | 🟠 {high} | 🟡 {medium} | 🟢 {low}）",
+        f"> **發現問題數**: {total_findings}（🔴 {critical} | 🟠 {high} | 🟡 {medium} | 🟢 {low}）{fp_line}",
         f"",
         f"## 綜合風險等級：{overall_grade}",
         f"",
@@ -252,6 +260,33 @@ def generate_report(
         lines.append("- 🔍 可嘗試聯繫作者修復，或尋找替代品")
         lines.append("- 💬 可使用 `/safety-check --report-fp <rule-id>` 報告誤報")
 
+    lines.append("")
+    lines.append("---")
+    lines.append("")
+
+    # 📌 掃描結論（尾段重點：誤報判定 + 最終建議）
+    lines.append("## 📌 掃描結論")
+    lines.append("")
+    lines.append("### 誤報判定")
+    if fp_findings:
+        lines.append(f"- ✅ **{len(fp_findings)} 個發現判定為誤報**（已自動識別，不計入風險評分）：")
+        lines.append("")
+        for f in fp_findings:
+            lines.append(f"  - `{f.rule_id}` @ {Path(f.file_path).name}:{f.line_number} — {f.fp_reason}")
+    else:
+        lines.append("- ℹ️ 未發現誤報模式（所有發現均按實際風險計入）")
+    lines.append("")
+    lines.append("### 最終建議")
+    if overall_grade in ["A", "B"]:
+        lines.append("- ✅ **可以安裝**：未發現需要阻擋安裝的風險項")
+    elif overall_grade == "C":
+        lines.append("- ⚠️ **人工複查後可安裝**：存在中風險發現，建議逐一確認後再決定")
+    elif overall_grade in ["D", "E"]:
+        lines.append("- 🚫 **不建議安裝**：存在較高/高風險發現，需先解決")
+    else:
+        lines.append("- 🚫 **強烈建議不要安裝**：風險等級過高")
+    if fp_findings:
+        lines.append(f"- 💡 已判定的 {len(fp_findings)} 個誤報（如環境變數讀取等安全模式）不影響安裝決定")
     lines.append("")
     lines.append("---")
     lines.append("")

@@ -19,6 +19,7 @@ class Finding:
     line_number: int
     matched_text: str
     context_line: str = ""
+    fp_reason: str = ""  # 非空 = 判定為誤報，內容為誤報原因
 
 
 @dataclass

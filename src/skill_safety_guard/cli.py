@@ -597,7 +597,9 @@ def _run_scan(args, target: Path, resolved: ScanTarget, output_file: Optional[Pa
     for r in skill_results.values():
         if hasattr(r, "findings"):
             all_findings.extend(r.findings)
-    overall_grade = calculate_risk_grade(all_findings)
+    # 誤報（fp_reason 非空）不計入風險評分
+    real_findings = [f for f in all_findings if not getattr(f, "fp_reason", "")]
+    overall_grade = calculate_risk_grade(real_findings)
 
     # 殺手場景決策（F-010）
     # 將 MCP findings 也計入風險評估（F-032）
@@ -612,7 +614,7 @@ def _run_scan(args, target: Path, resolved: ScanTarget, output_file: Optional[Pa
                 remediation=f["remediation"], file_path=f["file_path"],
                 line_number=f["line_number"], matched_text=f["matched_text"],
             ))
-    all_findings_for_decision = all_findings + mcp_findings_for_grade
+    all_findings_for_decision = real_findings + mcp_findings_for_grade
     decision = make_install_decision(overall_grade, all_findings_for_decision)
 
     if args.output == "json":
