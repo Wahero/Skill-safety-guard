@@ -13,7 +13,8 @@ class PathsDetector(BaseDetector):
         findings = []
         for rule in self.rules:
             try:
-                pattern = re.compile(rule["pattern"])
+                # 路徑檢測默認 case-insensitive（Windows 路徑不區分大小寫，AGENTS.md vs agents.md）
+                pattern = re.compile(rule["pattern"], re.IGNORECASE)
             except re.error:
                 continue
             for line_no, line in enumerate(content.splitlines(), start=1):

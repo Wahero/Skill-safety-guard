@@ -211,6 +211,7 @@ def generate_report(
         "shell": "💀 危險 Shell 命令",
         "paths": "📁 敏感路徑訪問",
         "unicode": "🕵️ Unicode 隱寫",
+        "critical_paths": "🚨 關鍵系統參數修改",
     }
 
     for cat, result in skill_results.items():

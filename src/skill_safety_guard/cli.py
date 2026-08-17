@@ -6,7 +6,7 @@ from pathlib import Path
 from typing import Dict
 
 from .rules_loader import load_all_rules, load_whitelist
-from .detectors import CredentialsDetector, ShellDetector, PathsDetector, UnicodeDetector
+from .detectors import CredentialsDetector, ShellDetector, PathsDetector, UnicodeDetector, CriticalPathsDetector
 from .detectors.base import Finding
 from .pi_check import check_pi_version, check_auth_permissions
 from .parser import parse_skill_file, validate_skill_frontmatter
@@ -97,6 +97,7 @@ def scan_target(target: Path, args) -> Dict:
         shell_det = ShellDetector(all_rules.get("shell", []), whitelist)
         path_det = PathsDetector(all_rules.get("paths", []), whitelist)
         unicode_det = UnicodeDetector(all_rules.get("unicode", []), whitelist)
+        critical_det = CriticalPathsDetector(all_rules.get("critical_paths", []), whitelist)
 
         # 檢測目標是文件還是目錄
         if target.is_file():
@@ -107,7 +108,7 @@ def scan_target(target: Path, args) -> Dict:
             except (UnicodeDecodeError, PermissionError):
                 content = ""
 
-            for det in [cred_det, shell_det, path_det, unicode_det]:
+            for det in [cred_det, shell_det, path_det, unicode_det, critical_det]:
                 result = DetectionResult(category=det.category, scanned_files=1)
                 findings = det.detect_file(target, content)
                 for f in findings:
@@ -116,7 +117,7 @@ def scan_target(target: Path, args) -> Dict:
                         result.findings.append(f)
                 skill_results[det.category] = result
         else:
-            for det in [cred_det, shell_det, path_det, unicode_det]:
+            for det in [cred_det, shell_det, path_det, unicode_det, critical_det]:
                 result = det.detect_directory(target)
                 skill_results[det.category] = result
 

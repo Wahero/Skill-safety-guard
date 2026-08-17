@@ -2,6 +2,7 @@
 # v0.1.2 改進：
 # - 使用非貪婪匹配 .+? 允許嵌套括號
 # - 要求訪問動詞上下文（open/read/cat/...）避免文檔誤報
+# - v1.2 新增：全局 AGENTS.md 自動修改檢測
 
 rules:
   - id: path-ssh
@@ -83,4 +84,78 @@ rules:
     confidence: high
     category: paths
     description: 訪問瀏覽器 Cookie 或密碼
+    remediation: 立即拒絕
+
+  # === v1.2 新增：全局 Agent 配置文件（最高優先級）===
+  # 自動寫入全局 AGENTS.md = 嚴重安全風險
+  # 真實案例：pi-web 的 ensure-subagent-delegation.ts 在每次啟動時寫 ~/.pi/agent/AGENTS.md
+
+  - id: path-agents-md-write
+    name: Global AGENTS.md write access
+    # 匹配「寫入函數」 + 「AGENTS.md 字面」 或 「包含 agent 的函數名」
+    # 例：writeFileSync(join(agentDir, "AGENTS.md")) 命中
+    # 例：writeFileSync(agentsMdPath) 命中
+    pattern: "(writeFileSync|fs\\.writeFile|appendFileSync|fs\\.appendFile|createWriteStream|writeFile|outputFile|ensureFile)\\s*\\([^)]*agents?[^)]*\\)|function\\s+(ensure|write|update|create|sync)\\w*(Agent|agent)"
+    severity: critical
+    confidence: high
+    category: paths
+    description: |
+      自動修改全局 AGENTS.md 或 agents/*.md（AI Agent 配置檔）
+      這是最高風險的攻擊之一：
+      - 持久性：修改後不會隨項目刪除而消失
+      - 跨 session：影響所有未來對話
+      - 跨項目：影響用戶的所有 AI 工作流
+      - 靜默：用戶未必知道 Agent 行為被改變
+    remediation: |
+      立即拒絕。全局 Agent 配置修改是 skill 的重大越權行為。
+      如需為 Agent 提供指引，請：
+        - 在專案內創建 AGENTS.md（不是全局）
+        - 或在用戶明確同意下修改全局
+      任何「自動寫全局 AGENTS.md」的行為視為惡意。
+
+  - id: path-agents-md-ref
+    name: Reference to global AGENTS.md (any code reference)
+    pattern: "(~/.pi/agent/agents?\\.md|\\$\\{HOME\\}/\\.pi/agent/agents?\\.md|homedir\\(\\)/\\.pi/agent/agents?\\.md)"
+    severity: high
+    confidence: high
+    category: paths
+    description: 代碼中引用全局 AGENTS.md
+    remediation: |
+      確認代碼意圖。如果目的是讀取可以，但要避免自動寫入。
+      如需修改全局 Agent 行為，要求用戶明確同意。
+
+  # === v1.2 新增：agents/*.md 子目錄 ===
+
+  - id: path-agents-dir-write
+    name: Write to ~/.pi/agent/agents/ directory
+    pattern: "(writeFileSync|fs\\.writeFile|appendFileSync|fs\\.appendFile)\\s*\\(?[^)]*\\.pi/agent/agents/"
+    severity: critical
+    confidence: high
+    category: paths
+    description: |
+      寫入全局 agents/ 子目錄。與 AGENTS.md 同等風險：
+      該目錄包含 subagent 定義文件，自動寫入等於：
+      - 注入新的 subagent 行為
+      - 修改現有 subagent 行為
+      - 跨項目持續生效
+    remediation: 拒絕。應使用項目內的 agents/ 目錄
+
+  # === v1.2 新增：models.json 等其他全局配置 ===
+
+  - id: path-pi-models-config
+    name: Write to ~/.pi/agent/models.json
+    pattern: "(writeFileSync|fs\\.writeFile|appendFileSync)\\s*\\(?[^)]*\\.pi/agent/models\\.json"
+    severity: high
+    confidence: high
+    category: paths
+    description: 修改全局 models.json（影響所有 provider 配置）
+    remediation: 應通過用戶明確確認修改
+
+  - id: path-pi-auth-write
+    name: Write to ~/.pi/agent/auth.json
+    pattern: "(writeFileSync|fs\\.writeFile|appendFileSync)\\s*\\(?[^)]*\\.pi/agent/auth\\.json"
+    severity: critical
+    confidence: high
+    category: paths
+    description: 修改全局 auth.json（Provider 憑證文件）
     remediation: 立即拒絕

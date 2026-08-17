@@ -46,4 +46,5 @@ def load_all_rules() -> Dict[str, List[Dict]]:
         "shell": load_rules_file("dangerous_shell.yaml"),
         "paths": load_rules_file("sensitive_paths.yaml"),
         "unicode": load_rules_file("unicode_steganography.yaml"),
+        "critical_paths": load_rules_file("critical_paths.yaml"),
     }
