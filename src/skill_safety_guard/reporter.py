@@ -18,6 +18,60 @@ CONFIDENCE_EMOJI = {
 }
 
 
+def generate_confidence_explanation(findings: List[Finding]) -> str:
+    """生成置信度解釋（F-015 增強）
+
+    解釋為什麼某些被分為高/中/低置信度，幫助用戶理解
+    """
+    if not findings:
+        return ""
+
+    high = [f for f in findings if f.confidence == "high"]
+    medium = [f for f in findings if f.confidence == "medium"]
+    low = [f for f in findings if f.confidence == "low"]
+
+    lines = [
+        "---",
+        "",
+        "## 置信度分級詳解",
+        "",
+        f"**總計**: 高 {len(high)} | 中 {len(medium)} | 低 {len(low)}",
+        "",
+        "### 分級標準",
+        "",
+        "| 級別 | 含义 | 建議行為 |",
+        "|------|------|---------|",
+        "| 🔴 高置信度 | 明確危險模式，推累為真實威脅 | 必須處理 |",
+        "| 🟡 中置信度 | 有可疑特徵但可能误報 | 人工複查 |",
+        "| 🟢 低置信度 | 複雜上下文才會觸發 | 可能是 false positive |",
+        "",
+    ]
+
+    if low:
+        lines.append("### 低置信度提示")
+        lines.append("")
+        lines.append("以下規則被分為低置信度，可能需要人工確認：")
+        lines.append("")
+        for f in low[:5]:
+            lines.append(f"- `{f.rule_id}` ({f.rule_name}): {f.file_path}:{f.line_number}")
+        if len(low) > 5:
+            lines.append(f"- ... 還有 {len(low) - 5} 個")
+        lines.append("")
+
+    lines.extend([
+        "### 調整置信度",
+        "",
+        "如果認為某些規則誤報過多：",
+        "",
+        "1. 在 `rules/whitelist.yaml` 中添加白名單條目（本地生效）",
+        "2. 運行 `safety-check --report-fp <rule-id>` 報告誤報（社區生效）",
+        "3. 使用 `--min-confidence high` 只看高置信度問題",
+        "",
+    ])
+
+    return "\n".join(lines)
+
+
 def calculate_risk_grade(findings: List[Finding]) -> str:
     """根據 findings 計算綜合風險等級 A-F"""
     if not findings:

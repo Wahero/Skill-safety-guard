@@ -128,6 +128,87 @@ python -m skill_safety_guard --report-fp shell-curl-bash
 
 ---
 
+## 誤報處理（重要）
+
+> **原則**：誤報率 > 檢出率。一個誤報會讓用戶卸載插件，影響遠大於漏報。
+
+### 如果你遇到了誤報
+
+**快速修復**：使用 `--min-confidence` 只看高置信度：
+
+```bash
+safety-check ./your-skill --min-confidence high
+```
+
+**正式反饋**：使用 `--report-fp` 命令：
+
+```bash
+safety-check --report-fp <rule-id>
+```
+
+該命令會生成 GitHub issue 鏈接，附帶處理流程和本地白名單模板。
+
+### 置信度分級
+
+| 級別 | 含义 | 建議行為 |
+|------|------|---------|
+| 🔴 高置信度 | 明確危險模式，推累為真實威脅 | 必須處理 |
+| 🟡 中置信度 | 有可疑特徵但可能誤報 | 人工複查 |
+| 🟢 低置信度 | 複雜上下文才會觸發 | 可能是 false positive |
+
+### 本地白名單
+
+在 `rules/whitelist.yaml` 中添加：
+
+```yaml
+whitelisted_patterns:
+  - rule_id: rule-that-misfires
+    pattern: "your-specific-text-to-whitelist"
+    reason: 為什麼是誤報
+```
+
+詳細指南見 [CONTRIBUTING.md](CONTRIBUTING.md)。
+
+### 處理時間承諾
+
+- 🔴 Critical 誤報：48 小時內修復
+- 🟡 Medium 誤報：1 週內修復
+- 🟢 Low 誤報：下一個版本處理
+
+---
+
+## 測試套件
+
+### 自動測試
+
+```bash
+python tests/test_phase0.py
+```
+
+預期結果：
+```
+=== V-02: YAML 解析驗證 ===        [OK]
+=== V-04: 正則檢測驗證 ===        [PASS] 100% 檢出率
+=== V-06: 誤報基線測試 ===        [PASS] 0% 誤報率
+>>> Phase 0 全部通過！
+```
+
+### 手動測試
+
+詳見 [TESTING.md](TESTING.md) —— 含 5/15/30 分鐘分層測試。
+
+---
+
+## 社區與貢獻
+
+- 🐛 **報告 Bug**：[GitHub Issues](https://github.com/Wahero/Skill-safety-guard/issues/new?template=bug_report.md)
+- 🚫 **報告誤報**：[False Positive Report](https://github.com/Wahero/Skill-safety-guard/issues/new?template=false_positive.md)
+- 💡 **貢獻代碼**：詳見 [CONTRIBUTING.md](CONTRIBUTING.md)
+- 📜 **行為準則**：[CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)
+- 🔔 **Release**：[v0.1.0](https://github.com/Wahero/Skill-safety-guard/releases/tag/v0.1.0)
+
+---
+
 ## 貢獻
 
 歡迎貢獻新規則！流程：
