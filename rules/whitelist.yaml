@@ -1,0 +1,42 @@
+# skill-safety-guard 白名單：已知誤報模式
+# 用途：降低誤報率至 ≤3%（v4 文檔 F-014 驗收標準）
+
+# 規則 ID 白名單：匹配後即使觸發也不報告
+# 場景：該規則在特定上下文中是正常的
+
+whitelisted_patterns:
+  # 文檔/示例代碼中的占位符
+  - rule_id: cred-openai
+    pattern: 'sk-example[A-Za-z0-9]+T3BlbkFJ[A-Za-z0-9]+|sk-xxx+|sk-placeholder'
+    reason: 文檔示例中的占位符
+
+  - rule_id: cred-anthropic
+    pattern: 'sk-ant-api03-example|sk-ant-placeholder'
+    reason: 文檔示例中的占位符
+
+  - rule_id: cred-aws-access-key
+    pattern: 'AKIAIOSFODNN7EXAMPLE|AKIA0000000000000000'
+    reason: AWS 官方文檔示例
+
+  - rule_id: cred-github-token
+    pattern: 'ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx|ghp_TOKENPLACEHOLDER'
+    reason: 文檔示例占位符
+
+  # 測試 fixture 中的真實命中（測試模式下保留所有命中以便驗證）
+  # 此項只在 test 模式下生效，生產模式忽略
+  - rule_id: '*'
+    pattern: '^TEST_MARKER:.*'
+    reason: 測試標記（僅 test 模式）
+
+# 路徑白名單：常見誤報路徑（即使命中也不報告）
+# 注意：不要列入 tests/fixtures/，否則會過濾掉我們自己的惡意測試樣本
+whitelisted_paths:
+  - '*/.gitignore'
+  - '*/CHANGELOG.md'
+
+# 置信度下調：命中後將置信度從 high 降為 low
+confidence_demotions:
+  - rule_id: path-env-file
+    context: '\.env\.example|\.env\.sample|\.env\.template'
+    new_confidence: low
+    reason: 可能是 .env.example 模板文件，非真實配置

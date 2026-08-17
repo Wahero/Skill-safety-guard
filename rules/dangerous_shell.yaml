@@ -1,0 +1,111 @@
+# skill-safety-guard 規則庫：危險 Shell 命令檢測
+# 使用雙引號包裹正則字符串以正確處理反斜杠
+
+rules:
+  - id: shell-curl-bash
+    name: curl piped to bash
+    pattern: "curl\\s+[^|]*\\|\\s*(sudo\\s+)?(ba)?sh|curl\\s+[^|]*>\\s*/tmp/[^&]+&&\\s*(sudo\\s+)?(ba)?sh"
+    severity: critical
+    confidence: high
+    category: shell
+    description: 遠程下載並執行腳本（極高風險，常見投毒載體）
+    remediation: 不要執行此類命令。如必須下載，先 curl -O 到本地審查後手動執行
+
+  - id: shell-wget-sh
+    name: wget piped to sh
+    pattern: "wget\\s+[^|]*\\|\\s*(sudo\\s+)?sh|wget\\s+[^|]*&&\\s*(sudo\\s+)?sh"
+    severity: critical
+    confidence: high
+    category: shell
+    description: 遠程下載並執行腳本
+    remediation: 同上 curl 處理
+
+  - id: shell-reverse-tcp
+    name: Reverse Shell (bash)
+    pattern: "bash\\s+-i\\s+>&\\s*/dev/tcp/|/dev/tcp/[0-9.]+/\\d+|\\(\\s*bash\\s*\\) >\\s*/dev/tcp/"
+    severity: critical
+    confidence: high
+    category: shell
+    description: 反向 Shell（攻擊者遠程接管）
+    remediation: 立即拒絕執行
+
+  - id: shell-reverse-nc
+    name: Reverse Shell (netcat)
+    pattern: "nc\\s+-[a-z]*e\\s*/bin/(ba)?sh|ncat\\s+-[a-z]*e\\s*/bin/(ba)?sh|rm\\s*/tmp/\\w+;\\s*mkfifo|mkfifo\\s+/tmp/[^;]+;\\s*"
+    severity: critical
+    confidence: high
+    category: shell
+    description: Netcat 反向 Shell
+    remediation: 立即拒絕執行
+
+  - id: shell-rm-rf-root
+    name: rm -rf on critical path
+    pattern: "rm\\s+-[rRfF]+\\s+/\\s*$|rm\\s+-[rRfF]+\\s+/\\*|rm\\s+-[rRfF]+\\s+~/?(\\s|$)|rm\\s+-[rRfF]+\\s+--no-preserve-root\\s+/"
+    severity: critical
+    confidence: high
+    category: shell
+    description: 刪除根目錄或用戶主目錄
+    remediation: 永遠不要執行此類命令
+
+  - id: shell-dd-disk
+    name: dd disk wipe
+    pattern: "dd\\s+if=/dev/(zero|urandom)\\s+of=/dev/(sd|hd|nvme|vd)[a-z]\\b"
+    severity: critical
+    confidence: high
+    category: shell
+    description: 用 dd 覆蓋磁盤設備
+    remediation: 立即拒絕執行
+
+  - id: shell-fork-bomb
+    name: Fork Bomb
+    pattern: ":\\(\\)\\s*\\{\\s*:\\|:&\\s*\\}\\s*;:\\s*"
+    severity: critical
+    confidence: high
+    category: shell
+    description: Fork bomb（拒絕服務攻擊）
+    remediation: 立即拒絕執行
+
+  - id: shell-base64-pipe-exec
+    name: Base64-decoded execution
+    pattern: "base64\\s+-d[^|]*\\|\\s*(ba)?sh|base64\\s+--decode[^|]*\\|\\s*(ba)?sh|\\|\\s*base64\\s+-d"
+    severity: critical
+    confidence: high
+    category: shell
+    description: Base64 解碼後執行（混淆惡意命令常見手法）
+    remediation: 解碼前先檢查內容
+
+  - id: shell-chmod-777
+    name: chmod 777
+    pattern: "chmod\\s+(-R\\s+)?777\\s+/|chmod\\s+(-R\\s+)?777\\s+~"
+    severity: high
+    confidence: medium
+    category: shell
+    description: 開放關鍵目錄權限
+    remediation: 改用最小權限（644/755），避免 777
+
+  - id: shell-disable-firewall
+    name: Disable firewall
+    pattern: "iptables\\s+-F|ufw\\s+disable|systemctl\\s+stop\\s+firewalld|netsh\\s+advfirewall\\s+set\\s+allprofiles\\s+state\\s+off"
+    severity: critical
+    confidence: high
+    category: shell
+    description: 關閉防火牆
+    remediation: 永遠不要執行
+
+  - id: shell-curl-env
+    name: exfiltrate env via curl
+    pattern: "curl\\s+[^|]*\\$\\(env\\)|curl\\s+[^|]*\\$?(PATH|HOME|USER|AWS_|GITHUB_)|env\\s*\\|\\s*curl"
+    severity: critical
+    confidence: high
+    category: shell
+    description: 通過 curl 外發環境變量（憑證外洩）
+    remediation: 立即拒絕執行
+
+  - id: shell-history-clear
+    name: Clear bash history
+    pattern: "history\\s+-c.*&&\\s*rm\\s+~/.bash_history|unset\\s+HISTFILE.*&&\\s*exit"
+    severity: high
+    confidence: medium
+    category: shell
+    description: 清除 bash 歷史（隱藏痕跡）
+    remediation: 警惕此模式

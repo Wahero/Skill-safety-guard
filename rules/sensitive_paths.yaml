@@ -1,0 +1,86 @@
+# skill-safety-guard 規則庫：敏感路徑訪問檢測
+# v0.1.2 改進：
+# - 使用非貪婪匹配 .+? 允許嵌套括號
+# - 要求訪問動詞上下文（open/read/cat/...）避免文檔誤報
+
+rules:
+  - id: path-ssh
+    name: SSH private key access
+    pattern: "(open|read|cat|file\\(|with\\s+open|Path\\(|access|load)\\s*\\(?.*?\\.ssh/(id_(rsa|ed25519|ecdsa|dsa)|config|known_hosts)"
+    severity: critical
+    confidence: high
+    category: paths
+    description: 訪問 SSH 私鑰目錄
+    remediation: 不應被 Skill 訪問。建議撤銷該密鑰重新生成
+
+  - id: path-etc-passwd
+    name: /etc/passwd access
+    pattern: "(open|read|cat|file\\(|with\\s+open|Path\\(|access|load)\\s*\\(?.*?/etc/(passwd|shadow|sudoers)"
+    severity: high
+    confidence: high
+    category: paths
+    description: 訪問系統用戶/密碼文件
+    remediation: 正常 Skill 不應讀取這些文件
+
+  - id: path-env-file
+    name: .env file access
+    pattern: "(open|read|cat|file\\(|with\\s+open|Path\\(|access|load)\\s*\\(?.*?\\.env(\\.local|\\.production|\\.staging|\\.development)?['\")]?"
+    severity: high
+    confidence: medium
+    category: paths
+    description: 訪問 .env 環境配置文件
+    remediation: 確保 .env 不在倉庫中；檢查該 Skill 是否真的需要此文件
+
+  - id: path-git-config
+    name: .git/config access
+    pattern: "(open|read|cat|file\\(|with\\s+open|Path\\(|access|load)\\s*\\(?.*?\\.git/(config|HEAD|index)"
+    severity: medium
+    confidence: medium
+    category: paths
+    description: 訪問 git 配置（可能包含 remote token）
+    remediation: 確認是否真的需要讀取 git 配置
+
+  - id: path-aws-credentials
+    name: AWS credentials access
+    pattern: "(open|read|cat|file\\(|with\\s+open|Path\\(|access|load)\\s*\\(?.*?\\.aws/(credentials|config)"
+    severity: critical
+    confidence: high
+    category: paths
+    description: 訪問 AWS 憑證文件
+    remediation: 立即撤銷相關 IAM 密鑰
+
+  - id: path-gnupg
+    name: GPG keyring access
+    pattern: "(open|read|cat|file\\(|with\\s+open|Path\\(|access|load)\\s*\\(?.*?\\.gnupg/"
+    severity: critical
+    confidence: high
+    category: paths
+    description: 訪問 GPG 密鑰環
+    remediation: 不應被 Skill 訪問
+
+  - id: path-docker
+    name: Docker socket access
+    pattern: "(open|read|cat|file\\(|with\\s+open|Path\\(|access|load|connect)\\s*\\(?.*?(/var/run/docker\\.sock|\\.docker/config\\.json)"
+    severity: critical
+    confidence: high
+    category: paths
+    description: 訪問 Docker socket（容器逃逸風險）
+    remediation: 不應被 Skill 訪問
+
+  - id: path-kube
+    name: Kubernetes secrets
+    pattern: "(open|read|cat|file\\(|with\\s+open|Path\\(|access|load)\\s*\\(?.*?(/.kube/config|/var/run/secrets/kubernetes\\.io)"
+    severity: critical
+    confidence: high
+    category: paths
+    description: 訪問 Kubernetes 配置/secrets
+    remediation: 不應被 Skill 訪問
+
+  - id: path-browser-cookies
+    name: Browser cookies / passwords
+    pattern: "(open|read|cat|file\\(|with\\s+open|Path\\(|access|load)\\s*\\(?.*?(google-chrome/.*Cookies|firefox/.*cookies\\.sqlite|chromium/Default/Cookies)"
+    severity: critical
+    confidence: high
+    category: paths
+    description: 訪問瀏覽器 Cookie 或密碼
+    remediation: 立即拒絕
