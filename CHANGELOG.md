@@ -4,6 +4,47 @@ All notable changes to skill-safety-guard will be documented in this file.
 
 ## [Unreleased]
 
+## [1.3.0] - 2026-08-17
+
+### Added (v1.3.0)
+**AI Agent 配置全面覆蓋**：
+- Cursor AI：~/.cursor/rules/, ~/.cursor/.cursorrules, ~/.cursor/mcp.json, ~/.cursor/extensions/
+- Aider：~/.aider.conf.yml, ~/.aider.model.metadata.json
+- OpenCode：~/.config/opencode/opencode.json
+- Cline（VSCode 擴展）：saoudrizwan.cline-dev
+- Cody（Sourcegraph）：sourcegraph.cody-ai
+
+**包管理器配置檢測**：
+- npm：.npmrc, npm config set
+- Yarn：.yarnrc, .yarnrc.yml
+- pip：pip.conf, pip config set
+- Cargo（Rust）：.cargo/config.toml, .cargo/credentials
+- Ruby gem：.gemrc
+- PHP Composer：.composer/config.json
+- Maven：.m2/settings.xml
+- Gradle：.gradle/init.gradle, .gradle/gradle.properties
+- Bower：.bowerrc
+
+**持久化機制檢測**：
+- macOS LaunchAgents：~/Library/LaunchAgents/*.plist
+- macOS LaunchDaemons：/Library/LaunchDaemons/*.plist
+- Linux autostart：~/.config/autostart/*.desktop
+- Systemd 用戶服務：~/.config/systemd/user/*.service
+
+**變量名啟發擴展**：
+- 增加 20+ 變量名模式（npmrcPath, awsCreds, sshKeys, etc.）
+
+**新規則數**：v1.2.0 16 → v1.3.0 39 (+23)
+
+### Changed
+- paths 檢測器默認 case-insensitive（Windows 路徑兼容）
+
+### Tests
+- 新增惡意樣本：tests/fixtures/malicious/package_persistence/SKILL.md
+- 12+ 個攻擊向量全部檢測
+
+## [Unreleased]
+
 ### Added (in progress for v1.1 / v2.0)
 - Unicode 隱寫檢測（F-022）：14 條規則
   - 零寬字符檢測（U+200B/C/D、U+FEFF）
