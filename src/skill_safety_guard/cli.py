@@ -70,6 +70,8 @@ def parse_args(argv=None):
     parser.add_argument("--osv", action="store_true", help="啟用 OSV.dev 實時漏洞查詢")
     parser.add_argument("--vuln-frequency", choices=["daily", "weekly", "monthly", "off"], help="設置漏洞庫自動更新頻率")
     parser.add_argument("--vuln-status", action="store_true", help="查看漏洞庫狀態")
+    parser.add_argument("--vuln-sources", action="store_true", help="查看所有漏洞源（含國內源）")
+    parser.add_argument("--vuln-proxy", metavar="URL", help="設置 GitHub 加速代理（如 https://ghproxy.net/）")
     return parser.parse_args(argv)
 
 
@@ -362,6 +364,40 @@ def main(argv=None):
             print(f"  說明: {'每天' if result['frequency']=='daily' else '每週' if result['frequency']=='weekly' else '每月' if result['frequency']=='monthly' else '關閉'}自動更新漏洞庫\n")
         else:
             print(f"\n[ERROR] {result.get('error', '設置失敗')}\n")
+        return 0
+
+    # 設置 GitHub 加速代理（國內用戶用）
+    if args.vuln_proxy:
+        from .vuln_feed import set_github_proxy
+        result = set_github_proxy(args.vuln_proxy)
+        if result.get("ok"):
+            print(f"\n[PROXY] 已設置加速代理: {result['proxies']}")
+            print(f"  漏洞庫更新將通過代理訪問 GitHub\n")
+        else:
+            print(f"\n[ERROR] {result.get('error', '設置失敗')}\n")
+        return 0
+
+    # 查看所有漏洞源（含國內源）
+    if args.vuln_sources:
+        from .vuln_feed import DOMESTIC_SOURCES, GITHUB_PROXIES, get_config
+        print("\n[VULN SOURCES] 漏洞源列表")
+        print("\n  === 自動源 ===")
+        print(f"  🌐 OSV.dev（主）: Google 官方，自動排除已撤銷 CVE")
+        print(f"  📦 本項目漏洞庫: GitHub raw（GitHub Actions 每天更新）")
+        config = get_config()
+        custom_proxies = config.get("github_proxies", [])
+        if custom_proxies:
+            print(f"  🔀 自定義加速代理: {', '.join(custom_proxies)}")
+        else:
+            print(f"  🔀 內置加速代理: {', '.join(GITHUB_PROXIES)}")
+        print(f"  ⚙️  可配置: 在 {config.get('_path', '~/.skill-safety-guard/config.json')} 添加 github_proxies")
+        print("\n  === 國內源（需人工/註冊） ===")
+        for key, src in DOMESTIC_SOURCES.items():
+            print(f"  🏛 {src['name']}")
+            print(f"     權威性: {src['authority']}")
+            print(f"     訪問: {src['access']}")
+            print(f"     URL: {src['url']}")
+        print()
         return 0
 
     # 查看漏洞庫狀態
