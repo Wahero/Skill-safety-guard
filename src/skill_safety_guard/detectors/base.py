@@ -147,13 +147,22 @@ class BaseDetector(ABC):
     def _collect_files(self, directory: Path) -> List[Path]:
         """收集目錄下所有應掃描的文件"""
         files = []
-        skip_dirs = {".git", "node_modules", "__pycache__", "venv", ".venv", "build", "dist", "tests/fixtures"}
+        # 構建產物 / 依賴目錄（按目錄組件匹配，避免 substring 誤傷如 .github、dist.py）
+        skip_dirs = {".git", "node_modules", "__pycache__", "venv", ".venv", "build", "dist"}
+        # 當掃描目標本身就是 tests/fixtures（或其子目錄，如測試套件直接掃樣本）時不跳過 fixture
+        scan_root = directory.resolve().as_posix()
+        scanning_fixtures = "tests/fixtures" in scan_root
 
         for item in directory.rglob("*"):
             if not item.is_file():
                 continue
-            # 跳過測試 fixtures 和構建產物
-            if any(skip in str(item) for skip in skip_dirs):
+            posix = item.as_posix()
+            parts = posix.split("/")
+            # 構建產物 / 依賴目錄：任意層級出現即跳過（as_posix 兼容 Windows 反斜杠路徑）
+            if any(bad in parts for bad in skip_dirs):
+                continue
+            # 測試 fixtures：僅在掃描整個倉庫時跳過；直接掃描 fixture 目錄時保留全部文件
+            if "tests" in parts and "fixtures" in parts and not scanning_fixtures:
                 continue
             # 只掃描文本文件
             if item.suffix in {

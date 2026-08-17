@@ -80,7 +80,7 @@ def test_v04_detection_rate():
     fixtures_dir = Path(__file__).resolve().parent / "fixtures" / "malicious"
     if not fixtures_dir.exists():
         print(colored(f"✗ 惡意樣本目錄不存在: {fixtures_dir}", RED))
-        return False
+        assert False, f"惡意樣本目錄不存在: {fixtures_dir}"
 
     malicious_samples = [d for d in fixtures_dir.iterdir() if d.is_dir()]
     print(f"  找到 {len(malicious_samples)} 個惡意樣本")
@@ -118,10 +118,10 @@ def test_v04_detection_rate():
 
     if detection_rate >= 0.8:
         print(colored("  [PASS] 通過 V-04 驗證標準（≥80%）", GREEN))
-        return True
     else:
         print(colored(f"  [FAIL] 未通過 V-04 驗證標準", RED))
-        return False
+        assert False, f"V-04 檢出率 {detection_rate:.0%} < 80%（{detected}/{len(malicious_samples)}）"
+    return True
 
 
 def test_v06_false_positive_baseline():
@@ -131,7 +131,7 @@ def test_v06_false_positive_baseline():
     fixtures_dir = Path(__file__).resolve().parent / "fixtures" / "clean"
     if not fixtures_dir.exists():
         print(colored(f"✗ 乾淨樣本目錄不存在: {fixtures_dir}", RED))
-        return False
+        assert False, f"乾淨樣本目錄不存在: {fixtures_dir}"
 
     clean_samples = [d for d in fixtures_dir.iterdir() if d.is_dir()]
     print(f"  找到 {len(clean_samples)} 個乾淨樣本")
@@ -170,7 +170,6 @@ def test_v06_false_positive_baseline():
 
     if fp_rate <= 0.1:
         print(colored("  [PASS] 通過 V-06 驗證標準（≤10%）", GREEN))
-        return True
     else:
         print(colored(f"  [WARN] 誤報率 {fp_rate:.0%} 高於 10% 標準", YELLOW))
         print(colored(f"  -> 需要檢查白名單規則是否覆蓋", YELLOW))
@@ -178,7 +177,8 @@ def test_v06_false_positive_baseline():
             print(colored(f"  誤報詳情:", YELLOW))
             for sample, rules in fp_details.items():
                 print(f"    {sample}: {rules}")
-        return False
+        assert False, f"V-06 誤報率 {fp_rate:.0%} > 10%"
+    return True
 
 
 def main():
