@@ -89,6 +89,20 @@ DOMESTIC_SOURCES = {
         "access": "需註冊/證書申請，建議人工查詢",
         "auto_usable": False,
     },
+    "caivd": {
+        "name": "CAIVD 中國人工智能漏洞庫（AIVD）",
+        "authority": "工信部主導、信通院（CAICT）建設（國家級）",
+        "url": "https://ai.nvdb.org.cn",
+        "access": "免註冊訪問，但數據前端渲染，無公開 JSON API（建議人工查詢）",
+        "auto_usable": False,
+    },
+    "avid": {
+        "name": "AVID AI 漏洞庫（國際開源）",
+        "authority": "開源社區（avidml.org，GitHub 可訪問）",
+        "url": "https://avidml.org",
+        "access": "結構化 JSON（AVID-YYYY-VNNN），可通過 GitHub API 自動拉取",
+        "auto_usable": True,
+    },
     "nvd_github_mirror": {
         "name": "NVD JSON 數據饋送鏡像（GitHub）",
         "authority": "社區維護（fkie-cad）",
@@ -406,6 +420,115 @@ def fetch_authoritative_vulns() -> Optional[List[Dict]]:
     return findings or None
 
 
+# ============ AVID（AI 漏洞庫，國際開源） ============
+
+AVID_GITHUB_API = "https://api.github.com/repos/avidml/avid-db"
+
+
+def fetch_avid_vulns(limit_per_year: int = 50) -> Optional[List[Dict]]:
+    """從 AVID 開源 AI 漏洞庫拉取漏洞（通過 GitHub API）
+
+    AVID 格式：AVID-YYYY-VNNN.json，含 metadata/problemtype/description
+    可用於 OSV 不可用時的 AI 漏洞補充來源。
+
+    注意：AVID 是 AI 系統漏洞（非僅 Pi Agent），過濾保留 AI 相關。
+    """
+    findings = []
+
+    try:
+        # 獲取年份目錄
+        req = urllib.request.Request(
+            f"{AVID_GITHUB_API}/contents/vulnerabilities",
+            headers={"User-Agent": "Mozilla/5.0 skill-safety-guard"},
+        )
+        with urllib.request.urlopen(req, timeout=15) as resp:
+            years = json.loads(resp.read().decode())
+    except Exception:
+        return None
+
+    for year_item in years:
+        year = year_item.get("name", "")
+        if not year.isdigit():
+            continue
+        try:
+            req = urllib.request.Request(
+                f"{AVID_GITHUB_API}/contents/vulnerabilities/{year}",
+                headers={"User-Agent": "Mozilla/5.0 skill-safety-guard"},
+            )
+            with urllib.request.urlopen(req, timeout=15) as resp:
+                vuln_files = json.loads(resp.read().decode())
+        except Exception:
+            continue
+
+        count = 0
+        for vf in vuln_files:
+            if count >= limit_per_year:
+                break
+            name = vf.get("name", "")
+            if not name.endswith(".json"):
+                continue
+            try:
+                req = urllib.request.Request(
+                    f"{AVID_GITHUB_API}/contents/vulnerabilities/{year}/{name}",
+                    headers={"User-Agent": "Mozilla/5.0 skill-safety-guard", "Accept": "application/vnd.github.v3.raw"},
+                )
+                with urllib.request.urlopen(req, timeout=15) as resp:
+                    raw = json.loads(resp.read().decode())
+            except Exception:
+                continue
+
+            count += 1
+            parsed = _parse_avid_vuln(raw, name)
+            if parsed:
+                findings.append(parsed)
+
+    return findings or None
+
+
+def _parse_avid_vuln(data: Dict, filename: str) -> Optional[Dict]:
+    """解析 AVID 漏洞 JSON 為內部格式"""
+    try:
+        metadata = data.get("metadata", {})
+        vuln_id = metadata.get("vuln_id") or filename.replace(".json", "")
+
+        # 描述
+        desc = data.get("description", {})
+        if isinstance(desc, dict):
+            desc_text = desc.get("value", "")
+        elif isinstance(desc, list):
+            desc_text = "; ".join(d.get("value", "") for d in desc if isinstance(d, dict))
+        else:
+            desc_text = str(desc)
+
+        # 問題類型
+        problemtype = data.get("problemtype", {})
+        if isinstance(problemtype, dict):
+            ptype = problemtype.get("type") or problemtype.get("classof") or "ai-vulnerability"
+        else:
+            ptype = "ai-vulnerability"
+
+        # 影響的產品
+        affects = data.get("affects", {})
+        affected_name = ""
+        if isinstance(affects, dict):
+            developer = affects.get("developer", {})
+            if isinstance(developer, dict):
+                affected_name = developer.get("name", "")
+
+        return {
+            "cve_id": vuln_id,  # AVID-YYYY-VNNN
+            "package": affected_name or "ai-system",
+            "severity": "medium",  # AVID 無標準嚴重度評分
+            "confidence": "medium",
+            "description": f"[AVID] {ptype}: {desc_text[:180]}",
+            "remediation": "查看 AVID 詳情: https://avidml.org/database/{vuln_id}",
+            "source": "AVID",
+            "published": data.get("published_date", ""),
+        }
+    except Exception:
+        return None
+
+
 def update_vulnerabilities(force: bool = False, authoritative: bool = True) -> Dict:
     """更新漏洞庫
 
@@ -432,8 +555,12 @@ def update_vulnerabilities(force: bool = False, authoritative: bool = True) -> D
 
     # 2. 權威源（Layer 3，可選）
     osv_findings = None
+    avid_findings = None
     if authoritative:
         osv_findings = fetch_authoritative_vulns()
+        # OSV 失敗時回退到 AVID（國際開源 AI 漏洞庫）
+        if osv_findings is None:
+            avid_findings = fetch_avid_vulns(limit_per_year=30)
 
     # 決定使用哪個數據
     if osv_findings is not None:
@@ -450,6 +577,21 @@ def update_vulnerabilities(force: bool = False, authoritative: bool = True) -> D
             "_schema_version": "1.0",
             "_last_updated": time.strftime("%Y-%m-%d %H:%M UTC", time.gmtime()),
             "_source": "OSV.dev authoritative",
+            "vulnerabilities": merged_vulns,
+        }
+    elif avid_findings is not None:
+        # AVID 回退：以 AVID 結果重建（OSV 不可用時）
+        merged_vulns = avid_findings
+        if remote_data:
+            remote_ids = {v["cve_id"] for v in avid_findings}
+            for v in remote_data.get("vulnerabilities", []):
+                if v["cve_id"] not in remote_ids:
+                    merged_vulns.append(v)
+        data = {
+            "_comment": "由 AVID 開源庫回退更新（OSV 不可用）",
+            "_schema_version": "1.0",
+            "_last_updated": time.strftime("%Y-%m-%d %H:%M UTC", time.gmtime()),
+            "_source": "AVID (fallback)",
             "vulnerabilities": merged_vulns,
         }
     elif remote_data:

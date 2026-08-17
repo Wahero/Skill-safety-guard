@@ -106,7 +106,38 @@ POST https://api.osv.dev/v1/query
 
 **可行性评估**：同 CNNVD，自动化接入难度高，标记为「需人工」源。
 
-### 3.3 NVD 镜像（GitHub）✅
+### 3.3 CAIVD 中国人工智能漏洞库（AIVD）
+
+| 项目 | 内容 |
+|------|------|
+| **运营方** | 工信部主导、中国信通院（CAICT）建设（国家级）|
+| **URL** | https://ai.nvdb.org.cn |
+| **编号格式** | 漏洞报送/平台公告 |
+| **权威性** | ⭐⭐⭐⭐⭐ 中国 AI 领域官方 |
+| **访问** | ✅ 免注册可访问网页 |
+
+**接入现状**：
+- ✅ 网页无需注册即可访问
+- ❌ **无公开 JSON API**：数据由前端 JS 渲染（SPA），非后端接口
+- 经逆向分析，站点数据硬编码在 webpack bundle 中，无文档化 API
+- **结论**：标记为「免注册人工查询」源，自动化接入待官方开放 API
+
+### 3.4 AVID AI 漏洞库（国际开源）✅
+
+| 项目 | 内容 |
+|------|------|
+| **运营方** | 开源社区（avidml.org）|
+| **URL** | https://avidml.org / GitHub: avidml/avid-db |
+| **编号格式** | `AVID-YYYY-VNNN` |
+| **权威性** | ⭐⭐⭐⭐ AI 漏洞开源标准 |
+| **访问** | ✅ GitHub API 可自动化 |
+
+**接入现状**：
+- ✅ 结构化 JSON（metadata/problemtype/description/impact）
+- ✅ 可通过 GitHub API 自动拉取（raw 被墙时 API 可用）
+- ✅ 已实现 `fetch_avid_vulns()`，作为 OSV 不可用时的后备源
+
+### 3.5 NVD 镜像（GitHub）✅
 
 | 项目 | 内容 |
 |------|------|
