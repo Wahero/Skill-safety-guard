@@ -2,6 +2,40 @@
 
 All notable changes to skill-safety-guard will be documented in this file.
 
+## [Unreleased]
+
+### Added (in progress for v1.1 / v2.0)
+- Unicode 隱寫檢測（F-022）：14 條規則
+  - 零寬字符檢測（U+200B/C/D、U+FEFF）
+  - Tag 字符區塊（U+E0000-U+E007F）檢測
+  - 不可見運算符檢測（U+2060-U+2064）
+  - 混合隱寫檢測
+- GitHub Issue 模板：feature_request.md、question.md
+- Pull Request 模板
+- 腳本：scripts/generate_unicode_rules.py
+- 腳本：scripts/fix_auth_permissions.py
+
+### Fixed
+- Windows auth.json 權限檢測（os.stat 不反映 ACL，改用 icacls）
+- YAML 對 Unicode 高位字符的處理（ `\u` 只支援 4 位 hex，U+E0000 需要字面字符）
+- Unicode 檢測需要單文件掃描支援
+
+## [1.0.0] - 2026-08-17
+
+### Added
+- **杀手場景**（v4 P0 最高優先級）
+  - F-007 URL/註冊名解析：支援 4 種 GitHub URL
+  - F-008 預覽式掃描：sub_path 只取子目錄
+  - F-009 粘貼式掃描：支援 'paste' 從 stdin 讀取
+  - F-010 三級決策：SAFE / CAUTION / DANGER
+- **誤報治理**（F-015）
+  - `--min-confidence` 過濾（high/medium/low）
+  - `--confidence-detail` 顯示分級原因
+  - `--report-fp` 改進含本地白名單模板
+- **跨平台 auth.json 檢測**
+  - Linux/Mac POSIX 權限
+  - Windows ACL 檢測（修本機 0o666 誤報）
+
 ## [0.1.0] - 2026-08-17
 
 ### Phase 0 完成 ✅

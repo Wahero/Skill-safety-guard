@@ -3,6 +3,7 @@ from .base import BaseDetector, Finding, DetectionResult  # noqa: F401
 from .credentials import CredentialsDetector
 from .shell import ShellDetector
 from .paths import PathsDetector
+from .unicode import UnicodeDetector
 
 
 __all__ = [
@@ -12,4 +13,5 @@ __all__ = [
     "CredentialsDetector",
     "ShellDetector",
     "PathsDetector",
+    "UnicodeDetector",
 ]

@@ -210,6 +210,7 @@ def generate_report(
         "credentials": "🔑 憑證洩露",
         "shell": "💀 危險 Shell 命令",
         "paths": "📁 敏感路徑訪問",
+        "unicode": "🕵️ Unicode 隱寫",
     }
 
     for cat, result in skill_results.items():

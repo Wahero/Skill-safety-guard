@@ -6,7 +6,7 @@ from pathlib import Path
 from typing import Dict
 
 from .rules_loader import load_all_rules, load_whitelist
-from .detectors import CredentialsDetector, ShellDetector, PathsDetector
+from .detectors import CredentialsDetector, ShellDetector, PathsDetector, UnicodeDetector
 from .detectors.base import Finding
 from .pi_check import check_pi_version, check_auth_permissions
 from .parser import parse_skill_file, validate_skill_frontmatter
@@ -96,10 +96,29 @@ def scan_target(target: Path, args) -> Dict:
         cred_det = CredentialsDetector(all_rules.get("credentials", []), whitelist)
         shell_det = ShellDetector(all_rules.get("shell", []), whitelist)
         path_det = PathsDetector(all_rules.get("paths", []), whitelist)
+        unicode_det = UnicodeDetector(all_rules.get("unicode", []), whitelist)
 
-        for det in [cred_det, shell_det, path_det]:
-            result = det.detect_directory(target)
-            skill_results[det.category] = result
+        # 檢測目標是文件還是目錄
+        if target.is_file():
+            from .detectors.base import DetectionResult
+            # 單文件掃描
+            try:
+                content = target.read_text(encoding="utf-8")
+            except (UnicodeDecodeError, PermissionError):
+                content = ""
+
+            for det in [cred_det, shell_det, path_det, unicode_det]:
+                result = DetectionResult(category=det.category, scanned_files=1)
+                findings = det.detect_file(target, content)
+                for f in findings:
+                    if not det._apply_whitelist(f):
+                        f = det._apply_confidence_demotion(f)
+                        result.findings.append(f)
+                skill_results[det.category] = result
+        else:
+            for det in [cred_det, shell_det, path_det, unicode_det]:
+                result = det.detect_directory(target)
+                skill_results[det.category] = result
 
         # SKILL.md frontmatter 驗證
         skill_md = target / "SKILL.md" if target.is_dir() else None

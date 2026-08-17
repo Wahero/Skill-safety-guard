@@ -50,16 +50,18 @@ jobs:
         env:
           PYTHONIOENCODING: utf-8
         run: |
-          python scripts/safety-check . --output json > safety-report.json || true
-          cat safety-report.json | python -c "
+          # 只掃描源代碼，不掃描 tests/fixtures/ （含惡意樣本）
+          python scripts/safety-check src/ --output json > safety-report.json || true
+          python -c "
           import sys, json
-          d = json.load(sys.stdin)
+          d = json.load(open('safety-report.json'))
           print('Scan grade:', d['overall_grade'])
           print('Findings:', d['summary']['total'])
-          # 在 CI 中，允許 D 級及以下的問題存在
-          if d['overall_grade'] in ['E', 'F']:
-            print('ERROR: Critical issues found in own project!', file=sys.stderr)
+          # 在 CI 中，源代碼中不應有 critical/high 問題
+          if d['summary']['critical'] > 0 or d['summary']['high'] > 0:
+            print(f'ERROR: {d[\"summary\"][\"critical\"]} critical, {d[\"summary\"][\"high\"]} high issues in source code!', file=sys.stderr)
             sys.exit(1)
+          print('Source scan OK')
           "
 
       - name: Upload safety report
