@@ -2,9 +2,10 @@
 
 > **個人開發者安裝 Skill / MCP 前的安全守護者**
 
-[![Version](https://img.shields.io/badge/version-2.0.0-orange.svg)]()
-[![Rules](https://img.shields.io/badge/rules-158-blue.svg)]()
-[![Phase](https://img.shields.io/badge/phase-2%20complete-green.svg)]()
+[![Version](https://img.shields.io/badge/version-3.4.3-orange.svg)]()
+[![Rules](https://img.shields.io/badge/rules-181-blue.svg)]()
+[![Categories](https://img.shields.io/badge/categories-9-green.svg)]()
+[![VulnFeed](https://img.shields.io/badge/vuln%20feed-OSV%2BAVID%2BCAIVD-purple.svg)]()
 [![License](https://img.shields.io/badge/license-MIT-green.svg)]()
 
 ---
@@ -97,7 +98,51 @@ python -m skill_safety_guard --report-fp shell-curl-bash
 
 ---
 
-## 檢測能力（v2.0.0 / 158 條規則 / 8 類檢測）
+## 🛡️ 漏洞情報系統（每日自動更新）
+
+> **亮點功能**：漏洞庫自動保持最新，支持多源回退 + 國內用戶加速代理
+
+```
+🌐 OSV.dev（Google 權威）——主源，自動排除已撤銷 CVE
+🇨🇳 CAIVD（工信部/信通院）——國內 AI 漏洞庫，免註冊人工查詢
+🌍 AVID（國際開源）——OSV 不可用時自動回退
+📦 本項目漏洞庫 —— GitHub Actions 每天更新
+```
+
+### 自動更新機制（零配置）
+
+```bash
+# 每次掃描自動檢查 TTL，過期後台更新（不阻塞）
+# GitHub Actions 每天 00:00 UTC 從權威源更新內置庫
+
+# 查看漏洞庫狀態
+safety-check --vuln-status
+# 📊 漏洞條目: 4 ｜ 🕐 更新日期 ｜ 🎯 漏洞清單
+
+# 手動更新
+safety-check --update-vulns
+
+# 設置更新頻率（默認每週）
+safety-check --vuln-frequency daily|weekly|monthly|off
+
+# 查看所有漏洞源
+safety-check --vuln-sources
+```
+
+### 多源回退 + 國內支持
+
+| 特性 | 說明 |
+|------|------|
+| **多源回退** | OSV → AVID → 本項目庫 → 加速代理 |
+| **撤銷自動清理** | OSV 查詢自動排除 withdrawn CVE |
+| **國內加速** | `--vuln-proxy` 設置 ghproxy 等代理 |
+| **離線可用** | 內置庫兜底，斷網也能用 |
+
+詳見 [`docs/VULN_SOURCES.md`](docs/VULN_SOURCES.md)。
+
+---
+
+## 檢測能力（v3.4.3 / 181 條規則 / 9 類檢測）
 
 ### 🚨 關鍵系統參數修改（最高優先級）
 
@@ -164,8 +209,13 @@ python -m skill_safety_guard --report-fp shell-curl-bash
 | **v1.4.0** | ✅ 已完成 | 編輯器 + Git + 歷史 + Rootkit |
 | **v1.5.0** | ✅ 已完成 | Freemium + SARIF + 提示詞注入 |
 | **v1.6.0** | ✅ 已完成 | MCP 依賴檢查 + --all 完整掃描 |
-| **v2.0.0** | 🚀 最新 | Phase 2 全部完成（8 類檢測，158 條規則）|
-| v3.0 | 📋 規劃 | LLM 輔助檢測 + MCP 注入深度檢測 |
+| **v2.0.0** | ✅ 已完成 | Phase 2 全部完成 |
+| **v3.0.0** | ✅ 已完成 | LLM 輔助檢測 + MCP 注入深度檢測（181 規則）|
+| **v3.1.0** | ✅ 已完成 | 性能優化（4x）+ 完整文檔 |
+| **v3.2.0** | ✅ 已完成 | 每日漏洞情報系統 |
+| **v3.3.0** | ✅ 已完成 | 權威漏洞源 + 自動更新頻率 |
+| **v3.4.x** | 🚀 最新 | 國內源（CAIVD/AVID）+ 增強狀態顯示 |
+| v4.0 | 📋 規劃 | 多框架支持 + MCP 代理網關 + CI/CD |
 
 詳細規劃見 [`docs/PRD_v4_聚焦个人开发者版.MD`](docs/PRD_v4_聚焦个人开发者版.MD)。
 
