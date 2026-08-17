@@ -1,0 +1,92 @@
+name: Update Vulnerability Feed
+
+on:
+  schedule:
+    - cron: '0 3 * * *'  # 每天 UTC 03:00 更新
+  workflow_dispatch:  # 手动触发
+
+permissions:
+  contents: write
+
+jobs:
+  update-vulns:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Update vulnerabilities.json
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python - << 'EOF'
+          """从 NVD + OSV.dev 抓取 Pi 相关 CVE，更新 vulnerabilities.json"""
+          import json, urllib.request, time
+          from pathlib import Path
+
+          # 1. OSV.dev 查询 @earendil-works/pi-coding-agent
+          osv_findings = []
+          try:
+              payload = {"package": {"name": "@earendil-works/pi-coding-agent"}}
+              req = urllib.request.Request(
+                  "https://api.osv.dev/v1/query",
+                  data=json.dumps(payload).encode(),
+                  headers={"Content-Type": "application/json"},
+                  method="POST",
+              )
+              with urllib.request.urlopen(req, timeout=30) as resp:
+                  data = json.loads(resp.read().decode())
+                  for v in data.get("vulns", []):
+                      osv_findings.append({
+                          "cve_id": v.get("id", "OSV-unknown"),
+                          "package": "pi-coding-agent",
+                          "npm_package": "@earendil-works/pi-coding-agent",
+                          "affected_versions": [],
+                          "severity": "medium",
+                          "description": (v.get("summary") or v.get("details") or "")[:200],
+                          "remediation": "升级至修复版本",
+                          "source": "OSV",
+                          "published": v.get("published", ""),
+                      })
+                  print(f"OSV: {len(osv_findings)} findings")
+          except Exception as e:
+              print(f"OSV error: {e}")
+
+          # 2. 保留已有的内置 CVE（合并）
+          feed_path = Path("rules/vulnerabilities.json")
+          existing = json.loads(feed_path.read_text(encoding="utf-8"))
+          existing_ids = {v["cve_id"] for v in existing.get("vulnerabilities", [])}
+
+          # 合并 OSV 新发现
+          merged = list(existing.get("vulnerabilities", []))
+          for f in osv_findings:
+              if f["cve_id"] not in existing_ids:
+                  merged.append(f)
+                  existing_ids.add(f["cve_id"])
+
+          # 更新时间戳
+          today = time.strftime("%Y-%m-%d")
+          existing["vulnerabilities"] = merged
+          existing["_last_updated"] = today
+          existing["_osv_checked_at"] = today
+
+          feed_path.write_text(json.dumps(existing, ensure_ascii=False, indent=2), encoding="utf-8")
+          print(f"Feed updated: {len(merged)} vulns, last updated {today}")
+          EOF
+
+      - name: Commit changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add rules/vulnerabilities.json
+          if git diff --cached --quiet; then
+            echo "No changes"
+          else
+            git commit -m "chore: 更新漏洞库 $(date +%Y-%m-%d)"
+            git push
+          fi

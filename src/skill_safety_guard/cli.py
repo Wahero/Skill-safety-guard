@@ -66,6 +66,8 @@ def parse_args(argv=None):
     parser.add_argument("--license-status", action="store_true", help="顯示許可證狀態")
     parser.add_argument("--audit-extensions", action="store_true", help="掃描已安裝擴展目錄")
     parser.add_argument("--pro", action="store_true", help="啟用 Pro 功能（LLM 輔助檢測）")
+    parser.add_argument("--update-vulns", action="store_true", help="更新漏洞庫（每日漏洞情報）")
+    parser.add_argument("--osv", action="store_true", help="啟用 OSV.dev 實時漏洞查詢")
     return parser.parse_args(argv)
 
 
@@ -192,7 +194,7 @@ def scan_target(target: Path, args) -> Dict:
 
 def scan_pi_only(args) -> Dict:
     """只掃描 Pi 全局"""
-    pi_result = check_pi_version()
+    pi_result = check_pi_version(use_osv=getattr(args, "osv", False))
     auth_result = check_auth_permissions()
 
     pi_combined = {
@@ -333,6 +335,20 @@ def main(argv=None):
         print(f"Can scan now: {can}\n")
         return 0
 
+    # 更新漏洞庫（每日漏洞情報）
+    if args.update_vulns:
+        from .vuln_feed import update_vulnerabilities, get_vuln_source_info
+        print("\n[VULN UPDATE] 檢查漏洞庫更新...")
+        result = update_vulnerabilities(force=True)
+        print(f"  狀態: {'✅ 已更新' if result.get('updated') else '⏭ 未更新'}")
+        print(f"  原因: {result.get('reason', 'ok')}")
+        if result.get('count'):
+            print(f"  漏洞條目: {result['count']}")
+        info = get_vuln_source_info()
+        print(f"  當前來源: {info['source']}（更新於 {info['last_updated']}）")
+        print(f"  當前規則: {info['count']} 條\n")
+        return 0
+
     # 解析掃描目標（F-007 殺手場景：支援 URL/粘貼）
     resolved = resolve_target(args.target)
     if resolved is None:
@@ -389,7 +405,7 @@ def _run_scan(args, target: Path, resolved: ScanTarget) -> int:
                     "clean": True, "error": "跳過（--no-pi）", "auth_check": {}}
     else:
         progress("正在檢查 Pi Agent 全局...")
-        pi_check = check_pi_version()
+        pi_check = check_pi_version(use_osv=getattr(args, "osv", False))
         pi_check["auth_check"] = check_auth_permissions()
         progress("完成 Pi 全局檢查")
 

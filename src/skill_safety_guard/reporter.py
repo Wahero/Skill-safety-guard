@@ -174,12 +174,19 @@ def generate_report(
     if pi_check.get("pi_available"):
         version = pi_check.get("version", "unknown")
         lines.append(f"- **檢測到版本**: `{version}`")
+        # 漏洞庫來源信息
+        vuln_src = pi_check.get("vuln_source", "")
+        vuln_cnt = pi_check.get("vuln_count", 0)
+        if vuln_src and vuln_cnt:
+            osv_note = " + OSV 實時查詢" if pi_check.get("osv_checked") else ""
+            lines.append(f"- 📡 漏洞庫: {vuln_cnt} 條（來源: {vuln_src}{osv_note}）")
         if pi_check.get("clean"):
             lines.append(f"- ✅ 不在已知漏洞範圍")
         else:
             lines.append(f"- ⚠️ 發現 {len(pi_check['vulnerabilities'])} 個已知漏洞：")
             for v in pi_check["vulnerabilities"]:
-                lines.append(f"  - **{v['cve_id']}** ({v['severity'].upper()}): {v['description']}")
+                src_note = f"（來源: {v.get('source', 'builtin')}）" if v.get("source") else ""
+                lines.append(f"  - **{v['cve_id']}** ({v['severity'].upper()}): {v['description']}{src_note}")
                 lines.append(f"    - 💡 {v['remediation']}")
     else:
         lines.append(f"- ⚠️ Pi 命令不可用（{pi_check.get('error', '未知錯誤')}）")

@@ -156,24 +156,55 @@ def _write_version_cache(info: Dict) -> None:
         pass
 
 
-def check_pi_version() -> Dict:
-    """執行 Pi 版本 CVE 檢查（F-005）
+def check_pi_version(use_osv: bool = False) -> Dict:
+    """執行 Pi 版本 CVE 檢查（F-005 + 每日漏洞情報）
+
+    使用三層漏洞情報源：
+    - Layer 1/2: 內置 + 遠程漏洞庫（vuln_feed）
+    - Layer 3: OSV.dev 實時查詢（可選，--osv）
 
     返回：
     {
         "pi_available": bool,
         "version": str,
         "vulnerabilities": [{cve_id, severity, description, remediation}],
-        "clean": bool
+        "clean": bool,
+        "vuln_source": str,
+        "osv_checked": bool
     }
     """
     info = get_pi_version()
     vulnerabilities = []
+    osv_checked = False
 
     if info["available"]:
-        for cve in KNOWN_CVES:
-            if _is_below(info["parsed"], cve["affected_below"]):
-                vulnerabilities.append(cve)
+        # Layer 1+2: 內置 + 遠程漏洞庫
+        from ..vuln_feed import check_version_against_vulns, get_vuln_source_info
+
+        result = check_version_against_vulns(info["version"])
+        vulnerabilities = result["vulnerabilities"]
+
+        # Layer 3: OSV.dev 實時查詢（可選）
+        if use_osv:
+            from ..vuln_feed import query_osv
+
+            # 查詢 pi 和 pi-coding-agent 包
+            for pkg in ["pi", "@earendil-works/pi-coding-agent"]:
+                osv_findings = query_osv(pkg, info["version"])
+                # 去重（按 cve_id）
+                existing_ids = {v.get("cve_id") for v in vulnerabilities}
+                for f in osv_findings:
+                    if f["cve_id"] not in existing_ids:
+                        vulnerabilities.append(f)
+                        existing_ids.add(f["cve_id"])
+            osv_checked = True
+
+    source_info = {}
+    try:
+        from ..vuln_feed import get_vuln_source_info
+        source_info = get_vuln_source_info()
+    except Exception:
+        pass
 
     return {
         "pi_available": info["available"],
@@ -181,4 +212,7 @@ def check_pi_version() -> Dict:
         "vulnerabilities": vulnerabilities,
         "clean": len(vulnerabilities) == 0,
         "error": info["error"],
+        "vuln_source": source_info.get("source", "builtin"),
+        "vuln_count": source_info.get("count", len(KNOWN_CVES)),
+        "osv_checked": osv_checked,
     }

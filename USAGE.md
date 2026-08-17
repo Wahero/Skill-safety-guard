@@ -13,10 +13,11 @@
 4. [检测类别](#4-检测类别)
 5. [命令参考](#5-命令参考)
 6. [输出格式](#6-输出格式)
-7. [Freemium 许可](#7-freemium-许可)
-8. [误报处理](#8-误报处理)
-9. [进阶用法](#9-进阶用法)
-10. [故障排除](#10-故障排除)
+7. [漏洞库更新](#7-漏洞库更新每日漏洞情报)
+8. [Freemium 许可](#8-freemium-许可)
+9. [误报处理](#9-误报处理)
+10. [进阶用法](#10-进阶用法)
+11. [故障排除](#11-故障排除)
 
 ---
 
@@ -225,7 +226,72 @@ python scripts/safety-check ./my-skill --output sarif > report.sarif
 
 ---
 
-## 7. Freemium 许可
+## 7. 漏洞库更新（每日漏洞情报）
+
+### 漏洞库架构（三层）
+
+```
+Layer 1: 内置基线（随仓库发布）
+  → rules/vulnerabilities.json
+  → 离线可用，刚装即有基础覆盖
+
+Layer 2: 远程漏洞源（核心更新）
+  → GitHub Actions 每天自动更新漏洞库
+  → safety-check --update-vulns 手动更新
+  → 24 小时 TTL 自动刷新
+
+Layer 3: OSV.dev 实时查询（零日覆盖）
+  → Google 开源漏洞库
+  → safety-check --osv 启用
+  → 按包名+版本实时查询最新 CVE
+```
+
+### 手动更新漏洞库
+
+```bash
+# 强制更新（拉取最新漏洞库）
+python scripts/safety-check --update-vulns
+
+# 查看当前漏洞库状态
+python scripts/safety-check --pi
+# 输出含：📡 漏洞库: N 条（来源: ...）
+```
+
+### OSV.dev 实时查询
+
+```bash
+# 启用 OSV 实时查询（网络失败时自动降级）
+python scripts/safety-check --pi --osv
+```
+
+### 漏洞库自动更新（GitHub Actions）
+
+仓库内置 `update-vulns.yml` 工作流，每天 UTC 03:00 自动：
+1. 查询 OSV.dev 获取 Pi 相关最新漏洞
+2. 合并到 `rules/vulnerabilities.json`
+3. 自动提交推送
+
+### 漏洞情报来源
+
+| 来源 | 用途 | 更新频率 |
+|------|------|---------|
+| 内置 JSON | 基线覆盖 | 随发布 |
+| GitHub 仓库 | 社区维护 | 每天 |
+| OSV.dev | 零日/最新 | 实时 |
+
+### 报告中的展示
+
+```
+### Pi 版本
+- **检测到版本**: `0.84.2`
+- 📡 漏洞库: 3 条（来源: https://github.com/Wahero/Skill-safety-guard）
+- ⚠️ 发现 1 个已知漏洞：
+  - **CVE-2026-54327** (CRITICAL): 任意文件读取漏洞（来源: NVD）
+```
+
+---
+
+## 8. Freemium 许可
 
 ### 免费层
 
@@ -262,7 +328,7 @@ python scripts/safety-check ./my-skill --pro
 
 ---
 
-## 8. 误报处理
+## 9. 误报处理
 
 ### 原则
 
@@ -306,7 +372,7 @@ confidence_demotions:
 
 ---
 
-## 9. 进阶用法
+## 10. 进阶用法
 
 ### 9.1 在 CI 中使用
 
@@ -365,7 +431,7 @@ set PYTHONIOENCODING=utf-8
 
 ---
 
-## 10. 故障排除
+## 11. 故障排除
 
 ### 问题 1：UnicodeEncodeError
 
