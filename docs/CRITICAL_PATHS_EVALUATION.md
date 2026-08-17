@@ -123,28 +123,57 @@ Layer 4: 運行時保護（OSQuery/Falco）
 
 ---
 
-## 五、新增的規則清單（v1.2）
+## 五、新增的規則清單
 
+### v1.3.0 新增 23 條規則
+
+#### AI Agent 配置（8 條新增）
 | 規則 ID | 描述 | 嚴重度 |
 |--------|------|--------|
-| critical-agents-md-write | 寫入全局 AGENTS.md | critical |
-| critical-pi-config-write | 寫入 ~/.pi/agent/* | critical |
-| critical-pi-config-unlink | 刪除 ~/.pi/agent/* | critical |
-| critical-claude-md-write | 寫入 Claude Code 配置 | critical |
-| critical-codex-config-write | 寫入 OpenAI Codex 配置 | critical |
-| critical-continue-config-write | 寫入 Continue.dev 配置 | critical |
-| critical-shell-init-write | 寫入 Shell init 文件 | critical |
-| critical-shell-init-shell-redirect | Shell 重定向到 init 文件 | critical |
-| critical-shell-init-unlink | 刪除 Shell init 文件 | critical |
-| critical-ssh-authorized-keys | 寫入 SSH authorized_keys | critical |
-| critical-ssh-config-write | 修改 SSH config | critical |
-| critical-cron-write | 修改 crontab | critical |
-| implicit-agent-function | 函數名暗示 Agent 配置 | high |
-| implicit-agent-variable | 變量名暗示 Agent 配置 | high |
-| implicit-write-then-chmod-exec | 寫後 chmod+x 後門模式 | critical |
-| implicit-homedir-write | homedir() + write 跨行模式 | high |
+| critical-cursor-rules-write | Cursor rules 寫入 | critical |
+| critical-cursor-mcp-write | Cursor MCP 配置 | critical |
+| critical-cursor-extensions-write | Cursor 擴展目錄 | high |
+| critical-aider-config-write | Aider 配置 | critical |
+| critical-opencode-config-write | OpenCode 配置 | critical |
+| critical-cline-config-write | Cline（VSCode）配置 | critical |
+| critical-cody-config-write | Cody（Sourcegraph）配置 | critical |
+| critical-claude-md-shell-redirect | Shell 重定向到 Claude | critical |
+| critical-codex-instructions | Codex instructions.md | critical |
 
-**共 16 條新規則**，全部 CRITICAL 或 HIGH 嚴重度。
+#### 包管理器配置（10 條新增）
+| 規則 ID | 描述 | 嚴重度 |
+|--------|------|--------|
+| critical-npmrc-write | .npmrc + npm config set | critical |
+| critical-yarnrc-write | .yarnrc 寫入 | critical |
+| critical-pip-conf-write | pip.conf + pip config set | critical |
+| critical-cargo-config-write | ~/.cargo/config.toml/credentials | critical |
+| critical-gemrc-write | .gemrc | critical |
+| critical-composer-config-write | ~/.composer/config.json | critical |
+| critical-maven-config-write | ~/.m2/settings.xml | critical |
+| critical-gradle-config-write | .gradle/init.gradle/properties | critical |
+| critical-bower-config-write | .bowerrc | critical |
+| critical-aws-credentials-write | AWS credentials | critical |
+
+#### 持久化機制（4 條新增）
+| 規則 ID | 描述 | 嚴重度 |
+|--------|------|--------|
+| critical-macos-launchagents | macOS LaunchAgent plist | critical |
+| critical-macos-launchdaemons | macOS LaunchDaemon plist | critical |
+| critical-linux-autostart | Linux .desktop autostart | critical |
+| critical-systemd-user-write | Systemd 用戶服務 | critical |
+
+#### 變量名擴展（implicit-agent-variable）
+- 增加 20+ 變量名模式（npmrcPath, awsCreds, sshKeys, cursorRulesPath, aiderConf, clinePath, launchAgentsPath 等）
+
+### v1.2 原有 16 條規則（保留）
+[上個版本的規則依然有效]
+
+### 規則總數演進
+
+| 版本 | critical_paths 規則 |
+|------|---------------------|
+| v1.2.0 | 16 |
+| **v1.3.0** | **39** |
 
 ---
 
