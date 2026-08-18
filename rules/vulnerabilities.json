@@ -1,8 +1,9 @@
 {
-  "_comment": "skill-safety-guard 漏洞情报源。由 GitHub Actions 定期更新 + 社区贡献。",
+  "_comment": "由权威源（OSV.dev）自动更新，每周核对撤销 CVE",
   "_schema_version": "1.0",
-  "_last_updated": "2026-08-17",
-  "_source_repo": "https://github.com/Wahero/Skill-safety-guard",
+  "_last_updated": "2026-08-18 01:15 UTC",
+  "_source": "OSV.dev authoritative",
+  "_updated_by": "github-actions[bot]",
   "vulnerabilities": [
     {
       "cve_id": "CVE-2026-54326",
@@ -30,7 +31,9 @@
       "cve_id": "CVE-2026-54328",
       "package": "pi-coding-agent",
       "npm_package": "@earendil-works/pi-coding-agent",
-      "affected_versions": ["<0.78.1"],
+      "affected_versions": [
+        "<0.78.1"
+      ],
       "severity": "high",
       "confidence": "medium",
       "description": "依賴鏈漏洞：0.74.0-0.78.0 版本存在漏洞（含傳遞依賴）",
