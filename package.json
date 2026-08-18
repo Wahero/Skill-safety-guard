@@ -1,0 +1,39 @@
+{
+  "name": "skill-safety-guard",
+  "version": "0.1.0",
+  "description": "Security guard before installing third-party Skills/MCPs. Scans for credential leaks, dangerous shell commands, sensitive path access, prompt injection, Unicode steganography, and checks Pi Agent global security (version CVEs + auth.json ACL).",
+  "keywords": [
+    "pi-package",
+    "pi",
+    "pi-coding-agent",
+    "security",
+    "skill-safety",
+    "mcp",
+    "scanning",
+    "ai-agent"
+  ],
+  "license": "MIT",
+  "author": "Wahero",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Wahero/Skill-safety-guard.git"
+  },
+  "homepage": "https://github.com/Wahero/Skill-safety-guard",
+  "bugs": {
+    "url": "https://github.com/Wahero/Skill-safety-guard/issues"
+  },
+  "pi": {
+    "skills": ["./SKILL.md"]
+  },
+  "files": [
+    "SKILL.md",
+    "src",
+    "scripts",
+    "rules",
+    "docs",
+    "demo",
+    "README.md",
+    "USAGE.md",
+    "LICENSE"
+  ]
+}

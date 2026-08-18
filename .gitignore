@@ -51,6 +51,7 @@ coverage/
 agent-output/
 artifacts-*/
 # 扫描报告（保留本地，不上传 GitHub）
+report/
 SCAN_REPORT_*.md
 scan-*.md
 scan-*.json

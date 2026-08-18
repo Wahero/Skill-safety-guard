@@ -5,7 +5,7 @@ allowed-tools:
   - read
   - bash
   - edit
-version: 0.1.0
+version: 3.4.3
 author: Wahero
 license: MIT
 ---
@@ -16,6 +16,15 @@ license: MIT
 > 對話式觸發：`/safety-check` ｜ 開源規則庫 ｜ 寬鬆免費策略
 
 ---
+
+## 設置（首次使用前，一次性）
+
+> skill-safety-guard 的引擎是 Python，代碼隨 Skill 一起分發，**無需安裝本項目**。
+> 唯一外部依賴是 `pyyaml`（絕大多數環境已預裝）：
+
+```bash
+pip install pyyaml
+```
 
 ## 觸發命令
 
@@ -52,12 +61,24 @@ safety-check https://github.com/Wahero/url-extract
 
 ## 安裝方式
 
+### 方式 0：作為 Pi Package 安裝（推薦，支持 `pi install` / 更新 / 官網展示）
+
 ```bash
-# 方式 1：複製到 Pi Agent skills 目錄
+pi install git:github.com/Wahero/Skill-safety-guard
+# 或 npm 發布後
+pi install npm:skill-safety-guard
+```
+
+### 方式 1：複製到 Pi Agent skills 目錄
+
+```bash
 mkdir -p ~/.pi/agent/skills/skill-safety-guard
 cp SKILL.md ~/.pi/agent/skills/skill-safety-guard/
+```
 
-# 方式 2：軟連結（開發模式）
+### 方式 2：軟連結（開發模式）
+
+```bash
 ln -s "$(pwd)" ~/.pi/agent/skills/skill-safety-guard
 ```
 
@@ -66,17 +87,21 @@ ln -s "$(pwd)" ~/.pi/agent/skills/skill-safety-guard
 ```
 用戶輸入 /safety-check <target>
    ↓
-Pi Agent 加載本 SKILL.md，調用 bash 執行
+Pi Agent 加載本 SKILL.md（baseDir = 本 Skill 所在目錄）
    ↓
-python -m skill_safety_guard <target>
+python {baseDir}/scripts/safety-check <target>
    ↓
 三層掃描：
   ① Pi Agent 全局（版本 + auth.json 權限）
-  ② Skill 內容（憑證 + Shell + 路徑 + Unicode）
+  ② Skill 內容（憑證 + Shell + 路徑 + Unicode + 注入）
   ③ Skill 依賴（MCP 服務器）
    ↓
 Markdown 風險報告（帶風險等級 + 修復建議 + 置信度標記）
 ```
+
+> `{baseDir}` 是 Pi 注入的 Skill 目錄佔位符——即使 Skill 被安裝到任意位置（pip 全局、~/.pi/agent/git/...、node_modules），
+> 都能正確解析到同倉庫內的 `scripts/`、`src/`、`rules/`，因此**同一份代碼無需複製第二遍**。
+> 若已 `pip install -e .`，也可直接用 `python -m skill_safety_guard <target>`。
 
 ## 安全保證
 
@@ -87,9 +112,11 @@ Markdown 風險報告（帶風險等級 + 修復建議 + 置信度標記）
 
 ## 當前狀態
 
-🚧 **v0.1.0 (Phase 0 通過，MVP 開發中)**
+✅ **v3.4.3 功能線**（181 規則 / 9 類檢測 / 自掃 SAFE）
 
-詳細路線圖見 `docs/PRD_v4_聚焦个人开发者版.MD`。
+🚀 **Pi Package 化**：根目錄 `package.json` 已配置 `pi` manifest，可通過 `pi install git:...` 安裝並展示於 [pi.dev/packages](https://pi.dev/packages)。
+
+詳細路線圖見 `docs/PRD_v4_聚焦个人开发者版.MD`，完整功能見 `功能說明書.md`。
 
 ---
 

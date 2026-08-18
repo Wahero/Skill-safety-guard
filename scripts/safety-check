@@ -19,6 +19,13 @@ src_path = Path(__file__).resolve().parent.parent / "src"
 if src_path.exists():
     sys.path.insert(0, str(src_path))
 
+# pyyaml 依賴檢查（首次運行給出友好提示，而非 raw traceback）
+try:
+    import yaml  # noqa: F401
+except ImportError:
+    print("[skill-safety-guard] 缺少依賴 pyyaml，請先執行：pip install pyyaml", file=sys.stderr)
+    sys.exit(3)
+
 from skill_safety_guard.cli import main
 
 if __name__ == "__main__":

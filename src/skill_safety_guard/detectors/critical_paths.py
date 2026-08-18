@@ -33,7 +33,8 @@ class CriticalPathsDetector(BaseDetector):
                 # 多行模式：跨行匹配
                 for match in pattern.finditer(content):
                     line_no = content[:match.start()].count("\n") + 1
-                    finding = self._make_finding(rule, file_path, line_no, match.group(0))
+                    line = content.splitlines()[line_no - 1].strip() if content.splitlines() else ""
+                    finding = self._make_finding(rule, file_path, line_no, match.group(0), line)
                     findings.append(finding)
             else:
                 # 單行模式：逐行匹配
@@ -45,13 +46,13 @@ class CriticalPathsDetector(BaseDetector):
                         if line_no in seen_lines:
                             break
                         seen_lines.add(line_no)
-                        finding = self._make_finding(rule, file_path, line_no, match.group(0))
+                        finding = self._make_finding(rule, file_path, line_no, match.group(0), line.strip())
                         findings.append(finding)
                         break  # 一個規則在同一行只報一次
 
         return findings
 
-    def _make_finding(self, rule: dict, file_path: Path, line_no: int, matched_text: str) -> Finding:
+    def _make_finding(self, rule: dict, file_path: Path, line_no: int, matched_text: str, context_line: str = "") -> Finding:
         return Finding(
             rule_id=rule["id"],
             rule_name=rule["name"],
@@ -63,5 +64,5 @@ class CriticalPathsDetector(BaseDetector):
             file_path=str(file_path),
             line_number=line_no,
             matched_text=matched_text[:100] + ("..." if len(matched_text) > 100 else ""),
-            context_line="",  # 跨行模式難以給單行上下文
+            context_line=context_line[:200],
         )

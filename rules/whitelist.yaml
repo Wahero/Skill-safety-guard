@@ -36,6 +36,17 @@ whitelisted_patterns:
     match_context: true
     reason: README.md 描述檢測能力的示例行（含中文註記，僅本工具 README 出現）
 
+  # 工具自身源碼中的 FP 判定註釋（paths.py 誤報自動識別邏輯文本自指命中）
+  - rule_id: path-env-file
+    pattern: '但實際是透過 os\.env'
+    reason: paths.py 中誤報判定邏輯的說明文本（非實際訪問 .env）
+
+  # 功能說明書中的檢測能力表格（與 README 同理）
+  - rule_id: critical-history-clear
+    pattern: '\| \*\*歷史篡改\*\*'
+    match_context: true
+    reason: 功能說明書.md 中「歷史篡改」檢測能力描述行
+
   # 測試 fixture 中的真實命中（測試模式下保留所有命中以便驗證）
   # 此項只在 test 模式下生效，生產模式忽略
   - rule_id: '*'
@@ -73,6 +84,8 @@ whitelisted_paths:
   # 掃描報告（描述漏洞，不是實際攻擊；與 SECURITY_AUDIT.md 同理）
   - '*/SCAN_REPORT_*.md'
   - '*/scan-pi-web-*.md'
+  - '*/scan-report-*.md'
+  - '*/report/*'
 
 # 置信度下調：命中後將置信度從 high 降為 low
 confidence_demotions:
