@@ -2,6 +2,7 @@
 from pathlib import Path
 from typing import Dict, List
 from .detectors.base import Finding, DetectionResult
+from . import __version__
 
 
 SEVERITY_EMOJI = {
@@ -323,7 +324,7 @@ def generate_report(
     lines.append("")
     lines.append("---")
     lines.append("")
-    lines.append("*本報告由 skill-safety-guard v1.5.0 自動生成*  ")
+    lines.append(f"*本報告由 skill-safety-guard v{__version__} 自動生成*  ")
     lines.append("*規則庫開源：https://github.com/Wahero/Skill-safety-guard/blob/main/rules/*  ")
     lines.append("*發現誤報？執行 `/safety-check --report-fp <rule-id>`*")
 

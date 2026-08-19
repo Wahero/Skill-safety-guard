@@ -1,213 +1,80 @@
 # skill-safety-guard 任務清單
 
-> **當前狀態**：v0.1.0 已推送，Phase 0 全部通過，Phase 1 進行中（~60% 完成）
-> **更新時間**：2026-08-17
+> **當前狀態**：v3.5.0（功能線）｜ 181 規則 / 9 類檢測 / 自掃 SAFE（A 級）
+> **更新時間**：2026-08-19
+> **過時說明**：本文檔以 v3.5.0 視角重寫，取代 v0.1.0 舊版。完整功能規格見 [`功能說明書.md`](功能說明書.md)；待辦清單以 [`Skill-safety-guard待跟進0818.md`](Skill-safety-guard待跟進0818.md) 為準。
 
 ---
 
-## 📊 整體進度
+## 📊 整體進度（v3.5.0）
 
-| 階段 | 狀態 | 完成度 | 預計剩餘 |
-|------|------|--------|---------|
-| Phase 0 前置驗證 | ✅ 全部通過 | 100% | 0 |
-| Phase 1 MVP | 🟡 進行中 | 60% | 6-8 天 |
-| Phase 2 增強 | ⬜ 未開始 | 0% | 15 天 |
-| Phase 3 商業化 | ⬜ 未開始 | 0% | 15 天 |
-| Phase 4 擴展 | ⬜ 後置 | 0% | 條件觸發 |
-
----
-
-## 🟡 Phase 1 剩餘任務（讓 v1.0 完整）
-
-### Sprint 1.1 - 骨架（100% ✅）
-
-- [x] F-001 創建項目結構
-- [x] F-002 編寫 SKILL.md
-- [x] F-003 命令解析器（基本）
-- [x] F-004 目標定位器（本地路徑）
-
-### Sprint 1.2 - Pi 全局（100% ✅）
-
-- [x] F-005 Pi 版本 CVE 檢測
-- [x] F-006 auth.json 權限檢查
-
-### 🆕 Sprint 1.3 - 殺手場景（0% ⬜）**← 下一個重點**
-
-這是 v4 文檔新增的 P0 最高優先級，但 v0.1.0 還未實現：
-
-- [ ] **F-007** URL/註冊名解析（接受 GitHub URL、社區 skill 註冊名）
-- [ ] **F-008** 預覽式掃描流程（不下載依賴、不執行）
-- [ ] **F-009** 粘貼式掃描（用戶粘貼 SKILL.md 內容）
-- [ ] **F-010** 報告攔截決策（三級建議：安全/警告/危險）
-
-> **為什麼這是下一個重點**：這是用戶最關心的「裝 skill 前掃描」場景，缺它就只是個 CLI 工具，不是 Skill 插件。
-
-### Sprint 1.4 - Skill 基礎檢測（100% ✅）
-
-- [x] F-011 憑證洩露檢測
-- [x] F-012 危險 Shell 命令檢測
-- [x] F-013 敏感路徑訪問檢測
-
-### Sprint 1.5 - 誤報治理（70% 🟡）
-
-- [x] F-014 白名單機制（基本）
-- [ ] **F-015** 置信度分級完善
-    - 當前只有三檔，缺少規則級配置
-    - 缺少「置信度低的命中是否摺疊顯示」的策略
-- [x] F-016 誤報反饋命令（基本 GitHub URL）
-- [ ] **F-017** 誤報反饋文檔
-    - 已在 TESTING.md 提及
-    - 需要在 README 補充官方文檔
-
-### Sprint 1.6 - 報告 + 測試（80% 🟡）
-
-- [x] F-018 Markdown 報告生成器
-- [x] F-019 /safety-check --help
-- [x] F-020 端到端測試（基本）
-- [ ] **F-021** Bug 修復 + 開源發布（**优化）
-    - 當前 v0.1.0 推送完成
-    - 需要：社區推廣文案、截圖、Release notes
+| 階段 | 狀態 | 完成度 | 說明 |
+|------|------|--------|------|
+| Phase 0 前置驗證 | ✅ 已完成 | 100% | CLI 骨架 + 目標定位器 |
+| Phase 1 MVP | ✅ 已完成 | 100% | 殺手場景（URL/粘貼/決策）+ 三類基礎檢測 |
+| Phase 2 增強 | ✅ 已完成 | 100% | Unicode 隱寫 + 提示詞注入 + MCP 依賴 |
+| Phase 3 商業化 | ✅ 已完成 | 100% | Freemium license + SARIF + 漏洞情報 |
+| Phase 4 擴展 | 🔵 後置 | 0% | 多框架 / MCP 網關 / 實時攔截（見待跟進 D 組）|
 
 ---
 
-## 🟢 Phase 2 增強任務（v2.0）
+## ✅ 已交付能力（v3.5.0）
 
-### Sprint 2.1 - Skill 高級檢測（0% ⬜）
+### 三層檢測架構
+1. **Pi Agent 全局**：版本 CVE 檢測（OSV.dev 權威源）+ auth.json ACL（icacls）
+2. **Skill 內容四類規則**：憑證洩露 / 危險 Shell / 敏感路徑 / Unicode 隱寫（181 條規則、9 類檢測器）
+3. **Critical Paths**：67 條關鍵路徑（~/.pi/agent/*、~/.claude/*、rootkit 向量、包管理配置）
 
-- [ ] F-022 Unicode 隱寫檢測（零寬字符、Tag 字符）
-- [ ] F-023 SKILL.md YAML 完整性檢查
-    - 已有基礎框架，需規則化
-- [ ] F-024 規則版提示詞注入檢測（不依賴 LLM）
+### 殺手場景
+- ✅ GitHub URL 掃描 → 自動生成 `scan-report-<repo>.md`
+- ✅ 本地路徑掃描 / 粘貼式掃描
+- ✅ 三級安裝建議（SAFE/CAUTION/DANGER）+ 統一掃描結論三部分
 
-### Sprint 2.2 - 交互增強（0% ⬜）
+### 商業化（Phase 3）
+- ✅ Freemium license（每日免費 3-5 次 / Pro $4.99/月）
+- ✅ SARIF 輸出 / 已安裝擴展靜態審計 / LLM 輔助檢測（--pro）
+- ✅ 每日漏洞情報（OSV.dev → AVID → GitHub 多源回退鏈）
 
-- [ ] F-025 /safety-check --all（完整掃描）
-    - 當前 `--all` 標記已存在但行為待實現
-- [ ] F-026 掃描進度顯示
-- [ ] F-027 風險等級匯總（**已實現基本**）
-- [ ] F-028 CI 本地預覽（pre-commit hook 範例已寫）
-
-### Sprint 2.3 - Skill 依賴檢查（0% ⬜）
-
-- [ ] F-029 MCP 服務器連接
-- [ ] F-030 工具/資源枚舉
-- [ ] F-031 工具風險分類
-- [ ] F-032 MCP 結果併入 Skill 報告
+### Pi Package
+- ✅ 單一來源（根目錄 package.json + SKILL.md 自引用）→ 克隆即用
+- ✅ pi.dev gallery 發布指南（docs/PI_PACKAGE.md）
 
 ---
 
-## 🟢 Phase 3 商業化任務（v3.0）
+## 🟠 待跟進（詳見待跟進清單 0818）
 
-### Sprint 3.1 - Freemium 系統（0% ⬜）
-
-- [ ] F-033 許可證密鑰生成
-- [ ] F-034 許可證驗證
-- [ ] F-035 寬鬆免費策略（每週 5 次）
-- [ ] F-036 個人版定價（$4.99/月）
-
-### Sprint 3.2 - LLM 高級檢測（0% ⬜）
-
-- [ ] F-037 LLM 提示詞注入檢測（Pro 限定）
-- [ ] F-038 已安裝擴展靜態審計
-- [ ] F-039 MCP 注入模式檢測
-- [ ] F-040 MCP 傳輸安全檢測
-
-### Sprint 3.3 - 多格式 + 優化（30% 🟡）
-
-- [x] F-041 JSON 格式輸出（**已实现**）
-- [ ] F-042 SARIF 格式輸出
-- [ ] F-043 性能優化
-- [ ] F-044 用戶文檔（**部分完成**）
+| 優先級 | 事項 | ID |
+|--------|------|----|
+| 🔴 P0 | ~~版本統一 / CHANGELOG 歸檔 / Release~~ | A-001~A-003 ✅ |
+| 🔴 P0 | SKILL.md / TASKS.md 同步 | A-004 ✅ |
+| 🟠 P1 | 安裝前自動攔截（研究 Pi hook API）| B-001 ⚠️ 需決策 |
+| 🟠 P1 | pytest 補 V-03 / V-05 | B-002 |
+| 🟠 P1 | 誤報反饋文檔 / 白名單教程 | B-003 / B-004 |
+| 🟠 P1 | 置信度分級完善 / LLM 真實測試 / 額度機制 | B-005~B-007 |
+| 🟡 P2 | GitHub Pages demo / 社區推廣 / 規則擴展 | C-001~C-003 |
+| 🟡 P2 | GitHub Action 正式化 / Pre-commit | C-004 / C-005 |
+| 🔵 P3 | 多框架適配 / MCP 網關 / 實時攔截 | D-001~D-003 |
 
 ---
 
-## 🔵 Phase 4 擴展任務（後置）
+## 📋 快速驗證
 
-### Sprint 4.x（條件觸發）
-
-- [ ] F-045 多框架適配（OpenClaude / OpenCode / Claude Code）
-- [ ] F-046 MCP 代理網關（運行時攔截）
-- [ ] F-047 實時危險命令攔截
-- [ ] ~~F-048 企業合規報告~~（**取消，不在定位內**）
-- [ ] F-049 GitHub Action
-- [ ] F-050 Pre-commit Hook（**範例已寫**）
+```bash
+cd D:/ai/PiAgent/Skill-safety-guard
+PYTHONIOENCODING=utf-8 python -m pytest tests/ -q                    # 3 passed
+PYTHONIOENCODING=utf-8 python scripts/safety-check . --no-pi          # SAFE / A / 0 發現
+PYTHONIOENCODING=utf-8 python -m pytest tests/test_phase0.py::test_v04_detection_rate -s -q | grep 檢出率   # 8/8
+```
 
 ---
 
-## 🟣 運維與社區任務（不在 PRD 內）
+## 📌 歷史版本里程碑
 
-### 立即可做
+| 版本 | 內容 |
+|------|------|
+| v0.1.0 → v1.6.0 | Phase 0/1/2（殺手場景、Unicode 隱寫、MCP 依賴）|
+| v2.0.0 | Phase 2 全部完成 |
+| v3.0.0 → v3.4.x | Phase 3（LLM 輔助、MCP 注入、漏洞情報、國內源）|
+| **v3.5.0** | URL 自動報告 + 誤報識別 + Pi Package 化 + 版本統一 |
 
-- [ ] **T-001** 修復開發機本身的 auth.json 0o666（順手修一個 P0 檢出）
-  ```bash
-  chmod 600 ~/.pi/agent/auth.json  # Mac/Linux
-  icacls "$env:USERPROFILE\.pi\agent\auth.json" /inheritance:r /grant:r "$env:USERNAME:(R,W)"  # Windows
-  ```
-- [ ] **T-002** 升級本機 Pi 至 0.85.0+（修復 CVE-2026-54327）
-- [ ] **T-003** 創建 GitHub Actions CI workflow（TESTING.md 有範例）
-
-### 推廣相關
-
-- [ ] **T-004** 截圖或錄製 demo 視頻
-- [ ] **T-005** 寫社區推廣文案（Twitter / Reddit / V2EX）
-- [ ] **T-006** 在 Pi Agent 社區提交介紹帖
-- [ ] **T-007** 創建 GitHub Release v0.1.0（含 Release notes）
-
-### 文檔完善
-
-- [ ] **T-008** 添加貢獻指南（CONTRIBUTING.md）
-- [ ] **T-009** 添加行為準則（CODE_OF_CONDUCT.md）
-- [ ] **T-010** 補充實際掃描截圖到 README
-- [ ] **T-011** 寫白名單貢獻教程
-
----
-
-## 📋 建議執行順序
-
-### 今天可以做的（< 1 小時）
-
-1. **T-001** 修復本機 auth.json 權限（30 秒）
-2. **T-002** 升級本機 Pi（5 分鐘）
-3. **T-007** 創建 GitHub Release v0.1.0（10 分鐘）
-
-### 本週可以做的（2-3 小時）
-
-4. **F-015** 完善置信度分級策略
-5. **F-017** 完善誤報反饋文檔
-6. **T-008** CONTRIBUTING.md
-7. **T-003** GitHub Actions CI
-
-### 下一個 Sprint（3-5 天）
-
-8. **F-007~F-010** 殺手場景（URL 解析 + 預覽掃描）
-9. **F-022** Unicode 隱寫檢測（v2.0 第一個）
-10. **T-004** Demo 視頻
-
----
-
-## 📈 關鍵指標追蹤
-
-| 指標 | 當前 | 目標 v1.0 |
-|------|------|----------|
-| 規則數 | 31 | 50+ |
-| 惡意樣本檢出率 | 100% | 100% |
-| 乾淨樣本誤報率 | 0% | ≤3% |
-| 殺手場景覆蓋 | 0% | 100% |
-| 端到端測試覆蓋 | 60% | 90% |
-| 文檔完整度 | 70% | 90% |
-| GitHub stars | 0 | 50 |
-
----
-
-## ❓ 下一個決策
-
-要我接著做哪個？
-
-- **A. 立即處理本機**（T-001/T-002，30 秒 + 5 分鐘）
-- **B. 創建 Release v0.1.0**（T-007，10 分鐘）
-- **C. 開始殺手場景**（F-007，URL 解析，1-2 天）
-- **D. 完善誤報治理**（F-015/F-017，半天）
-- **E. 加 Unicode 檢測**（F-022，2.5 天）
-- **F. 寫 CONTRIBUTING.md**（T-008，1 小時）
-
-選一個或多個都行。
+*完整變更見 CHANGELOG.md*

@@ -70,6 +70,7 @@ whitelisted_paths:
   - '*/demo/outputs/*.md'
   - '*/demo/index.html'
   - '*/docs/CRITICAL_PATHS_EVALUATION.md'
+  - '*/docs/PACKAGE_INTRO.md'  # pi.dev gallery 雙語產品介紹（含 ClawHavoc 攻擊手法示例文案）
   - '*/scripts/generate_critical_paths_rules.py'
   - '*/rules/credentials.yaml'
   - '*/rules/sensitive_paths.yaml'

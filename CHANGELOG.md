@@ -2,7 +2,7 @@
 
 All notable changes to skill-safety-guard will be documented in this file.
 
-## [Unreleased]
+## [3.5.0] - 2026-08-19
 
 ### Added
 **GitHub URL 掃描自動生成 MD 報告（預設行為）**：
@@ -15,6 +15,24 @@ All notable changes to skill-safety-guard will be documented in this file.
 - `path-env-file` 規則誤報自動判定：命中 `os.environ.get()` / `os.getenv()` 等環境變數讀取模式時，判定為誤報（憑證不寫入原始碼是安全做法），不計入風險評分
 - 報告尾段「📌 掃描結論」升級為統一三部分格式：① 文字結論（可安裝/複查/拒裝） ② 結論說明（風險來源分析 + 誤報說明） ③ 漏洞數字卡片（嚴重度統計表）
 - 誤報項在報告中標示 ✅ 誤報判定，統計與風險等級自動排除誤報
+
+**Pi Package 化（單一來源，無需兩份代碼）**：
+- 根目錄新增 `package.json`（pi manifest：`"pi": {"skills": ["./SKILL.md"]}` + `pi-package` keyword）
+- `SKILL.md` 改用 `{baseDir}/scripts/safety-check` 自引用調用（克隆即可跑）
+- 新增 `docs/PI_PACKAGE.md`（發布指南：git/npm/pi.dev gallery/檢查清單/FAQ）
+- 新增 `docs/PACKAGE_INTRO.md`（pi.dev gallery 雙語 EN/ZH 項目介紹，痛點驅動文案）
+- `scripts/safety-check` 增加 pyyaml 缺失友好提示
+
+### Fixed
+- Windows 路徑跳過失效：`"tests/fixtures" in str(Path)` 在反斜杠路徑下永不命中 → 改用 `as_posix()` + 目錄組件匹配（自掃 242 → 113 發現）
+- 白名單覆蓋自指內容：demo/、rules/ 規則定義、docs 評估文檔、掃描報告等加入 whitelisted_paths（自掃 113 → 0，SAFE/A 級）
+- `critical_paths` context_line 空字串 → 改為填充實際行內容（修復 match_context 白名單對 critical_paths 無效）
+- pytest 假通過：測試函數 `return True/False` 改為 `assert`（檢出率 0/8 也顯示 PASS 的 bug）
+- 補 `docs/PACKAGE_INTRO.md` 入路徑白名單（ClawHavoc 攻擊手法示例誤報）
+- reporter 報告版本號從硬編碼 v1.5.0 改為讀取 `__version__`
+
+### 版本同步（A-001）
+- `src/skill_safety_guard/__init__.py` / `package.json` / `pyproject.toml` / `SKILL.md` frontmatter 統一為 v3.5.0
 
 ## [3.0.0] - 2026-08-17
 
@@ -151,9 +169,9 @@ v1.6.0: 158 → v3.0.0: **181**（+23）
 - 新增惡意樣本：tests/fixtures/malicious/package_persistence/SKILL.md
 - 12+ 個攻擊向量全部檢測
 
-## [Unreleased]
+## [2.0.0] - 2026-08-17（歷史歸檔）
 
-### Added (in progress for v1.1 / v2.0)
+### Added (v2 系列：Unicode 隱寫 + 工具完善)
 - Unicode 隱寫檢測（F-022）：14 條規則
   - 零寬字符檢測（U+200B/C/D、U+FEFF）
   - Tag 字符區塊（U+E0000-U+E007F）檢測
@@ -242,9 +260,9 @@ v1.6.0: 158 → v3.0.0: **181**（+23）
 
 ## [Unreleased]
 
-### Phase 1 計劃
-- F-007~F-010: 殺手場景「安裝前 URL 掃描」
-- F-014~F-017: 白名單擴展 + 置信度分級完善
-- F-018~F-021: 報告優化 + 端到端測試
+### 歷史計劃（已全部完成，僅存檔）
+- F-007~F-010: 殺手場景「安裝前 URL 掃描」 → ✅ 已實現（手動 URL 掃描）
+- F-014~F-017: 白名單擴展 + 置信度分級完善 → ✅ 已實現
+- F-018~F-021: 報告優化 + 端到端測試 → ✅ 已實現
 
 詳見 `docs/PRD_v4_聚焦个人开发者版.MD`。
