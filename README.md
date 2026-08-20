@@ -314,6 +314,21 @@ python tests/test_phase0.py
 
 ---
 
+## ☕ 支持這個項目
+
+維護這個項目需要時間與咖啡。如果你覺得它有用：
+
+- 🌍 **全球**：點擊右上角 **Sponsor** 按鈕（GitHub Sponsors，0% 平台費）
+- 🇨🇳 **大陸**：掃碼贊助，直接入帳（0% 手續費）
+
+| 支付寶 | 微信 |
+|--------|------|
+| ![支付寶收款碼](docs/images/alipay-qr.png) | ![微信收款碼](docs/images/wechat-qr.png) |
+
+> 收款碼圖片位於 `docs/images/`，如需更新請替換同名文件。
+
+---
+
 ## 許可證
 
 MIT License —— 詳見 [LICENSE](LICENSE) 文件。
