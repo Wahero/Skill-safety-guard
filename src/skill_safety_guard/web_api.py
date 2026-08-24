@@ -48,6 +48,20 @@ def _count_severity(findings: List[Dict]) -> Dict[str, int]:
     return out
 
 
+def _get_vuln_db_info() -> Dict:
+    """獲取漏洞庫狀態（用於報告）"""
+    try:
+        from .vuln_feed import get_vuln_source_info
+        info = get_vuln_source_info()
+        return {
+            "source": info.get("source", ""),
+            "last_updated": info.get("last_updated", ""),
+            "count": info.get("count", 0),
+        }
+    except Exception:
+        return {"source": "unavailable", "last_updated": "", "count": 0}
+
+
 def run_scan(
     target_str: str,
     *,
@@ -171,6 +185,7 @@ def run_scan(
             },
             "scanned_files": scanned_files,
             "elapsed_ms": int((time.time() - t0) * 1000),
+            "vuln_db": _get_vuln_db_info(),
         }
     finally:
         cleanup_target(resolved)

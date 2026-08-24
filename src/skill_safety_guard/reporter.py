@@ -325,6 +325,20 @@ def generate_report(
     lines.append("")
     lines.append("---")
     lines.append("")
+    # 漏洞庫狀態
+    lines.append("## 📡 本次掃描使用的漏洞庫")
+    lines.append("")
+    try:
+        from .vuln_feed import get_vuln_source_info
+        vi = get_vuln_source_info()
+        lines.append(f"- **數據來源**：{vi.get('source', 'N/A')}")
+        lines.append(f"- **更新時間**：{vi.get('last_updated', 'N/A')}")
+        lines.append(f"- **漏洞條目**：{vi.get('count', 0)} 條")
+    except Exception:
+        lines.append("- 漏洞庫狀態無法取得")
+    lines.append("")
+    lines.append("---")
+    lines.append("")
     lines.append(f"*本報告由 skill-safety-guard v{__version__} 自動生成*  ")
     lines.append("*規則庫開源：https://github.com/Wahero/Skill-safety-guard/blob/main/rules/*  ")
     lines.append("*發現誤報？執行 `/safety-check --report-fp <rule-id>`*")

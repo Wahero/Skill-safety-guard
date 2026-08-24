@@ -277,6 +277,10 @@ function render(r) {
   $('stTotal').textContent = s.total ?? 0;
   $('stFp').textContent = s.fp_excluded ?? 0;
   $('meta').textContent = `${r.display_name || r.target} · ${(r.elapsed_ms / 1000).toFixed(1)}s · ${s.critical||0}C/${s.high||0}H/${s.medium||0}M/${s.low||0}L`;
+  const vdb = r.vuln_db;
+  if (vdb) {
+    $('meta').textContent += ` · 漏洞庫: ${vdb.count || 0}條 (${vdb.last_updated || 'N/A'})`;
+  }
 
   const findings = r.findings || [];
   const tbody = $('tbody');
@@ -296,6 +300,15 @@ function render(r) {
         <td class="match">${(f.matched_text || '').slice(0, 120)}</td>
         <td class="conf">${CONF_ICON[f.confidence] || '🟢'} ${f.confidence}</td>`;
       tbody.appendChild(tr);
+      // 說明 + 建議行
+      if (f.description || f.remediation) {
+        const dr = document.createElement('tr');
+        dr.innerHTML = `<td colspan="5" style="padding:2px 12px 8px 12px;font-size:12px;color:var(--ink-500);border-bottom:1px solid var(--line)">
+          ${f.description ? `<div style="margin-bottom:2px">📋 ${f.description}</div>` : ''}
+          ${f.remediation ? `<div>💡 ${f.remediation}</div>` : ''}
+        </td>`;
+        tbody.appendChild(dr);
+      }
     }
   }
 }
