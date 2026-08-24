@@ -5,7 +5,7 @@ allowed-tools:
   - read
   - bash
   - edit
-version: 3.5.0
+version: 3.6.0
 author: Wahero
 license: MIT
 ---
@@ -112,7 +112,7 @@ Markdown 風險報告（帶風險等級 + 修復建議 + 置信度標記）
 
 ## 當前狀態
 
-✅ **v3.5.0 功能線**（181 規則 / 9 類檢測 / 自掃 SAFE）
+✅ **v3.6.0 功能線**（187 規則 / 10 類檢測 / 自掃 SAFE）
 
 🚀 **Pi Package 化**：根目錄 `package.json` 已配置 `pi` manifest，可通過 `pi install git:...` 安裝並展示於 [pi.dev/packages](https://pi.dev/packages)。
 

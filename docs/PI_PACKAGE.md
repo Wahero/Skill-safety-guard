@@ -38,7 +38,7 @@ FOUND: skill-safety-guard | baseDir: <package root>
 ```json
 {
   "name": "skill-safety-guard",
-  "version": "3.5.0",
+  "version": "3.6.0",
   "keywords": ["pi-package", "pi", "security", "skill-safety", "mcp"],
   "license": "MIT",
   "pi": {

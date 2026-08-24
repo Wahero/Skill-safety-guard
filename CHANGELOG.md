@@ -2,7 +2,7 @@
 
 All notable changes to skill-safety-guard will be documented in this file.
 
-## [Unreleased]
+## [3.6.0] - 2026-08-24
 
 ### Added
 **隱私行為檢測類別（privacy，6 條規則）**：
@@ -13,6 +13,10 @@ All notable changes to skill-safety-guard will be documented in this file.
 
 ### Fixed
 - `.mjs` / `.cjs` 檔案未被掃描：Node ESM/CommonJS 擴展（如 pi-trail 的 server.mjs 主風險源）未列入文本後綴白名單，現已補上
+
+### 版本同步（A-001）
+- `src/skill_safety_guard/__init__.py` / `package.json` / `pyproject.toml` / `SKILL.md` frontmatter / `README.md` badge 統一為 v3.6.0
+- 規則數 181 → 187、檢測類別 9 → 10（新增 privacy 類別）
 
 ## [3.5.0] - 2026-08-19
 

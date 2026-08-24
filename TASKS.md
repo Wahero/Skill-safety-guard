@@ -1,6 +1,6 @@
 # skill-safety-guard 任務清單
 
-> **當前狀態**：v3.5.0（功能線）｜ 181 規則 / 9 類檢測 / 自掃 SAFE（A 級）
+> **當前狀態**：v3.6.0（功能線）｜ 187 規則 / 10 類檢測 / 自掃 SAFE（A 級）
 > **更新時間**：2026-08-19
 > **過時說明**：本文檔以 v3.5.0 視角重寫，取代 v0.1.0 舊版。完整功能規格見 [`功能說明書.md`](功能說明書.md)；待辦清單以 [`Skill-safety-guard待跟進0818.md`](Skill-safety-guard待跟進0818.md) 為準。
 
@@ -76,5 +76,6 @@ PYTHONIOENCODING=utf-8 python -m pytest tests/test_phase0.py::test_v04_detection
 | v2.0.0 | Phase 2 全部完成 |
 | v3.0.0 → v3.4.x | Phase 3（LLM 輔助、MCP 注入、漏洞情報、國內源）|
 | **v3.5.0** | URL 自動報告 + 誤報識別 + Pi Package 化 + 版本統一 |
+| **v3.6.0** | 隱私行為檢測（6 規則）+ .mjs/.cjs 掃描修復 |
 
 *完整變更見 CHANGELOG.md*
