@@ -110,6 +110,7 @@ function scanSkillDir(dir: string): { total: number; grade: string; verdict: str
     for (const name of entries) {
       if (files >= MAX_FILES) return;
       if (name === ".git" || name === "node_modules" || name === "__pycache__" || name === "venv") continue;
+      if (name === "rules" || name === "extension" || name === "tests" || name === "report" || name === "demo" || name === "docs") continue;
       const p = join(d, name);
       let st;
       try {
