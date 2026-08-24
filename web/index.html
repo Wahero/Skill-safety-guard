@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>skill-safety-guard · 掃描工作台</title>
+<style>
+  :root {
+    --ink-900: #0B1220;
+    --ink-700: #334155;
+    --ink-500: #64748B;
+    --ink-400: #94A3B8;
+    --paper: #F7F8FA;
+    --surface: #FFFFFF;
+    --line: rgba(11,18,32,0.08);
+    --scan: #0E7490;
+    --scan-weak: #E0F2FE;
+    --safe: #15803D;
+    --safe-weak: #DCFCE7;
+    --caution: #B45309;
+    --caution-weak: #FEF3C7;
+    --danger: #B91C1C;
+    --danger-weak: #FEE2E2;
+    --mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: Inter, "Noto Sans SC", -apple-system, "Segoe UI", sans-serif;
+    background: var(--paper);
+    color: var(--ink-900);
+    font-size: 14px;
+  }
+  header {
+    background: var(--ink-900);
+    color: #fff;
+    padding: 16px 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  header .logo { font-size: 18px; font-weight: 700; }
+  header .ver {
+    font-family: var(--mono);
+    font-size: 11px;
+    background: rgba(255,255,255,0.12);
+    padding: 2px 8px;
+    border-radius: 4px;
+  }
+  main { max-width: 960px; margin: 24px auto; padding: 0 24px; }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 20px;
+    box-shadow: 0 0 0 1px rgba(11,18,32,.06), 0 1px 2px rgba(11,18,32,.06), 0 2px 6px rgba(11,18,32,.05);
+  }
+  .scan-input { display: flex; gap: 8px; }
+  .scan-input input[type="text"] {
+    flex: 1;
+    height: 48px;
+    font-size: 15px;
+    padding: 0 16px;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    background: #F1F5F9;
+    outline: none;
+    font-family: var(--mono);
+  }
+  .scan-input input[type="text"]:focus { border-color: var(--scan); box-shadow: 0 0 0 2px rgba(14,116,144,0.2); }
+  button.primary {
+    height: 48px;
+    padding: 0 20px;
+    background: var(--scan);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  button.primary:disabled { opacity: 0.5; cursor: not-allowed; }
+  button.primary:active:not(:disabled) { transform: scale(0.98); }
+  .modes { display: flex; gap: 16px; margin-top: 12px; color: var(--ink-500); font-size: 13px; }
+  .modes label { display: flex; align-items: center; gap: 6px; cursor: pointer; }
+  .hint { margin-top: 8px; color: var(--ink-400); font-size: 12px; }
+  #progress { margin-top: 16px; font-family: var(--mono); font-size: 13px; color: var(--scan); min-height: 20px; }
+
+  .result { margin-top: 20px; display: none; }
+  .summary-row { display: flex; gap: 20px; align-items: stretch; }
+  .badge {
+    width: 160px;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 24px 12px;
+    color: #fff;
+    text-align: center;
+  }
+  .badge .label { font-size: 28px; font-weight: 800; }
+  .badge .grade { font-family: var(--mono); font-size: 64px; font-weight: 800; line-height: 1; margin: 8px 0; }
+  .badge .text { font-size: 14px; font-weight: 500; }
+  .badge.safe { background: var(--safe); }
+  .badge.caution { background: var(--caution); }
+  .badge.danger { background: var(--danger); }
+  .stats { flex: 1; display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .stat { background: var(--paper); border: 1px solid var(--line); border-radius: 6px; padding: 14px; }
+  .stat .n { font-family: var(--mono); font-size: 24px; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .stat .k { color: var(--ink-500); font-size: 12px; margin-top: 2px; }
+  .meta { margin-top: 12px; color: var(--ink-400); font-size: 12px; font-family: var(--mono); }
+
+  table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+  th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { position: sticky; top: 0; background: var(--surface); font-size: 12px; font-weight: 600; color: var(--ink-500); }
+  td.rule { font-family: var(--mono); font-size: 12px; }
+  td.match { font-family: var(--mono); font-size: 12px; color: var(--ink-700); word-break: break-all; }
+  .pill { display: inline-block; padding: 1px 8px; border-radius: 4px; font-size: 12px; font-weight: 600; color: #fff; }
+  .pill.critical { background: #7F1D1D; }
+  .pill.high { background: #C2410C; }
+  .pill.medium { background: #B45309; }
+  .pill.low { background: #15803D; }
+  .conf { font-size: 12px; }
+  .empty { color: var(--ink-400); text-align: center; padding: 40px; }
+  .error { margin-top: 16px; background: var(--danger-weak); border: 1px solid var(--danger); color: var(--danger); padding: 12px 16px; border-radius: 6px; display: none; }
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">🛡️ skill-safety-guard</div>
+  <div class="ver">v3.6.0</div>
+  <div style="flex:1"></div>
+  <div style="font-size:12px;color:rgba(255,255,255,.6)">個人開發者安裝 Skill/MCP 前的安全守護者</div>
+</header>
+<main>
+  <div class="card">
+    <div class="scan-input">
+      <input type="text" id="target" placeholder="貼上 GitHub URL 或本地路徑，例如 https://github.com/user/skill" autofocus />
+      <button class="primary" id="scanBtn" onclick="startScan()">開始掃描 ⚡</button>
+    </div>
+    <div class="modes">
+      <label><input type="checkbox" id="pi" /> Pi 全局（版本 CVE + auth.json）</label>
+      <label><input type="checkbox" id="mcp" /> MCP 依賴檢查</label>
+    </div>
+    <div class="hint">支持 GitHub URL / 本地路徑 / 粘貼內容。掃描結果與 CLI 報告對齊。</div>
+    <div id="progress"></div>
+    <div class="error" id="error"></div>
+  </div>
+
+  <div class="result" id="result">
+    <div class="card">
+      <div class="summary-row">
+        <div class="badge" id="badge">
+          <div class="label" id="verdict">—</div>
+          <div class="grade" id="grade">—</div>
+          <div class="text" id="decisionText">—</div>
+        </div>
+        <div class="stats">
+          <div class="stat"><div class="n" id="stFiles">0</div><div class="k">掃描檔案</div></div>
+          <div class="stat"><div class="n" id="stTotal">0</div><div class="k">有效發現</div></div>
+          <div class="stat"><div class="n" id="stFp">0</div><div class="k">誤報排除</div></div>
+        </div>
+      </div>
+      <div class="meta" id="meta"></div>
+    </div>
+
+    <div class="card" style="margin-top:16px">
+      <div style="font-weight:600;margin-bottom:4px">發現項</div>
+      <table>
+        <thead><tr><th style="width:96px">嚴重度</th><th style="width:180px">規則 ID</th><th>位置</th><th>命中內容</th><th style="width:72px">置信度</th></tr></thead>
+        <tbody id="tbody"></tbody>
+      </table>
+      <div class="empty" id="empty">✅ 未發現問題</div>
+    </div>
+  </div>
+</main>
+
+<script>
+const $ = (id) => document.getElementById(id);
+const SEV = { critical: ['critical','Critical'], high: ['high','High'], medium: ['medium','Medium'], low: ['low','Low'] };
+const CONF_ICON = { high: '🔴', medium: '🟡', low: '🟢' };
+
+async function startScan() {
+  const target = $('target').value.trim();
+  if (!target) { $('target').focus(); return; }
+  const btn = $('scanBtn');
+  btn.disabled = true;
+  $('error').style.display = 'none';
+  $('result').style.display = 'none';
+  $('progress').textContent = '→ 建立掃描任務…';
+
+  try {
+    const res = await fetch('/api/scans', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ target, include_pi: $('pi').checked, include_mcp: $('mcp').checked })
+    });
+    const { job_id, error } = await res.json();
+    if (error) throw new Error(error);
+
+    const es = new EventSource(`/api/scans/${job_id}/events`);
+    es.addEventListener('progress', (e) => {
+      const d = JSON.parse(e.data);
+      $('progress').textContent = '→ ' + d.msg;
+    });
+    es.addEventListener('done', async (e) => {
+      es.close();
+      const d = JSON.parse(e.data);
+      if (d.status === 'error') {
+        $('progress').textContent = '';
+        showError(d.error || '掃描失敗');
+        btn.disabled = false;
+        return;
+      }
+      const r = await fetch(`/api/scans/${job_id}`).then(x => x.json());
+      render(r);
+      $('progress').textContent = '';
+      btn.disabled = false;
+    });
+    es.onerror = () => {
+      // SSE 可能因 done 關閉而觸發；若仍在跑則忽略
+    };
+  } catch (err) {
+    $('progress').textContent = '';
+    showError(err.message);
+    btn.disabled = false;
+  }
+}
+
+function showError(msg) {
+  $('error').textContent = '⚠️ ' + msg;
+  $('error').style.display = 'block';
+}
+
+function render(r) {
+  $('result').style.display = 'block';
+  const v = r.verdict || 'SAFE';
+  const badge = $('badge');
+  badge.className = 'badge ' + (v === 'DANGER' ? 'danger' : v === 'CAUTION' ? 'caution' : 'safe');
+  $('verdict').textContent = v;
+  $('grade').textContent = r.grade || '—';
+  $('decisionText').textContent = (r.decision && r.decision.title) || '';
+
+  const s = r.summary || {};
+  $('stFiles').textContent = r.scanned_files ?? 0;
+  $('stTotal').textContent = s.total ?? 0;
+  $('stFp').textContent = s.fp_excluded ?? 0;
+  $('meta').textContent = `${r.display_name || r.target} · ${(r.elapsed_ms / 1000).toFixed(1)}s · ${s.critical||0}C/${s.high||0}H/${s.medium||0}M/${s.low||0}L`;
+
+  const findings = r.findings || [];
+  const tbody = $('tbody');
+  const empty = $('empty');
+  tbody.innerHTML = '';
+  if (findings.length === 0) {
+    empty.style.display = 'block';
+  } else {
+    empty.style.display = 'none';
+    for (const f of findings) {
+      const tr = document.createElement('tr');
+      const sev = SEV[f.severity] || SEV.low;
+      tr.innerHTML = `
+        <td><span class="pill ${sev[0]}">${sev[1]}</span></td>
+        <td class="rule">${f.rule_id}</td>
+        <td class="rule">${f.file_path || '—'}${f.line_number ? ':' + f.line_number : ''}</td>
+        <td class="match">${(f.matched_text || '').slice(0, 120)}</td>
+        <td class="conf">${CONF_ICON[f.confidence] || '🟢'} ${f.confidence}</td>`;
+      tbody.appendChild(tr);
+    }
+  }
+}
+</script>
+</body>
+</html>
