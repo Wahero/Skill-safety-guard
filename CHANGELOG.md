@@ -2,6 +2,18 @@
 
 All notable changes to skill-safety-guard will be documented in this file.
 
+## [Unreleased]
+
+### Added
+**隱私行為檢測類別（privacy，6 條規則）**：
+- 新增 `rules/privacy.yaml` + `PrivacyDetector`（`src/skill_safety_guard/detectors/privacy.py`），補上「行為隱私」盲區
+- 背景：pi-trail（github.com/Naoki326/pi-trail）實戰分析——靜態規則回報 SAFE/A/0，但存在真實隱私風險（記錄輸入 + 無鑒權 LAN 伺服器 + 讀取 auth.json）
+- 6 條規則：`privacy-input-hook`（輸入事件掛鉤/會話監測）、`privacy-session-scan`（掃描會話目錄）、`privacy-auth-json-read`（讀取 auth.json）、`privacy-lan-server-no-auth`（0.0.0.0 無鑒權服務）、`privacy-credential-exfil`（讀 auth.json 後外發）、`privacy-machine-fingerprint`（裝置指紋）
+- 掃描 pi-trail 後綜合等級由 A（SAFE）升為 D（較高風險，CAUTION），更貼近真實風險
+
+### Fixed
+- `.mjs` / `.cjs` 檔案未被掃描：Node ESM/CommonJS 擴展（如 pi-trail 的 server.mjs 主風險源）未列入文本後綴白名單，現已補上
+
 ## [3.5.0] - 2026-08-19
 
 ### Added

@@ -83,6 +83,7 @@ whitelisted_paths:
   - '*/rules/mcp.yaml'
   - '*/rules/mcp_injection.yaml'
   - '*/rules/installed_extensions.yaml'
+  - '*/rules/privacy.yaml'
   - '*/rules/whitelist.yaml'
   # 掃描報告（描述漏洞，不是實際攻擊；與 SECURITY_AUDIT.md 同理）
   - '*/SCAN_REPORT_*.md'

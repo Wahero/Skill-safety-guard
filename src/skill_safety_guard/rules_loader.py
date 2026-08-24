@@ -51,4 +51,5 @@ def load_all_rules() -> Dict[str, List[Dict]]:
         "prompt_injection": load_rules_file("prompt_injection.yaml"),
         "mcp": load_rules_file("mcp.yaml"),
         "mcp_injection": load_rules_file("mcp_injection.yaml"),
+        "privacy": load_rules_file("privacy.yaml"),
     }

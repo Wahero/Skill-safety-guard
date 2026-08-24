@@ -228,6 +228,7 @@ def generate_report(
         "paths": "📁 敏感路徑訪問",
         "unicode": "🕵️ Unicode 隱寫",
         "critical_paths": "🚨 關鍵系統參數修改",
+        "privacy": "👁️ 隱私行為（會話監測/資料外洩）",
     }
 
     for cat, result in skill_results.items():

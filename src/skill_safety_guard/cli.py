@@ -7,7 +7,7 @@ from pathlib import Path
 from typing import Dict, Optional
 
 from .rules_loader import load_all_rules, load_whitelist
-from .detectors import CredentialsDetector, ShellDetector, PathsDetector, UnicodeDetector, CriticalPathsDetector
+from .detectors import CredentialsDetector, ShellDetector, PathsDetector, UnicodeDetector, CriticalPathsDetector, PrivacyDetector
 from .license import (
     can_scan, record_scan, activate_license, generate_license_key,
     load_license, print_tier_banner, FREE_SCANS_PER_WEEK, PRO_PRICE_MONTHLY_USD,
@@ -156,6 +156,7 @@ def scan_target(target: Path, args) -> Dict:
         path_det = PathsDetector(all_rules.get("paths", []), whitelist)
         unicode_det = UnicodeDetector(all_rules.get("unicode", []), whitelist)
         critical_det = CriticalPathsDetector(all_rules.get("critical_paths", []), whitelist)
+        privacy_det = PrivacyDetector(all_rules.get("privacy", []), whitelist)
         installed_ext_det = CredentialsDetector(all_rules.get("installed_extensions", []), whitelist)  # reuse base
         prompt_inj_det = CredentialsDetector(all_rules.get("prompt_injection", []), whitelist)  # reuse base
 
@@ -170,6 +171,7 @@ def scan_target(target: Path, args) -> Dict:
 
             for det, cat in [(cred_det, "credentials"), (shell_det, "shell"), (path_det, "paths"),
                               (unicode_det, "unicode"), (critical_det, "critical_paths"),
+                              (privacy_det, "privacy"),
                               (installed_ext_det, "installed_extensions"), (prompt_inj_det, "prompt_injection")]:
                 det.category = cat
                 result = DetectionResult(category=cat, scanned_files=1)
@@ -181,7 +183,8 @@ def scan_target(target: Path, args) -> Dict:
                 skill_results[cat] = result
         else:
             for det, cat in [(cred_det, "credentials"), (shell_det, "shell"), (path_det, "paths"),
-                              (unicode_det, "unicode"), (critical_det, "critical_paths")]:
+                              (unicode_det, "unicode"), (critical_det, "critical_paths"),
+                              (privacy_det, "privacy")]:
                 det.category = cat
                 result = det.detect_directory(target)
                 skill_results[cat] = result

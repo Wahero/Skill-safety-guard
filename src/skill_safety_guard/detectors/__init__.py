@@ -5,6 +5,7 @@ from .shell import ShellDetector
 from .paths import PathsDetector
 from .unicode import UnicodeDetector
 from .critical_paths import CriticalPathsDetector
+from .privacy import PrivacyDetector
 
 
 __all__ = [
@@ -16,4 +17,5 @@ __all__ = [
     "PathsDetector",
     "UnicodeDetector",
     "CriticalPathsDetector",
+    "PrivacyDetector",
 ]

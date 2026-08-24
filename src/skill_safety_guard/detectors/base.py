@@ -174,6 +174,7 @@ class BaseDetector(ABC):
                 ".json", ".yaml", ".yml", ".toml", ".cfg", ".ini",
                 ".html", ".css", ".jsx", ".tsx", ".vue", ".go", ".rs",
                 ".java", ".kt", ".rb", ".php",
+                ".mjs", ".cjs",
             }:
                 files.append(item)
         return files

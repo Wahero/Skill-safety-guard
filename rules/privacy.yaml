@@ -1,0 +1,74 @@
+# skill-safety-guard 規則庫：隱私行為檢測（v3.6.0 新增）
+# 覆蓋「監測會話 + 外洩敏感資料」的行為模式
+#
+# 背景：/safety-check 對 pi-trail（github.com/Naoki326/pi-trail）的實戰分析發現，
+#       現有靜態規則（憑證/危險命令/敏感路徑/Unicode/注入）回報 SAFE/A/0，
+#       但該擴展存在真實隱私風險（記錄輸入 + 無鑒權 LAN 伺服器 + 讀取 auth.json）。
+#       故新增此行為檢測類別，補上「行為隱私」這塊盲區。
+#
+# 注意：此類別是「隱私信號」而非「確定性漏洞」，medium 置信度表示需人工複查用途。
+# YAML 注意事項：正則字符串使用雙引號 + 雙反斜杠轉義（PyYAML \s 為非法轉義）。
+
+rules:
+
+  # === 會話監測 ===
+
+  - id: privacy-input-hook
+    name: 輸入事件掛鉤（會話監測）
+    pattern: "\\.on\\s*\\(\\s*[\"']input[\"']"
+    severity: high
+    confidence: medium
+    category: privacy
+    description: 掛鉤 AI 助手的 input 事件，記錄用戶輸入（鍵盤記錄式行為）
+    remediation: 確認記錄內容與用途；若會記錄密鑰/密碼等敏感輸入，拒絕安裝
+
+  - id: privacy-session-scan
+    name: 掃描會話目錄
+    pattern: "\\.pi[\"'/\\s,]+agent[\"'/\\s,]+sessions"
+    severity: high
+    confidence: high
+    category: privacy
+    description: 讀取 ~/.pi/agent/sessions 會話目錄（對話歷史 / 會話元數據）
+    remediation: 確認是否需要讀取會話檔案；會話內容可能含敏感對話
+
+  # === 憑證讀取 ===
+
+  - id: privacy-auth-json-read
+    name: 讀取 auth.json 憑證
+    pattern: "(readFileSync|fs\\.readFile|fs\\.promises\\.readFile|readFile|openSync|createReadStream)\\s*\\([\\s\\S]{0,120}?auth\\.json"
+    severity: medium
+    confidence: high
+    category: privacy
+    description: 讀取 ~/.pi/agent/auth.json（AI 助手的 API 憑證）
+    remediation: 確認讀取用途；憑證被讀取後若外發即構成資料外洩
+
+  # === 資料外洩 ===
+
+  - id: privacy-lan-server-no-auth
+    name: 無鑒權 LAN 伺服器（0.0.0.0）
+    pattern: "\\.listen\\s*\\([^)]*[\"']0\\.0\\.0\\.0[\"']"
+    severity: high
+    confidence: high
+    category: privacy
+    description: 啟動監聽 0.0.0.0 的網路服務（同網段任何人可訪問，通常無鑒權）
+    remediation: 確認服務有鑒權；否則同網段他人可存取本機資料
+
+  - id: privacy-credential-exfil
+    name: 憑證外洩（讀取 auth.json 後外發）
+    pattern: "auth\\.json[\\s\\S]{0,6000}?fetch\\s*\\(\\s*[\"']https?://[^\"']*"
+    severity: high
+    confidence: medium
+    category: privacy
+    description: 讀取 auth.json 後向外部 URL 發起請求（憑證/敏感資料外洩）
+    remediation: 確認外發目標與內容；若非用戶明確認可，拒絕安裝
+
+  # === 裝置指紋 ===
+
+  - id: privacy-machine-fingerprint
+    name: 裝置唯一標識提取
+    pattern: "MachineGuid|IOPlatformUUID|/etc/machine-id|/var/lib/dbus/machine-id"
+    severity: low
+    confidence: medium
+    category: privacy
+    description: 提取機器唯一標識（Windows MachineGuid / macOS IOPlatformUUID / Linux machine-id）
+    remediation: 確認用途；裝置指紋可用於跨站追蹤
