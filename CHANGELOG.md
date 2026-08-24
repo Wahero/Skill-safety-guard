@@ -2,6 +2,21 @@
 
 All notable changes to skill-safety-guard will be documented in this file.
 
+## [Unreleased]
+
+### Added
+**安裝前自動攔截 + 實時攔截（B-001/D-003）**：
+- 新增 Pi 擴展 `extension/safety-guard.ts`（純 TypeScript，零外部依賴）
+- `tool_call` hook：bash 命令命中 12 條危險模式 → 彈確認框攔截（無 UI 環境 critical 直接攔截）
+- `input` hook：`/skill:<name>` 載入前輕量掃描 → D/F 級攔截、C 級提示
+- `package.json` 新增 `pi.extensions` 聲明，`pi install git:...` 隨套件自動載入
+
+**Web 後端封裝（C-006 選項 B）**：
+- 新增 `src/skill_safety_guard/web_api.py`：結構化掃描 API（複用 cli.scan_target/reporter，不觸碰許可額度）
+- 新增 `web/server.py`：純 stdlib ThreadingHTTPServer，`POST /api/scans` + SSE 進度
+- 新增 `web/index.html`：功能型前端（決策大徽章 + 發現表格，design token 落地）
+- API 對齊 docs/WEB_UI_DESIGN.md §8（scans / license / vulns）
+
 ## [3.6.0] - 2026-08-24
 
 ### Added
