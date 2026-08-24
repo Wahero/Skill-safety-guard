@@ -200,6 +200,14 @@ class Handler(BaseHTTPRequestHandler):
             except Exception as e:  # noqa: BLE001
                 return self._send_json({"error": str(e)}, 500)
 
+        # 報告下載
+        if path.startswith("/reports/"):
+            filename = path.split("/reports/")[1]
+            if ".." in filename or "/" in filename or "\\" in filename:
+                return self.send_error(403, "Forbidden")
+            report_path = Path(__file__).resolve().parent.parent / "report" / filename
+            return self._send_file(report_path)
+
         # 靜態頁面
         if path in ("/", "/index.html"):
             return self._send_file(WEB_INDEX)
@@ -250,7 +258,7 @@ class Handler(BaseHTTPRequestHandler):
                     self.wfile.flush()
                     sent += 1
                 if job["done"].is_set():
-                    payload = json.dumps({"status": job["status"], "grade": (job.get("result") or {}).get("grade"), "error": job.get("error")}, ensure_ascii=False)
+                    payload = json.dumps({"status": job["status"], "grade": (job.get("result") or {}).get("grade"), "error": job.get("error"), "report_md_url": (job.get("result") or {}).get("report_md_url")}, ensure_ascii=False)
                     self.wfile.write(f"event: done\ndata: {payload}\n\n".encode("utf-8"))
                     self.wfile.flush()
                     break

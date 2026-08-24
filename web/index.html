@@ -163,6 +163,7 @@
         </div>
       </div>
       <div class="meta" id="meta"></div>
+      <div id="download" style="margin-top:8px;display:none"></div>
     </div>
 
     <div class="card" style="margin-top:16px">
@@ -280,6 +281,15 @@ function render(r) {
   const vdb = r.vuln_db;
   if (vdb) {
     $('meta').textContent += ` · 漏洞庫: ${vdb.count || 0}條 (${vdb.last_updated || 'N/A'})`;
+  }
+
+  // 下載鏈接
+  const dl = $('download');
+  if (r.report_md_url) {
+    dl.innerHTML = `<a href="${r.report_md_url}" download style="color:var(--scan);text-decoration:none;font-weight:600">📥 下載 MD 報告</a>`;
+    dl.style.display = 'block';
+  } else {
+    dl.style.display = 'none';
   }
 
   const findings = r.findings || [];

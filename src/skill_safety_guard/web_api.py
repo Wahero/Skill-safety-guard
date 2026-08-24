@@ -176,6 +176,23 @@ def run_scan(
         if progress:
             progress("完成掃描")
 
+        # 生成 MD 報告（供下載）
+        report_md_url = None
+        try:
+            from .reporter import generate_report
+            report_md = generate_report(str(target), pi_check, skill_results, grade)
+            # 儲存到 report/ 目錄
+            report_dir = Path(__file__).resolve().parent.parent.parent / "report"
+            report_dir.mkdir(parents=True, exist_ok=True)
+            # 生成純 ASCII 安全檔名
+            ts = time.strftime("%Y%m%d-%H%M%S")
+            safe_name = f"scan-{ts}.md"
+            report_path = report_dir / safe_name
+            report_path.write_text(report_md, encoding="utf-8")
+            report_md_url = f"/reports/{report_path.name}"
+        except Exception:
+            pass
+
         return {
             "target": target_str,
             "display_name": resolved.display_name,
@@ -193,6 +210,7 @@ def run_scan(
             "scanned_files": scanned_files,
             "elapsed_ms": int((time.time() - t0) * 1000),
             "vuln_db": _get_vuln_db_info(),
+            "report_md_url": report_md_url,
         }
     finally:
         cleanup_target(resolved)
