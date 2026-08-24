@@ -529,10 +529,13 @@ def _run_scan(args, target: Path, resolved: ScanTarget, output_file: Optional[Pa
         if args.output == "markdown" and not args.no_color:
             print(f"  → {msg}")
 
-    # 漏洞庫自動更新檢查（可配置頻率，後台更新不阻塞）
+    # 每日漏洞庫定義檢查（同日只查一次，有新版本則同步更新）
     try:
-        from .vuln_feed import auto_update_if_due
-        auto_update_if_due()
+        from .vuln_feed import check_and_update_vulns
+        if args.output == "markdown" and not args.no_color:
+            check_and_update_vulns(progress_cb=lambda msg: print(f"  → {msg}"))
+        else:
+            check_and_update_vulns()
     except Exception:
         pass
 

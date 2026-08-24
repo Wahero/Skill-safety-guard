@@ -90,6 +90,13 @@ def run_scan(
     if progress:
         progress("解析掃描目標…")
 
+    # 每日漏洞庫定義檢查（同日只查一次，在掃描前執行）
+    try:
+        from .vuln_feed import check_and_update_vulns
+        check_and_update_vulns(progress_cb=progress)
+    except Exception:
+        pass
+
     resolved = resolve_target(target_str)
     if resolved is None:
         return {"target": target_str, "error": f"無法解析目標：{target_str}"}

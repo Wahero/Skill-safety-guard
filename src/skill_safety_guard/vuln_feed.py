@@ -43,6 +43,7 @@ CACHE_DIR = Path.home() / ".skill-safety-guard"
 LOCAL_VULNS_CACHE = CACHE_DIR / "vulnerabilities_cache.json"
 UPDATE_META = CACHE_DIR / "vuln_update_meta.json"
 CONFIG_FILE = CACHE_DIR / "config.json"
+DAILY_CHECK_MARKER = CACHE_DIR / "vuln_daily_check.json"
 
 # OSV.dev API（權威源）
 OSV_QUERY_URL = "https://api.osv.dev/v1/query"
@@ -662,6 +663,71 @@ def _write_update_meta() -> None:
         UPDATE_META.write_text(json.dumps({"last_update": time.time()}), encoding="utf-8")
     except Exception:
         pass
+
+
+def daily_check_needed() -> bool:
+    """檢查今天是否已做過漏洞庫每日檢查（同日不重複）"""
+    try:
+        if DAILY_CHECK_MARKER.exists():
+            data = json.loads(DAILY_CHECK_MARKER.read_text(encoding="utf-8"))
+            last_date = data.get("date", "")
+            today = time.strftime("%Y-%m-%d")
+            return last_date != today
+    except Exception:
+        pass
+    return True
+
+
+def mark_daily_check_done() -> None:
+    """標記今日已檢查"""
+    try:
+        CACHE_DIR.mkdir(parents=True, exist_ok=True)
+        DAILY_CHECK_MARKER.write_text(
+            json.dumps({"date": time.strftime("%Y-%m-%d")}), encoding="utf-8"
+        )
+    except Exception:
+        pass
+
+
+def check_and_update_vulns(progress_cb=None) -> Dict:
+    """每日檢查漏洞庫定義：同日只查一次，有新版本則更新
+
+    Args:
+        progress_cb: 進度回調 (msg: str)
+    Returns:
+        {"updated": bool, "count": int, "message": str}
+    """
+    if not daily_check_needed():
+        info = get_vuln_source_info()
+        return {"updated": False, "count": info.get("count", 0), "message": "今日已檢查，跳過"}
+
+    mark_daily_check_done()
+
+    if progress_cb:
+        progress_cb("檢查漏洞庫定義…")
+
+    # 檢查是否已有更新
+    config = get_config()
+    if config.get("update_frequency") == "off":
+        info = get_vuln_source_info()
+        return {"updated": False, "count": info.get("count", 0), "message": "自動更新已關閉"}
+
+    try:
+        result = update_vulnerabilities(force=True)
+        if result.get("updated"):
+            count = result.get("count", 0)
+            if progress_cb:
+                progress_cb(f"漏洞庫已更新（{count} 條）")
+            return {"updated": True, "count": count, "message": f"已更新至 {count} 條"}
+        else:
+            info = get_vuln_source_info()
+            count = info.get("count", 0)
+            if progress_cb:
+                progress_cb(f"漏洞庫已是最新（{count} 條）")
+            return {"updated": False, "count": count, "message": f"已是最新（{count} 條）"}
+    except Exception:
+        info = get_vuln_source_info()
+        return {"updated": False, "count": info.get("count", 0), "message": "檢查失敗，使用現有緩存"}
 
 
 # ============ OSV 實時查詢（單次） ============
