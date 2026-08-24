@@ -97,42 +97,39 @@ function scanContent(content: string, file: string, rules: Rule[]): Hit[] {
 function scanSkillDir(dir: string): { total: number; grade: string; verdict: string; hits: Hit[] } | null {
   if (!existsSync(dir)) return null;
   const allHits: Hit[] = [];
-  let files = 0;
 
-  const walk = (d: string) => {
-    if (files >= MAX_FILES) return;
-    let entries: string[] = [];
-    try {
-      entries = readdirSync(d);
-    } catch {
-      return;
-    }
-    for (const name of entries) {
-      if (files >= MAX_FILES) return;
-      if (name === ".git" || name === "node_modules" || name === "__pycache__" || name === "venv") continue;
-      if (name === "rules" || name === "extension" || name === "tests" || name === "report" || name === "demo" || name === "docs") continue;
-      const p = join(d, name);
-      let st;
+  // 只掃描入口檔 + 根層安裝腳本（不遞迴，避免文檔/規則定義/測試樣本誤報）
+  const scanFiles: string[] = ["SKILL.md"];
+  const rootPatterns = [/\.sh$/i, /^install/i, /^setup/i, /^postinstall/i, /^Makefile$/i, /^Dockerfile$/i, /\.ps1$/i];
+  try {
+    for (const name of readdirSync(dir)) {
+      if (name === ".git" || name === "node_modules") continue;
+      const p = join(dir, name);
       try {
-        st = statSync(p);
-      } catch {
-        continue;
-      }
-      if (st.isDirectory()) {
-        walk(p);
-      } else if (st.isFile() && TEXT_EXT.test(name) && st.size <= MAX_BYTES) {
-        files++;
-        try {
-          const content = readFileSync(p, "utf-8");
-          allHits.push(...scanContent(content, p, SHELL_RULES));
-          allHits.push(...scanContent(content, p, CRED_RULES));
-        } catch {
-          // 忽略不可讀檔案
+        const st = statSync(p);
+        if (st.isFile() && rootPatterns.some((r) => r.test(name))) {
+          scanFiles.push(name);
         }
+      } catch {
+        // ignore
       }
     }
-  };
-  walk(dir);
+  } catch {
+    return null;
+  }
+
+  for (const name of scanFiles) {
+    const p = join(dir, name);
+    try {
+      const st = statSync(p);
+      if (!st.isFile() || st.size > MAX_BYTES) continue;
+      const content = readFileSync(p, "utf-8");
+      allHits.push(...scanContent(content, p, SHELL_RULES));
+      allHits.push(...scanContent(content, p, CRED_RULES));
+    } catch {
+      // ignore
+    }
+  }
 
   const critical = allHits.filter((h) => h.severity === "critical").length;
   const high = allHits.filter((h) => h.severity === "high").length;
