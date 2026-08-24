@@ -2,7 +2,7 @@
 
 All notable changes to skill-safety-guard will be documented in this file.
 
-## [Unreleased]
+## [3.7.0] - 2026-08-24
 
 ### Added
 **安裝前自動攔截 + 實時攔截（B-001/D-003）**：
@@ -16,6 +16,11 @@ All notable changes to skill-safety-guard will be documented in this file.
 - 新增 `web/server.py`：純 stdlib ThreadingHTTPServer，`POST /api/scans` + SSE 進度
 - 新增 `web/index.html`：功能型前端（決策大徽章 + 發現表格，design token 落地）
 - API 對齊 docs/WEB_UI_DESIGN.md §8（scans / license / vulns）
+
+### 版本同步（A-001）
+- `src/skill_safety_guard/__init__.py` / `package.json` / `pyproject.toml` / `SKILL.md` frontmatter / `README.md` badge 統一為 v3.7.0
+
+---
 
 ## [3.6.0] - 2026-08-24
 

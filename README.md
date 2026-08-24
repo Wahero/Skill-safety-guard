@@ -2,7 +2,7 @@
 
 > **個人開發者安裝 Skill / MCP 前的安全守護者**
 
-[![Version](https://img.shields.io/badge/version-3.6.0-orange.svg)]()
+[![Version](https://img.shields.io/badge/version-3.7.0-orange.svg)]()
 [![Rules](https://img.shields.io/badge/rules-187-blue.svg)]()
 [![Categories](https://img.shields.io/badge/categories-10-green.svg)]()
 [![VulnFeed](https://img.shields.io/badge/vuln%20feed-OSV%2BAVID%2BCAIVD-purple.svg)]()
@@ -142,7 +142,7 @@ safety-check --vuln-sources
 
 ---
 
-## 檢測能力（v3.6.0 / 187 條規則 / 10 類檢測）
+## 檢測能力（v3.7.0 / 187 條規則 / 10 類檢測）
 
 ### 🚨 關鍵系統參數修改（最高優先級）
 
@@ -216,7 +216,8 @@ safety-check --vuln-sources
 | **v3.3.0** | ✅ 已完成 | 權威漏洞源 + 自動更新頻率 |
 | **v3.4.x** | ✅ 已完成 | 國內源（CAIVD/AVID）+ 增強狀態顯示 |
 | **v3.5.0** | ✅ 已完成 | GitHub URL 自動報告 + 誤報識別 + Pi Package 化 + 版本統一 |
-| **v3.6.0** | 🚀 最新 | 隱私行為檢測（6 規則）+ .mjs/.cjs 掃描修復 |
+| **v3.6.0** | ✅ 已完成 | 隱私行為檢測（6 規則）+ .mjs/.cjs 掃描修復 |
+| **v3.7.0** | 🚀 最新 | Pi 擴展攔截（B-001）+ Web 後端（C-006）|
 | v4.0 | 📋 規劃 | 多框架支持 + MCP 代理網關 + CI/CD |
 
 詳細規劃見 [`docs/PRD_v4_聚焦个人开发者版.MD`](docs/PRD_v4_聚焦个人开发者版.MD)。
