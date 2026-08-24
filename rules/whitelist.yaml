@@ -73,6 +73,7 @@ whitelisted_paths:
   - '*/docs/PACKAGE_INTRO.md'  # pi.dev gallery 雙語產品介紹（含 ClawHavoc 攻擊手法示例文案）
   - '*/docs/SELFSCAN_RULES.md'  # 自掃維護規則（含常見誤觸發模式示例，本文件自身必須豁免）
   - '*/demo/web-ui/*'  # Web 界面原型（含 curl|bash 等攻擊示例展示，與 demo/index.html 同理）
+  - '*/extension/*'  # Pi 擴展（safety-guard.ts 內含與 rules/dangerous_shell.yaml 相同的正則，掃描必然自指命中）
   - '*/scripts/generate_critical_paths_rules.py'
   - '*/rules/credentials.yaml'
   - '*/rules/sensitive_paths.yaml'
