@@ -218,8 +218,38 @@ async function startScan() {
       $('progress').textContent = '';
       btn.disabled = false;
     });
+    let pollTimer = null;
     es.onerror = () => {
-      // SSE 可能因 done 關閉而觸發；若仍在跑則忽略
+      // SSE 連線失敗 → 降級為輪詢
+      if (pollTimer) return;
+      es.close();
+      $('progress').textContent = '→ SSE 不可用，輪詢中…';
+      pollTimer = setInterval(async () => {
+        try {
+          const r = await fetch(`/api/scans/${job_id}`).then(x => x.json());
+          if (r.status === 'done' || r.status === 'error') {
+            clearInterval(pollTimer);
+            if (r.status === 'error') {
+              showError(r.error || '掃描失敗');
+            } else {
+              render(r);
+            }
+            $('progress').textContent = '';
+            btn.disabled = false;
+          } else {
+            $('progress').textContent = '→ ' + (r.status || '掃描中…');
+          }
+        } catch {
+          clearInterval(pollTimer);
+          showError('連線失敗，請檢查伺服器是否運行中');
+          $('progress').textContent = '';
+          btn.disabled = false;
+        }
+      }, 500);
+      // 30 秒超時
+      setTimeout(() => {
+        if (pollTimer) { clearInterval(pollTimer); pollTimer = null; showError('掃描超時'); btn.disabled = false; }
+      }, 30000);
     };
   } catch (err) {
     $('progress').textContent = '';
