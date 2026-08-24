@@ -304,8 +304,8 @@ function render(r) {
       if (f.description || f.remediation) {
         const dr = document.createElement('tr');
         dr.innerHTML = `<td colspan="5" style="padding:2px 12px 8px 12px;font-size:12px;color:var(--ink-500);border-bottom:1px solid var(--line)">
-          ${f.description ? `<div style="margin-bottom:2px">📋 ${f.description}</div>` : ''}
-          ${f.remediation ? `<div>💡 ${f.remediation}</div>` : ''}
+          ${f.description ? `<div style="margin-bottom:2px"><b>漏洞說明：</b>${f.description}</div>` : ''}
+          ${f.remediation ? `<div><b>建議操作：</b>${f.remediation}</div>` : ''}
         </td>`;
         tbody.appendChild(dr);
       }
