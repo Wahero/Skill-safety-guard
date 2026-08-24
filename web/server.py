@@ -266,6 +266,14 @@ class Handler(BaseHTTPRequestHandler):
 # main
 # ---------------------------------------------------------------------------
 def main():
+    # Windows 終端 UTF-8 兼容
+    if sys.platform.startswith("win"):
+        try:
+            sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+            sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+        except Exception:
+            pass
+
     ap = argparse.ArgumentParser(description="skill-safety-guard Web 後端")
     ap.add_argument("--port", type=int, default=8765)
     ap.add_argument("--host", default="127.0.0.1")
