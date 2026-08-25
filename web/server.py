@@ -21,6 +21,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import sys
 import threading
 import time
@@ -47,6 +48,30 @@ DEMO_UI = ROOT.parent / "demo" / "web-ui" / "index.html"
 JOBS: dict = {}
 JOBS_LOCK = threading.Lock()
 _HISTORY_MAX = 100
+
+# CORS 白名單（P1-6 安全加固）
+ALLOWED_ORIGINS = frozenset({
+    "http://localhost:8765",
+    "http://127.0.0.1:8765",
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+})
+
+# Rate limiting 狀態（P1-6）
+_rate_limits: dict = {}
+_rate_lock = threading.Lock()
+
+
+def _check_rate_limit(ip: str) -> bool:
+    """每 IP 每分鐘最多 5 次 POST 請求"""
+    now = time.time()
+    with _rate_lock:
+        window = _rate_limits.setdefault(ip, [])
+        window[:] = [t for t in window if now - t < 60]
+        if len(window) >= 5:
+            return False
+        window.append(now)
+        return True
 
 
 def _new_job() -> str:
@@ -121,7 +146,10 @@ class Handler(BaseHTTPRequestHandler):
         self.send_response(code)
         self.send_header("Content-Type", "application/json; charset=utf-8")
         self.send_header("Content-Length", str(len(body)))
-        self.send_header("Access-Control-Allow-Origin", "*")
+        # CORS：僅允許白名單來源（P1-6）
+        origin = self.headers.get("Origin", "")
+        if origin in ALLOWED_ORIGINS:
+            self.send_header("Access-Control-Allow-Origin", origin)
         self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
         self.send_header("Access-Control-Allow-Headers", "Content-Type")
         self.end_headers()
@@ -148,7 +176,7 @@ class Handler(BaseHTTPRequestHandler):
 
     def _read_body(self):
         length = int(self.headers.get("Content-Length", 0) or 0)
-        if length <= 0:
+        if length <= 0 or length > 1024 * 1024:  # 1 MB 上限（P1-6）
             return {}
         raw = self.rfile.read(length)
         try:
@@ -158,7 +186,15 @@ class Handler(BaseHTTPRequestHandler):
 
     # -- routing --
     def do_OPTIONS(self):
-        self._send_json({}, 204)
+        # CORS preflight（P1-6）
+        origin = self.headers.get("Origin", "")
+        self.send_response(204)
+        if origin in ALLOWED_ORIGINS:
+            self.send_header("Access-Control-Allow-Origin", origin)
+        self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+        self.send_header("Access-Control-Allow-Headers", "Content-Type")
+        self.send_header("Content-Length", "0")
+        self.end_headers()
 
     def do_GET(self):
         parsed = urlparse(self.path)
@@ -204,9 +240,18 @@ class Handler(BaseHTTPRequestHandler):
         # 報告下載
         if path.startswith("/reports/"):
             filename = path.split("/reports/")[1]
-            if ".." in filename or "/" in filename or "\\" in filename:
+            report_root = Path(__file__).resolve().parent.parent / "report"
+            report_path = (report_root / filename).resolve()
+            # 路徑遍歷防禦（P1-6 加固）：resolve 後必須仍在 report_root 下
+            try:
+                rp = os.path.normpath(str(report_path))
+                rr = os.path.normpath(str(report_root))
+                if not rp.startswith(rr + os.sep) and rp != rr:
+                    return self.send_error(403, "Forbidden")
+            except (OSError, ValueError):
                 return self.send_error(403, "Forbidden")
-            report_path = Path(__file__).resolve().parent.parent / "report" / filename
+            if not report_path.exists():
+                return self.send_error(404, "Not Found")
             return self._send_file(report_path)
 
         # 靜態頁面
@@ -222,6 +267,9 @@ class Handler(BaseHTTPRequestHandler):
         path = parsed.path
 
         if path == "/api/scans":
+            # Rate limiting（P1-6）
+            if not _check_rate_limit(self.client_address[0]):
+                return self._send_json({"error": "請求過於頻繁，請稍後再試"}, 429)
             body = self._read_body()
             target = (body.get("target") or "").strip()
             if not target:
@@ -241,7 +289,10 @@ class Handler(BaseHTTPRequestHandler):
         self.send_response(200)
         self.send_header("Content-Type", "text/event-stream; charset=utf-8")
         self.send_header("Cache-Control", "no-cache")
-        self.send_header("Access-Control-Allow-Origin", "*")
+        # CORS：SSE 同樣套用白名單（P1-6）
+        origin = self.headers.get("Origin", "")
+        if origin in ALLOWED_ORIGINS:
+            self.send_header("Access-Control-Allow-Origin", origin)
         self.end_headers()
 
         if not job:
@@ -290,7 +341,8 @@ def main():
 
     server = ThreadingHTTPServer((args.host, args.port), Handler)
     server.daemon_threads = True
-    print(f"🛡️  skill-safety-guard Web 後端：http://{args.host}:{args.port}")
+    print(f"🛡️  skill-safety-guard v{__version__} Web 後端：http://{args.host}:{args.port}")
+    print(f"   ⚠️  目前為 demo 模式，僅供本地測試使用")
     print(f"   功能前端：http://{args.host}:{args.port}/")
     print(f"   設計原型：http://{args.host}:{args.port}/ui")
     print(f"   Ctrl+C 停止")
