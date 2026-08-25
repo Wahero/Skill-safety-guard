@@ -15,6 +15,7 @@
 import json
 import os
 import re
+import sys
 import urllib.request
 from pathlib import Path
 from typing import Dict, List, Optional
@@ -56,11 +57,17 @@ def is_llm_available() -> bool:
 
 
 def get_api_key() -> Optional[str]:
-    return (
-        os.environ.get("DEEPSEEK_API_KEY")
-        or os.environ.get("OPENAI_API_KEY")
-        or _read_pi_auth_key()
-    )
+    env_key = os.environ.get("DEEPSEEK_API_KEY") or os.environ.get("OPENAI_API_KEY")
+    if env_key:
+        return env_key
+    auth_key = _read_pi_auth_key()
+    if auth_key:
+        print(
+            "[隱私提示] 使用來自 ~/.pi/agent/auth.json 的 API key。"
+            "建議改用環境變數 DEEPSEEK_API_KEY 以避免意外洩漏。",
+            file=sys.stderr,
+        )
+    return auth_key
 
 
 def _call_llm(system_prompt: str, user_content: str, max_tokens: int = 2048):

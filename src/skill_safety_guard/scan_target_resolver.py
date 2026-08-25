@@ -10,6 +10,7 @@
 import re
 import shutil
 import subprocess
+import platform
 import sys
 import tempfile
 from pathlib import Path
@@ -115,9 +116,14 @@ def fetch_github_repo(user: str, repo: str, ref: str = "HEAD", sub_path: str = "
     tmp_dir = Path(tempfile.mkdtemp(prefix=f"safety-scan-{repo}-"))
 
     # 簡化策略：完整淺 clone，之後只保留需要的子路徑
+    # 沙箱加固（P1-5）：禁用 hooks 和 file:// 協議，防止惡意倉庫執行代碼
+    hooks_path = "NUL" if platform.system() == "Windows" else "/dev/null"
     cmd = [
         "git", "clone",
         "--depth=1",
+        "-c", f"core.hooksPath={hooks_path}",
+        "-c", "protocol.file.allow=never",
+        "-c", "submodule.recurse=false",
         f"https://github.com/{user}/{repo}.git",
         str(tmp_dir),
     ]

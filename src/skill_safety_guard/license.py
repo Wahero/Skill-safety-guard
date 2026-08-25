@@ -1,4 +1,7 @@
-"""Freemium 許可證系統（F-033~F-036）
+"""⚠️ DEMO 層級 Freemium 許可證系統（F-033~F-036）
+
+**本系統為 DEMO 層級。SECRET_KEY 隨原始碼公開，任何人可偽造 Pro key。**
+正式部署必須改用環境變量 SSG_LICENSE_SECRET 或非對稱簽名（如 Ed25519）。
 
 設計理念：
 - 離線驗證（不需要網路請求）
@@ -11,7 +14,7 @@
 - 前 16 字節：HMAC 校驗數據
 - 後 16 字節：HMAC 簽名（用 SECRET_KEY 計算）
 
-本系統使用固定的 SECRET_KEY（演示用）。
+⚠️ 本系統使用固定的 SECRET_KEY（演示用，已隨原始碼公開）。
 生產環境應使用：
   - 環境變量 SSG_LICENSE_SECRET
   - 或從 license server 獲取公鑰進行驗證
@@ -21,6 +24,7 @@ import hashlib
 import hmac
 import json
 import os
+import sys
 import time
 from dataclasses import dataclass, asdict
 from pathlib import Path
@@ -84,6 +88,8 @@ def generate_license_key(plan: str = "monthly") -> str:
     parts = [encoded[i:i+4] for i in range(0, len(encoded), 4)]
     key = "ssg-pro-" + "-".join(parts)
 
+    # 標記 demo（P1-7）：明確告知用戶此密鑰不可用於生產
+    print("⚠️  [DEMO] 此密鑰僅用於測試。SECRET_KEY 已公開，任何人可偽造。", file=sys.stderr)
     return key
 
 
@@ -236,8 +242,9 @@ def print_tier_banner() -> None:
     can, info = can_scan()
 
     if info["tier"] == "pro":
-        expires = time.strftime("%Y-%m-%d", time.localtime(info["expires_at"]))
-        print(f"[PRO] Unlimited scans · expires {expires}")
+        expires = time.strftime("%Y-%m-%d", time.localtime(info["expires_at"])) if info["expires_at"] else "never"
+        print(f"[PRO (demo)] Unlimited scans · expires {expires}")
+        print("  ⚠️  Demo 模式：SECRET_KEY 已公開，任何 fork 均可偽造 Pro key")
     else:
         remaining = info["remaining"]
         limit = info["limit"]

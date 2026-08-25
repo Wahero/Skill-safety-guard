@@ -6,6 +6,7 @@ import time
 from pathlib import Path
 from typing import Dict, Optional
 
+from . import __version__
 from .rules_loader import load_all_rules, load_whitelist
 from .detectors import CredentialsDetector, ShellDetector, PathsDetector, UnicodeDetector, CriticalPathsDetector, PrivacyDetector
 from .license import (
@@ -78,6 +79,12 @@ def parse_args(argv=None):
     parser.add_argument("--vuln-status", action="store_true", help="查看漏洞庫狀態")
     parser.add_argument("--vuln-sources", action="store_true", help="查看所有漏洞源（含國內源）")
     parser.add_argument("--vuln-proxy", metavar="URL", help="設置 GitHub 加速代理（如 https://ghproxy.net/）")
+    parser.add_argument(
+        "--version",
+        action="version",
+        version=f"skill-safety-guard v{__version__}",
+        help="顯示版本號",
+    )
     return parser.parse_args(argv)
 
 
