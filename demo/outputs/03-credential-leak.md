@@ -1,4 +1,4 @@
-> **[CAUTION] 建議：人工複查後決定**
+﻿> **[CAUTION] 建議：人工複查後決定**
 >
 > **目標**: `D:\AI\PiAgent\Skill-safety-guard\tests\fixtures\malicious\credential_leak`
 > **警告**: 發現 4 個高風險問題。不建議安裝，除非你能解釋每個問題
@@ -107,5 +107,5 @@ openai.api_key = "sk-proj-abc123def456ghi789jkl012mno345pqr678stu901vwx234T3Blbk
 ---
 
 *本報告由 skill-safety-guard v0.1.0 自動生成*  
-*規則庫開源：https://github.com/Wahero/Skill-safety-guard/blob/main/rules/*  
+*規則庫開源：https://github.com/Wahero/Skill-safety-guard/blob/main/src/skill_safety_guard/rules/*  
 *發現誤報？執行 `/safety-check --report-fp <rule-id>`*

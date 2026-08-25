@@ -1,4 +1,4 @@
-# Skill Safety-guard 風險報告
+﻿# Skill Safety-guard 風險報告
 
 > **掃描目標**: `D:\AI\PiAgent\Skill-safety-guard`  
 > **掃描文件數**: 0  
@@ -33,5 +33,5 @@
 ---
 
 *本報告由 skill-safety-guard v0.1.0 自動生成*  
-*規則庫開源：https://github.com/Wahero/Skill-safety-guard/blob/main/rules/*  
+*規則庫開源：https://github.com/Wahero/Skill-safety-guard/blob/main/src/skill_safety_guard/rules/*  
 *發現誤報？執行 `/safety-check --report-fp <rule-id>`*

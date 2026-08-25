@@ -33,10 +33,10 @@ from pathlib import Path
 from typing import Dict, List, Optional
 
 # 內置漏洞庫路徑（隨倉庫更新）
-BUILTIN_VULNS = Path(__file__).resolve().parent.parent.parent / "rules" / "vulnerabilities.json"
+BUILTIN_VULNS = Path(__file__).resolve().parent / "rules" / "vulnerabilities.json"
 
 # 遠程漏洞源（GitHub raw，可更新）
-REMOTE_FEED_URL = "https://raw.githubusercontent.com/Wahero/Skill-safety-guard/main/rules/vulnerabilities.json"
+REMOTE_FEED_URL = "https://raw.githubusercontent.com/Wahero/Skill-safety-guard/main/src/skill_safety_guard/rules/vulnerabilities.json"
 
 # 本地緩存
 CACHE_DIR = Path.home() / ".skill-safety-guard"

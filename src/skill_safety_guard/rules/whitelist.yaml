@@ -41,6 +41,11 @@ whitelisted_patterns:
     pattern: '但實際是透過 os\.env'
     reason: paths.py 中誤報判定邏輯的說明文本（非實際訪問 .env）
 
+  # 工具自身 LLM prompt 中的注入類型描述（llm_check.py SYSTEM_PROMPT 自指命中）
+  - rule_id: pi-zh-system-leak
+    pattern: '輸出系統提示'
+    reason: llm_check.py SYSTEM_PROMPT 中描述注入攻擊類型的說明文本（非實際攻擊指令）
+
   # 功能說明書中的檢測能力表格（與 README 同理）
   - rule_id: critical-history-clear
     pattern: '\| \*\*歷史篡改\*\*'

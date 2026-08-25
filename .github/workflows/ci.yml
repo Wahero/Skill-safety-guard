@@ -89,7 +89,7 @@ jobs:
           import sys
           from pathlib import Path
           errors = []
-          for f in Path('rules').glob('*.yaml'):
+          for f in Path('src/skill_safety_guard/rules').glob('*.yaml'):
               try:
                   data = yaml.safe_load(f.read_text(encoding='utf-8'))
                   rules = data.get('rules', []) if isinstance(data, dict) else []
@@ -111,5 +111,5 @@ jobs:
                   print('  -', e)
               sys.exit(1)
           else:
-              print(f'All {sum(1 for _ in Path(\"rules\").glob(\"*.yaml\"))} YAML files OK')
+              print(f'All {sum(1 for _ in Path(\"src/skill_safety_guard/rules\").glob(\"*.yaml\"))} YAML files OK')
           "

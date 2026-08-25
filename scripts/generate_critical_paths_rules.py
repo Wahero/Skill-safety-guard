@@ -7,7 +7,7 @@ v1.3.0: Added persistence mechanisms (macOS LaunchAgents, Linux autostart).
 """
 from pathlib import Path
 
-TARGET_FILE = Path(__file__).resolve().parent.parent / "rules" / "critical_paths.yaml"
+TARGET_FILE = Path(__file__).resolve().parent.parent / "src" / "skill_safety_guard" / "rules" / "critical_paths.yaml"
 
 content = r'''# skill-safety-guard 規則庫：關鍵系統參數修改檢測
 # v1.2 新增：覆蓋 AI Agent 全局配置文件、Shell init、SSH 等

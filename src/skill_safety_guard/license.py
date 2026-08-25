@@ -24,7 +24,7 @@ import os
 import time
 from dataclasses import dataclass, asdict
 from pathlib import Path
-from typing import Optional
+from typing import Dict, Optional, Tuple
 
 
 # ⚠️ 演示用 SECRET_KEY。實際部署應使用環境變量或 KMS。
@@ -179,7 +179,7 @@ def get_week_start() -> float:
     return week_start.timestamp()
 
 
-def can_scan() -> tuple[bool, dict]:
+def can_scan() -> Tuple[bool, Dict]:
     """檢查用戶是否可以掃描（基於許可證和使用計數）
 
     返回：(can_scan, info_dict)

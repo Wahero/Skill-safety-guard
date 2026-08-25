@@ -108,7 +108,7 @@ jobs:
                   unique.append(v)
 
           # 合并已有内置（保留 OSV 未覆盖的手动补充）
-          feed_path = Path("rules/vulnerabilities.json")
+          feed_path = Path("src/skill_safety_guard/rules/vulnerabilities.json")
           if feed_path.exists():
               existing = json.loads(feed_path.read_text(encoding="utf-8"))
               existing_ids = {v["cve_id"] for v in unique}
@@ -134,7 +134,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add rules/vulnerabilities.json
+          git add src/skill_safety_guard/rules/vulnerabilities.json
           if git diff --cached --quiet; then
             echo "No changes"
           else

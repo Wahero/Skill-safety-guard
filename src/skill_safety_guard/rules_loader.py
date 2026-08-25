@@ -5,17 +5,11 @@ import yaml
 
 
 def get_rules_dir() -> Path:
-    """獲取規則目錄的絕對路徑（兼容開發模式和安裝模式）"""
-    # 開發模式：src/skill_safety_guard/ → ../../rules/
-    here = Path(__file__).resolve().parent
-    dev_rules = here.parent.parent / "rules"
-    if dev_rules.exists():
-        return dev_rules
-    # 安裝模式：skill_safety_guard/ 同級的 rules/
-    install_rules = here.parent / "rules"
-    if install_rules.exists():
-        return install_rules
-    raise FileNotFoundError(f"規則目錄未找到。已嘗試: {dev_rules}, {install_rules}")
+    """獲取規則目錄的絕對路徑（規則隨套件打包，開發/安裝模式統一路徑）"""
+    rules_dir = Path(__file__).resolve().parent / "rules"
+    if not rules_dir.exists():
+        raise FileNotFoundError(f"規則目錄未找到: {rules_dir}")
+    return rules_dir
 
 
 def load_rules_file(filename: str) -> List[Dict]:

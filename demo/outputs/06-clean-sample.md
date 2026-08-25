@@ -1,4 +1,4 @@
-> **[SAFE] 建議：可以安裝**
+﻿> **[SAFE] 建議：可以安裝**
 >
 > **目標**: `D:\AI\PiAgent\Skill-safety-guard\tests\fixtures\clean\hello-world`
 > **安全**: 未發現重大安全問題，可以繼續評估其他因素（許可證、依賴、作者信譽等）
@@ -60,5 +60,5 @@
 ---
 
 *本報告由 skill-safety-guard v0.1.0 自動生成*  
-*規則庫開源：https://github.com/Wahero/Skill-safety-guard/blob/main/rules/*  
+*規則庫開源：https://github.com/Wahero/Skill-safety-guard/blob/main/src/skill_safety_guard/rules/*  
 *發現誤報？執行 `/safety-check --report-fp <rule-id>`*

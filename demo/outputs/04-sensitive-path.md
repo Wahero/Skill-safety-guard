@@ -1,4 +1,4 @@
-> **[DANGER] 建議：不要安裝**
+﻿> **[DANGER] 建議：不要安裝**
 >
 > **目標**: `D:\AI\PiAgent\Skill-safety-guard\tests\fixtures\malicious\sensitive_path`
 > **危險**: 發現 6 個嚴重問題。強烈建議不要安裝此 Skill
@@ -205,5 +205,5 @@ k8s_secrets = open("/var/run/secrets/kubernetes.io/serviceaccount/token").read()
 ---
 
 *本報告由 skill-safety-guard v0.1.0 自動生成*  
-*規則庫開源：https://github.com/Wahero/Skill-safety-guard/blob/main/rules/*  
+*規則庫開源：https://github.com/Wahero/Skill-safety-guard/blob/main/src/skill_safety_guard/rules/*  
 *發現誤報？執行 `/safety-check --report-fp <rule-id>`*

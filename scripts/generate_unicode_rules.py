@@ -2,7 +2,7 @@
 """Generate unicode_steganography.yaml with literal high-codepoint characters."""
 from pathlib import Path
 
-TARGET_FILE = Path(__file__).resolve().parent.parent / "rules" / "unicode_steganography.yaml"
+TARGET_FILE = Path(__file__).resolve().parent.parent / "src" / "skill_safety_guard" / "rules" / "unicode_steganography.yaml"
 
 # 預構建所有需要的 pattern
 ZWSP = chr(0x200B)

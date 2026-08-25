@@ -34,6 +34,7 @@ SRC = Path(__file__).resolve().parent.parent / "src"
 if SRC.exists():
     sys.path.insert(0, str(SRC))
 
+from skill_safety_guard import __version__  # noqa: E402
 from skill_safety_guard.web_api import run_scan  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent
@@ -112,7 +113,7 @@ def _job_brief(job: dict) -> dict:
 # HTTP Handler
 # ---------------------------------------------------------------------------
 class Handler(BaseHTTPRequestHandler):
-    server_version = "skill-safety-guard/0.1"
+    server_version = f"skill-safety-guard/{__version__}"
 
     # -- helpers --
     def _send_json(self, obj, code: int = 200):
@@ -164,7 +165,7 @@ class Handler(BaseHTTPRequestHandler):
         path = parsed.path
 
         if path == "/api/health":
-            return self._send_json({"ok": True, "version": "3.6.0", "jobs": len(JOBS)})
+            return self._send_json({"ok": True, "version": __version__, "jobs": len(JOBS)})
 
         if path == "/api/scans":
             jobs = [ _job_brief(j) for j in sorted(JOBS.values(), key=lambda j: -j["created_at"]) ]

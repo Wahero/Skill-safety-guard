@@ -127,10 +127,10 @@ def handle_report_fp(rule_id: str) -> int:
     print(f"  4. 預期的正確行為")
     print(f"\n提交後，維護者會：")
     print(f"  - 在 7 天內處理")
-    print(f"  - 添加白名單條目到 rules/whitelist.yaml")
+    print(f"  - 添加白名單條目到 src/skill_safety_guard/rules/whitelist.yaml")
     print(f"  - 或調整規則（你會在 PR 中看到討論）")
     print(f"\n本地臨時白名單（不等於社區認可）：")
-    print(f"  編輯 rules/whitelist.yaml，添加：")
+    print(f"  編輯 src/skill_safety_guard/rules/whitelist.yaml，添加：")
     print(f"  ```yaml")
     print(f"  whitelisted_patterns:")
     print(f"    - rule_id: {rule_id}")
@@ -182,9 +182,13 @@ def scan_target(target: Path, args) -> Dict:
                         result.findings.append(f)
                 skill_results[cat] = result
         else:
+            # installed_extensions 不在目錄掃描中執行：該規則集設計為審計已安裝
+            # 擴展代碼（JS/TS），而非掃描一般 Skill 源碼；ext-curl-wget 等規則
+            # 對文檔性 curl/wget 提及過度敏感。擴展審計走 --audit-extensions。
             for det, cat in [(cred_det, "credentials"), (shell_det, "shell"), (path_det, "paths"),
                               (unicode_det, "unicode"), (critical_det, "critical_paths"),
-                              (privacy_det, "privacy")]:
+                              (privacy_det, "privacy"),
+                              (prompt_inj_det, "prompt_injection")]:
                 det.category = cat
                 result = det.detect_directory(target)
                 skill_results[cat] = result

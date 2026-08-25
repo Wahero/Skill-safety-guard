@@ -9,6 +9,7 @@ description = "個人開發者 Skill/MCP 安全掃描工具"
 readme = "README.md"
 requires-python = ">=3.8"
 license = { text = "MIT" }
+dependencies = ["pyyaml>=6.0"]
 authors = [{ name = "Wahero" }]
 keywords = ["security", "skill", "agent", "pi-agent", "scanner"]
 classifiers = [
@@ -29,4 +30,4 @@ safety-check = "skill_safety_guard.cli:main"
 where = ["src"]
 
 [tool.setuptools.package-data]
-"skill_safety_guard" = []
+"skill_safety_guard" = ["rules/*.yaml", "rules/*.json"]

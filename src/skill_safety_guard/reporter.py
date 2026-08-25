@@ -65,7 +65,7 @@ def generate_confidence_explanation(findings: List[Finding]) -> str:
         "",
         "如果認為某些規則誤報過多：",
         "",
-        "1. 在 `rules/whitelist.yaml` 中添加白名單條目（本地生效）",
+        "1. 在 `src/skill_safety_guard/rules/whitelist.yaml` 中添加白名單條目（本地生效）",
         "2. 運行 `safety-check --report-fp <rule-id>` 報告誤報（社區生效）",
         "3. 使用 `--min-confidence high` 只看高置信度問題",
         "",
@@ -340,7 +340,7 @@ def generate_report(
     lines.append("---")
     lines.append("")
     lines.append(f"*本報告由 skill-safety-guard v{__version__} 自動生成*  ")
-    lines.append("*規則庫開源：https://github.com/Wahero/Skill-safety-guard/blob/main/rules/*  ")
+    lines.append("*規則庫開源：https://github.com/Wahero/Skill-safety-guard/blob/main/src/skill_safety_guard/rules/*  ")
     lines.append("*發現誤報？執行 `/safety-check --report-fp <rule-id>`*")
 
     return "\n".join(lines)
