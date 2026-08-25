@@ -40,7 +40,7 @@ class PrivacyDetector(BaseDetector):
                 for match in pattern.finditer(content):
                     line_no = content[:match.start()].count("\n") + 1
                     ctx = lines[line_no - 1].strip()[:200] if 0 < line_no <= len(lines) else ""
-                    findings.append(self._make(rule, file_path, line_no, match.group(0), ctx))
+                    findings.append(self._make_finding(rule, file_path, line_no, match.group(0), ctx))
             else:
                 seen_lines = set()
                 for line_no, line in enumerate(lines, start=1):
@@ -50,20 +50,5 @@ class PrivacyDetector(BaseDetector):
                         if line_no in seen_lines:
                             break
                         seen_lines.add(line_no)
-                        findings.append(self._make(rule, file_path, line_no, match.group(0), line.strip()))
+                        findings.append(self._make_finding(rule, file_path, line_no, match.group(0), line.strip()))
         return findings
-
-    def _make(self, rule: dict, file_path: Path, line_no: int, matched_text: str, context_line: str = "") -> Finding:
-        return Finding(
-            rule_id=rule["id"],
-            rule_name=rule["name"],
-            severity=rule.get("severity", "medium"),
-            confidence=rule.get("confidence", "medium"),
-            category=rule.get("category", "privacy"),
-            description=rule.get("description", ""),
-            remediation=rule.get("remediation", ""),
-            file_path=str(file_path),
-            line_number=line_no,
-            matched_text=matched_text[:100] + ("..." if len(matched_text) > 100 else ""),
-            context_line=context_line[:200],
-        )

@@ -10,6 +10,7 @@ from .rules_loader import load_all_rules, load_whitelist
 from .detectors import (
     CredentialsDetector, ShellDetector, PathsDetector, UnicodeDetector,
     CriticalPathsDetector, PrivacyDetector,
+    InstalledExtensionsDetector, PromptInjectionDetector,
 )
 from .detectors.base import Finding
 from .parser import parse_skill_file, validate_skill_frontmatter
@@ -61,8 +62,8 @@ def scan_target(target: Path, args) -> Dict:
         unicode_det = UnicodeDetector(all_rules.get("unicode", []), whitelist)
         critical_det = CriticalPathsDetector(all_rules.get("critical_paths", []), whitelist)
         privacy_det = PrivacyDetector(all_rules.get("privacy", []), whitelist)
-        installed_ext_det = CredentialsDetector(all_rules.get("installed_extensions", []), whitelist)  # reuse base
-        prompt_inj_det = CredentialsDetector(all_rules.get("prompt_injection", []), whitelist)  # reuse base
+        installed_ext_det = InstalledExtensionsDetector(all_rules.get("installed_extensions", []), whitelist)
+        prompt_inj_det = PromptInjectionDetector(all_rules.get("prompt_injection", []), whitelist)
 
         # 檢測目標是文件還是目錄
         if target.is_file():
@@ -73,29 +74,23 @@ def scan_target(target: Path, args) -> Dict:
             except (UnicodeDecodeError, PermissionError):
                 content = ""
 
-            for det, cat in [(cred_det, "credentials"), (shell_det, "shell"), (path_det, "paths"),
-                              (unicode_det, "unicode"), (critical_det, "critical_paths"),
-                              (privacy_det, "privacy"),
-                              (installed_ext_det, "installed_extensions"), (prompt_inj_det, "prompt_injection")]:
-                det.category = cat
-                result = DetectionResult(category=cat, scanned_files=1)
+            for det in [cred_det, shell_det, path_det, unicode_det, critical_det,
+                        privacy_det, installed_ext_det, prompt_inj_det]:
+                result = DetectionResult(category=det.category, scanned_files=1)
                 findings = det.detect_file(target, content)
                 for f in findings:
                     if not det._apply_whitelist(f):
                         f = det._apply_confidence_demotion(f)
                         result.findings.append(f)
-                skill_results[cat] = result
+                skill_results[det.category] = result
         else:
             # installed_extensions 不在目錄掃描中執行：該規則集設計為審計已安裝
             # 擴展代碼（JS/TS），而非掃描一般 Skill 源碼；ext-curl-wget 等規則
             # 對文檔性 curl/wget 提及過度敏感。擴展審計走 --audit-extensions。
-            for det, cat in [(cred_det, "credentials"), (shell_det, "shell"), (path_det, "paths"),
-                              (unicode_det, "unicode"), (critical_det, "critical_paths"),
-                              (privacy_det, "privacy"),
-                              (prompt_inj_det, "prompt_injection")]:
-                det.category = cat
+            for det in [cred_det, shell_det, path_det, unicode_det, critical_det,
+                        privacy_det, prompt_inj_det]:
                 result = det.detect_directory(target)
-                skill_results[cat] = result
+                skill_results[det.category] = result
 
         # SKILL.md frontmatter 驗證
         skill_md = target / "SKILL.md" if target.is_dir() else None

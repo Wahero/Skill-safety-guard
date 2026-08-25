@@ -30,20 +30,10 @@ class UnicodeDetector(BaseDetector):
                     # 對於零寬字符，顯示 codepoint 而不是字符本身
                     display_text = self._format_matched_text(matched_text)
 
-                    finding = Finding(
-                        rule_id=rule["id"],
-                        rule_name=rule["name"],
-                        severity=rule.get("severity", "medium"),
-                        confidence=rule.get("confidence", "medium"),
-                        category=rule.get("category", "unicode"),
-                        description=rule.get("description", ""),
-                        remediation=rule.get("remediation", ""),
-                        file_path=str(file_path),
-                        line_number=line_no,
-                        matched_text=display_text,
-                        context_line=line.strip()[:200],
-                    )
-                    findings.append(finding)
+                    findings.append(self._make_finding(
+                        rule, file_path, line_no,
+                        display_text, line.strip(),
+                    ))
                     # 一個文件對每條規則只報告一次（取第一個匹配位置）
                     break
 

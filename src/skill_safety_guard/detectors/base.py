@@ -88,6 +88,57 @@ class BaseDetector(ABC):
             if compiled is not None:
                 yield rule, compiled
 
+    # ------------------------------------------------------------------
+    # 統一 Finding 構建與逐行檢測（P1-2 / P1-3）
+    # ------------------------------------------------------------------
+
+    def _make_finding(
+        self,
+        rule: Dict,
+        file_path: Path,
+        line_number: int,
+        matched_text: str,
+        context_line: str = "",
+    ) -> Finding:
+        """統一 Finding 構建（P1-3）
+
+        所有檢測器子類通過此方法生成 Finding，消除重複代碼。
+        matched_text 截斷 ≤100 字符，context_line 截斷 ≤200 字符。
+        """
+        mt = matched_text or ""
+        return Finding(
+            rule_id=rule.get("id", ""),
+            rule_name=rule.get("name", ""),
+            severity=rule.get("severity", "medium"),
+            confidence=rule.get("confidence", "medium"),
+            category=rule.get("category", self.category),
+            description=rule.get("description", ""),
+            remediation=rule.get("remediation", ""),
+            file_path=str(file_path),
+            line_number=line_number,
+            matched_text=mt[:100] + ("..." if len(mt) > 100 else ""),
+            context_line=(context_line or "")[:200],
+        )
+
+    def _detect_lines(self, file_path: Path, content: str) -> List[Finding]:
+        """標準逐行正則檢測（P1-2 統一遍歷）
+
+        credentials / shell / installed_extensions / prompt_injection 共用此邏輯。
+        需要特殊處理的子類（paths 的 FP 判定、critical_paths 的多行模式、
+        unicode 的字符格式化）應覆寫 detect_file 並直接呼叫 _make_finding。
+        """
+        findings: List[Finding] = []
+        for rule, pattern in self._iter_compiled_rules():
+            for line_no, line in enumerate(content.splitlines(), start=1):
+                if line_no > 5000:
+                    break
+                for match in pattern.finditer(line):
+                    findings.append(self._make_finding(
+                        rule, file_path, line_no,
+                        match.group(0), line.strip(),
+                    ))
+        return findings
+
     @abstractmethod
     def detect_file(self, file_path: Path, content: str) -> List[Finding]:
         """檢測單個文件"""

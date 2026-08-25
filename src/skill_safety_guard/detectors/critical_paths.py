@@ -51,18 +51,3 @@ class CriticalPathsDetector(BaseDetector):
                         break  # 一個規則在同一行只報一次
 
         return findings
-
-    def _make_finding(self, rule: dict, file_path: Path, line_no: int, matched_text: str, context_line: str = "") -> Finding:
-        return Finding(
-            rule_id=rule["id"],
-            rule_name=rule["name"],
-            severity=rule.get("severity", "medium"),
-            confidence=rule.get("confidence", "medium"),
-            category=rule.get("category", "critical_paths"),
-            description=rule.get("description", ""),
-            remediation=rule.get("remediation", ""),
-            file_path=str(file_path),
-            line_number=line_no,
-            matched_text=matched_text[:100] + ("..." if len(matched_text) > 100 else ""),
-            context_line=context_line[:200],
-        )

@@ -6,6 +6,8 @@ from .paths import PathsDetector
 from .unicode import UnicodeDetector
 from .critical_paths import CriticalPathsDetector
 from .privacy import PrivacyDetector
+from .installed_extensions import InstalledExtensionsDetector
+from .prompt_injection import PromptInjectionDetector
 
 
 __all__ = [
@@ -18,4 +20,6 @@ __all__ = [
     "UnicodeDetector",
     "CriticalPathsDetector",
     "PrivacyDetector",
+    "InstalledExtensionsDetector",
+    "PromptInjectionDetector",
 ]
