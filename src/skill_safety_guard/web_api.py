@@ -16,7 +16,8 @@ from .detectors import CredentialsDetector, ShellDetector, PathsDetector, Unicod
 from .reporter import calculate_risk_grade
 from .scan_target_resolver import resolve_target, cleanup_target
 from .pi_check import check_pi_version, check_auth_permissions
-from .cli import make_install_decision, scan_target
+from .commands import make_install_decision
+from .scan_orchestrator import scan_target
 
 # 進度回調型別
 ProgressCb = Optional[Callable[[str], None]]

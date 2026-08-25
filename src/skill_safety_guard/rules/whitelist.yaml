@@ -96,6 +96,16 @@ whitelisted_paths:
   - '*/scan-pi-web-*.md'
   - '*/scan-report-*.md'
   - '*/report/*'
+  # 自掃回歸豁免：P1-1 拆分後根目錄文檔的自指誤報（P0-5 新增 prompt_injection 目錄掃描後暴露）
+  # 這些是產品文檔中的檢測能力描述，其中「Ignore previous instructions」「jailbreak」等是示例引用。
+  # 不能用 pattern 層級豁免（會全局削弱 pi-ignore-previous 和 pi-jailbreak 規則的檢測能力）。
+  - '*/Skill-safety-guard/README.md'
+  - '*/Skill-safety-guard/USAGE.md'
+  - '*/Skill-safety-guard/PROMOTION.md'
+  - '*/Skill-safety-guard/功能說明書.md'
+  # P1-5 沙箱代碼 core.hooksPath=NUL 觸發 critical-gitconfig-sshcommand 規則。
+  # 不能用 pattern 層級豁免（core.hooksPath= 是真實攻擊指標，在實際 SKILL.md 中必須檢出）。
+  - '*/skill_safety_guard/scan_target_resolver.py'
 
 # 置信度下調：命中後將置信度從 high 降為 low
 confidence_demotions:

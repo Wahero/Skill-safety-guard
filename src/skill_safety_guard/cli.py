@@ -1,24 +1,36 @@
-"""CLI 主入口（F-007~F-010 殺手場景 + V-01 驗證項 + F-003/F-004）"""
+"""CLI 主入口（命令路由 + 參數解析）
+
+P1-1 重構後職責：
+  - parse_args(): 命令行參數定義
+  - main(): 命令路由 + 子命令派發
+  - _run_scan(): 掃描編排（進度、MCP、LLM、輸出格式化）
+
+掃描邏輯 → scan_orchestrator.py
+子命令實現 → commands.py
+"""
 import argparse
-import sys
 import json
+import sys
 import time
 from pathlib import Path
-from typing import Dict, Optional
+from typing import Optional
 
 from . import __version__
-from .rules_loader import load_all_rules, load_whitelist
-from .detectors import CredentialsDetector, ShellDetector, PathsDetector, UnicodeDetector, CriticalPathsDetector, PrivacyDetector
 from .license import (
     can_scan, record_scan, activate_license, generate_license_key,
-    load_license, print_tier_banner, FREE_SCANS_PER_WEEK, PRO_PRICE_MONTHLY_USD,
+    load_license, print_tier_banner,
 )
-from .detectors.base import Finding
 from .pi_check import check_pi_version, check_auth_permissions
-from .parser import parse_skill_file, validate_skill_frontmatter
 from .reporter import generate_report, calculate_risk_grade, generate_confidence_explanation
 from .sarif import findings_to_sarif_string
 from .scan_target_resolver import resolve_target, cleanup_target, ScanTarget
+
+# P1-1 拆分：從新模組導入
+from .scan_orchestrator import scan_target, resolve_output_file, emit_output
+from .commands import (
+    handle_report_fp, scan_pi_only, format_json_output,
+    make_install_decision, format_decision_block,
+)
 
 
 def parse_args(argv=None):
@@ -88,269 +100,6 @@ def parse_args(argv=None):
     return parser.parse_args(argv)
 
 
-def resolve_output_file(args, resolved) -> Optional[Path]:
-    """解析報告輸出檔案路徑
-
-    優先序：
-    1. 用戶顯式指定 --output-file
-    2. GitHub URL 掃描 → 自動生成 scan-report-<repo>.md 到當前工作目錄
-    3. 其他情況 → None（只印 stdout，不寫檔）
-    """
-    if getattr(args, "output_file", None):
-        return Path(args.output_file).resolve()
-    if args.output == "markdown" and resolved and resolved.kind.startswith("github"):
-        display = resolved.display_name  # e.g. github.com/user/repo
-        repo = display.split("/")[-1] if display else "scan"
-        return Path.cwd() / f"scan-report-{repo}.md"
-    return None
-
-
-def emit_output(text: str, output_file: Optional[Path]) -> None:
-    """印出報告；若指定 output_file 則同時寫入該檔案"""
-    print(text)
-    if output_file:
-        try:
-            output_file.parent.mkdir(parents=True, exist_ok=True)
-            output_file.write_text(text, encoding="utf-8")
-            print(f"\n📄 報告已存檔：{output_file}", file=sys.stderr)
-        except OSError as e:
-            print(f"\n[WARN] 報告寫檔失敗：{e}", file=sys.stderr)
-
-
-def handle_report_fp(rule_id: str) -> int:
-    """處理誤報報告（F-016）"""
-    issue_url = (
-        f"https://github.com/Wahero/Skill-safety-guard/issues/new"
-        f"?template=false_positive.md"
-        f"&title=%5BFalse+Positive%5D+{rule_id}"
-        f"&labels=false-positive"
-    )
-    print(f"\n[REPORT] 報告誤報：{rule_id}")
-    print(f"\n請訪問以下鏈接提交誤報：\n  {issue_url}")
-    print(f"\n請在 issue 中包含：")
-    print(f"  1. 規則 ID: {rule_id}")
-    print(f"  2. 觸發該規則的 SKILL.md 或代碼片段")
-    print(f"  3. 為什麼這是誤報")
-    print(f"  4. 預期的正確行為")
-    print(f"\n提交後，維護者會：")
-    print(f"  - 在 7 天內處理")
-    print(f"  - 添加白名單條目到 src/skill_safety_guard/rules/whitelist.yaml")
-    print(f"  - 或調整規則（你會在 PR 中看到討論）")
-    print(f"\n本地臨時白名單（不等於社區認可）：")
-    print(f"  編輯 src/skill_safety_guard/rules/whitelist.yaml，添加：")
-    print(f"  ```yaml")
-    print(f"  whitelisted_patterns:")
-    print(f"    - rule_id: {rule_id}")
-    print(f"      pattern: \"<your-specific-text>\"")
-    print(f"      reason: \"<why-this-is-false-positive>\"")
-    print(f"  ```")
-    return 0
-
-
-def scan_target(target: Path, args) -> Dict:
-    """執行掃描"""
-    whitelist = load_whitelist()
-    all_rules = load_all_rules()
-
-    skill_results: Dict = {}
-    if not args.pi:
-        if not target.exists():
-            print(f"[ERROR] 目標路徑不存在：{target}", file=sys.stderr)
-            sys.exit(2)
-
-        cred_det = CredentialsDetector(all_rules.get("credentials", []), whitelist)
-        shell_det = ShellDetector(all_rules.get("shell", []), whitelist)
-        path_det = PathsDetector(all_rules.get("paths", []), whitelist)
-        unicode_det = UnicodeDetector(all_rules.get("unicode", []), whitelist)
-        critical_det = CriticalPathsDetector(all_rules.get("critical_paths", []), whitelist)
-        privacy_det = PrivacyDetector(all_rules.get("privacy", []), whitelist)
-        installed_ext_det = CredentialsDetector(all_rules.get("installed_extensions", []), whitelist)  # reuse base
-        prompt_inj_det = CredentialsDetector(all_rules.get("prompt_injection", []), whitelist)  # reuse base
-
-        # 檢測目標是文件還是目錄
-        if target.is_file():
-            from .detectors.base import DetectionResult
-            # 單文件掃描
-            try:
-                content = target.read_text(encoding="utf-8")
-            except (UnicodeDecodeError, PermissionError):
-                content = ""
-
-            for det, cat in [(cred_det, "credentials"), (shell_det, "shell"), (path_det, "paths"),
-                              (unicode_det, "unicode"), (critical_det, "critical_paths"),
-                              (privacy_det, "privacy"),
-                              (installed_ext_det, "installed_extensions"), (prompt_inj_det, "prompt_injection")]:
-                det.category = cat
-                result = DetectionResult(category=cat, scanned_files=1)
-                findings = det.detect_file(target, content)
-                for f in findings:
-                    if not det._apply_whitelist(f):
-                        f = det._apply_confidence_demotion(f)
-                        result.findings.append(f)
-                skill_results[cat] = result
-        else:
-            # installed_extensions 不在目錄掃描中執行：該規則集設計為審計已安裝
-            # 擴展代碼（JS/TS），而非掃描一般 Skill 源碼；ext-curl-wget 等規則
-            # 對文檔性 curl/wget 提及過度敏感。擴展審計走 --audit-extensions。
-            for det, cat in [(cred_det, "credentials"), (shell_det, "shell"), (path_det, "paths"),
-                              (unicode_det, "unicode"), (critical_det, "critical_paths"),
-                              (privacy_det, "privacy"),
-                              (prompt_inj_det, "prompt_injection")]:
-                det.category = cat
-                result = det.detect_directory(target)
-                skill_results[cat] = result
-
-        # SKILL.md frontmatter 驗證
-        skill_md = target / "SKILL.md" if target.is_dir() else None
-        if skill_md and skill_md.exists():
-            fm = parse_skill_file(skill_md)
-            if fm:
-                validation = validate_skill_frontmatter(fm)
-                if not validation["valid"] or validation["warnings"]:
-                    fm_findings = []
-                    for missing in validation["missing"]:
-                        fm_findings.append(Finding(
-                            rule_id="skill-frontmatter-missing",
-                            rule_name=f"SKILL.md 缺少必需字段：{missing}",
-                            severity="medium",
-                            confidence="high",
-                            category="skill_meta",
-                            description=f"SKILL.md frontmatter 缺少 `{missing}` 字段",
-                            remediation=f"在 frontmatter 中添加 `{missing}: <value>`",
-                            file_path=str(skill_md),
-                            line_number=1,
-                            matched_text=f"---\n[缺少 {missing}]",
-                            context_line=f"---\nname: ...\n[{missing} missing]\n---",
-                        ))
-                    for warn in validation["warnings"]:
-                        fm_findings.append(Finding(
-                            rule_id="skill-frontmatter-warning",
-                            rule_name="SKILL.md 警告",
-                            severity="low",
-                            confidence="medium",
-                            category="skill_meta",
-                            description=warn,
-                            remediation="審查並修正",
-                            file_path=str(skill_md),
-                            line_number=1,
-                            matched_text=warn[:50],
-                            context_line="",
-                        ))
-                    skill_results["skill_meta"] = type('R', (), {
-                        "category": "skill_meta",
-                        "findings": fm_findings,
-                        "scanned_files": 1,
-                    })()
-
-    return skill_results
-
-
-def scan_pi_only(args) -> Dict:
-    """只掃描 Pi 全局"""
-    pi_result = check_pi_version(use_osv=getattr(args, "osv", False))
-    auth_result = check_auth_permissions()
-
-    pi_combined = {
-        **pi_result,
-        "auth_check": auth_result,
-    }
-
-    return {"_pi_only": True, "pi_check": pi_combined}
-
-
-def format_json_output(target: str, pi_check: Dict, skill_results: Dict, overall_grade: str, decision: dict = None) -> str:
-    """JSON 格式輸出"""
-    all_findings = []
-    for r in skill_results.values():
-        if hasattr(r, "findings"):
-            for f in r.findings:
-                all_findings.append({
-                    "rule_id": f.rule_id,
-                    "rule_name": f.rule_name,
-                    "severity": f.severity,
-                    "confidence": f.confidence,
-                    "category": f.category,
-                    "description": f.description,
-                    "file_path": f.file_path,
-                    "line_number": f.line_number,
-                    "matched_text": f.matched_text,
-                })
-
-    output = {
-        "target": target,
-        "overall_grade": overall_grade,
-        "pi_check": {
-            "version": pi_check.get("version", ""),
-            "pi_available": pi_check.get("pi_available", False),
-            "vulnerabilities": pi_check.get("vulnerabilities", []),
-            "auth_check": pi_check.get("auth_check", {}),
-        },
-        "findings": all_findings,
-        "summary": {
-            "total": len(all_findings),
-            "critical": sum(1 for f in all_findings if f["severity"] == "critical"),
-            "high": sum(1 for f in all_findings if f["severity"] == "high"),
-            "medium": sum(1 for f in all_findings if f["severity"] == "medium"),
-            "low": sum(1 for f in all_findings if f["severity"] == "low"),
-        },
-    }
-
-    if decision:
-        output["decision"] = decision
-
-    return json.dumps(output, ensure_ascii=False, indent=2)
-
-
-def make_install_decision(grade: str, findings: list) -> dict:
-    """殺手場景決策邏輯（F-010）"""
-    critical = sum(1 for f in findings if f.severity == "critical")
-    high = sum(1 for f in findings if f.severity == "high")
-    medium = sum(1 for f in findings if f.severity == "medium")
-
-    if grade in ["A", "B"]:
-        return {
-            "verdict": "SAFE",
-            "title": "安全",
-            "description": "未發現重大安全問題，可以繼續評估其他因素（許可證、依賴、作者信譽等）",
-        }
-    elif grade == "C":
-        return {
-            "verdict": "CAUTION",
-            "title": "警告",
-            "description": f"發現 {medium} 個中風險問題，建議人工審查每個後再決定是否安裝",
-        }
-    elif grade in ["D", "E"]:
-        return {
-            "verdict": "CAUTION",
-            "title": "警告",
-            "description": f"發現 {high} 個高風險問題。不建議安裝，除非你能解釋每個問題",
-        }
-    else:  # F
-        return {
-            "verdict": "DANGER",
-            "title": "危險",
-            "description": f"發現 {critical} 個嚴重問題。強烈建議不要安裝此 Skill",
-        }
-
-
-def format_decision_block(target_name: str, decision: dict) -> str:
-    """格式化殺手場景決策區塊"""
-    verdict_map = {
-        "SAFE": "[SAFE] 建議：可以安裝",
-        "CAUTION": "[CAUTION] 建議：人工複查後決定",
-        "DANGER": "[DANGER] 建議：不要安裝",
-    }
-
-    return f"""> **{verdict_map.get(decision['verdict'], decision['verdict'])}**
->
-> **目標**: `{target_name}`
-> **{decision['title']}**: {decision['description']}
->
-> ---
-
-"""
-
-
 def main(argv=None):
     """CLI 主入口"""
     args = parse_args(argv)
@@ -377,11 +126,11 @@ def main(argv=None):
             return 1
 
     if args.license_status:
-        lic = load_license()
         can, info = can_scan()
         print(f"\nTier: {info['tier'].upper()}")
         if info["tier"] == "pro":
-            print(f"Expires: {time.strftime('%Y-%m-%d', time.localtime(info['expires_at']))}")
+            exp = info.get("expires_at")
+            print(f"Expires: {time.strftime('%Y-%m-%d', time.localtime(exp)) if exp else 'never'}")
         else:
             used = info['limit'] - info['remaining']
             print(f"Scans this week: {used}/{info['limit']}")
@@ -453,7 +202,7 @@ def main(argv=None):
     if args.vuln_status:
         from .vuln_feed import (
             get_vuln_source_info, get_frequency, get_ttl, _read_update_meta,
-            get_all_cves, load_vulnerabilities,
+            get_all_cves, LOCAL_VULNS_CACHE,
         )
         info = get_vuln_source_info()
         print("\n[VULN STATUS] 漏洞庫狀態")
@@ -471,7 +220,6 @@ def main(argv=None):
             print(f"  ⏱ 本地最後檢查: 從未（使用內置/緩存庫）")
 
         # 本地緩存狀態
-        from .vuln_feed import LOCAL_VULNS_CACHE
         if LOCAL_VULNS_CACHE.exists():
             mtime = time.strftime('%Y-%m-%d %H:%M', time.localtime(LOCAL_VULNS_CACHE.stat().st_mtime))
             print(f"  💾 本地緩存文件: 存在（{mtime}）")
