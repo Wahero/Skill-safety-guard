@@ -33,7 +33,7 @@ const SHELL_RULES: Rule[] = [
   { id: "shell-reverse-nc", name: "Reverse Shell (netcat)", severity: "critical",
     pattern: new RegExp("nc\\s+-[a-z]*e\\s*/bin/(ba)?sh|ncat\\s+-[a-z]*e\\s*/bin/(ba)?sh|rm\\s*/tmp/\\w+;\\s*mkfifo|mkfifo\\s+/tmp/[^;]+;\\s*") },
   { id: "shell-rm-rf-root", name: "rm -rf on critical path", severity: "critical",
-    pattern: new RegExp("rm\\s+-[rRfF]+\\s+/\\s*$|rm\\s+-[rRfF]+\\s+/\\*|rm\\s+-[rRfF]+\\s+~/?\\s|rm\\s+-[rRfF]+\\s+--no-preserve-root\\s+/") },
+    pattern: new RegExp("rm\\s+-[rRfF]+\\s+/\\s*$|rm\\s+-[rRfF]+\\s+/\\*|rm\\s+-[rRfF]+\\s+~/?(\\s|$)|rm\\s+-[rRfF]+\\s+--no-preserve-root\\s+/") },
   { id: "shell-dd-disk", name: "dd disk wipe", severity: "critical",
     pattern: new RegExp("dd\\s+if=/dev/(zero|urandom)\\s+of=/dev/(sd|hd|nvme|vd)[a-z]\\b") },
   { id: "shell-fork-bomb", name: "Fork Bomb", severity: "critical",

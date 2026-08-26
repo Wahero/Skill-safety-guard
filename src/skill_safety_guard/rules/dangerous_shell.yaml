@@ -22,7 +22,7 @@ rules:
 
   - id: shell-reverse-tcp
     name: Reverse Shell (bash)
-    pattern: "bash\\s+-i\\s+>&\\s*/dev/tcp/|/dev/tcp/[0-9.]+/\\d+|\\(\\s*bash\\s*\\) >\\s*/dev/tcp/"
+    pattern: "bash\\s+-i\\s+>&\\s*/dev/tcp/|/dev/tcp/[0-9.]+/\\d+|\\(\\s*bash\\s*\\)\\s*>\\s*/dev/tcp/"
     severity: critical
     confidence: high
     category: shell
