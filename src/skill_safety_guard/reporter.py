@@ -231,6 +231,7 @@ def generate_report(
         "privacy": "👁️ 隱私行為（會話監測/資料外洩）",
         "native_file_ops": "🗑️ 原生檔案刪除操作（Rust/Python/Go/PS）",
         "owasp": "🛡️ OWASP Top 10 程式碼模式（A1/A2/A3/A10）",
+        "multi_framework": "🔧 多框架配置 + CI/CD + Docker 安全",
     }
 
     for cat, result in skill_results.items():

@@ -48,4 +48,5 @@ def load_all_rules() -> Dict[str, List[Dict]]:
         "privacy": load_rules_file("privacy.yaml"),
         "native_file_ops": load_rules_file("native_file_ops.yaml"),
         "owasp": load_rules_file("owasp_patterns.yaml"),
+        "multi_framework": load_rules_file("multi_framework.yaml"),
     }

@@ -1,0 +1,275 @@
+# skill-safety-guard 規則庫：多框架配置 + CI/CD + Docker 安全
+# v3.9.0 新增：覆蓋 Windsurf / Goose / Devin / Copilot / Roo Code + GitHub Actions / GitLab CI + Dockerfile
+
+rules:
+
+  # ============================================================
+  # 多框架配置：AI Coding 框架的安全配置檢測
+  # ============================================================
+
+  # Windsurf (Codeium)
+  - id: cf-windsurf-config-write
+    name: Windsurf 配置寫入
+    pattern: "(writeFileSync|fs\\.writeFile|appendFileSync)\\s*\\([^)]*\\.windsurfrc[^)]*\\)"
+    severity: high
+    confidence: high
+    category: critical_paths
+    description: 寫入 Windsurf 配置文件（行為規則注入向量）
+    remediation: 確認配置內容是否包含惡意指令
+
+  - id: cf-windsurf-agent-write
+    name: Windsurf Agent 配置寫入
+    pattern: "(writeFileSync|fs\\.writeFile|appendFileSync)\\s*\\([^)]*windsurf.*\\.json[^)]*\\)"
+    severity: medium
+    confidence: medium
+    category: critical_paths
+    description: 寫入 Windsurf Agent 配置（可能影響 AI 行為）
+    remediation: 確認配置來自可信來源
+
+  # Goose (e2b)
+  - id: cf-goose-config-write
+    name: Goose 配置寫入
+    pattern: "(writeFileSync|fs\\.writeFile|appendFileSync)\\s*\\([^)]*goose.*\\.json[^)]*\\)"
+    severity: medium
+    confidence: medium
+    category: critical_paths
+    description: 寫入 Goose Agent 配置（可能影響 AI 行為）
+    remediation: 確認配置來自可信來源
+
+  - id: cf-goose-agent-dir
+    name: Goose Agent 目錄寫入
+    pattern: "(writeFileSync|fs\\.writeFile|appendFileSync)\\s*\\([^)]*\\. goose/[^)]*\\)"
+    severity: medium
+    confidence: medium
+    category: critical_paths
+    description: 寫入 Goose Agent 目錄（影響 AI 工作空間）
+    remediation: 確認寫入的目標
+
+  # Devin (Cognition Labs)
+  - id: cf-devin-config-write
+    name: Devin 配置寫入
+    pattern: "(writeFileSync|fs\\.writeFile|appendFileSync)\\s*\\([^)]*\\.devin/[^)]*\\)"
+    severity: medium
+    confidence: medium
+    category: critical_paths
+    description: 寫入 Devin 配置目錄（影響 AI 行為）
+    remediation: 確認配置來自可信來源
+
+  # GitHub Copilot
+  - id: cf-copilot-instructions-write
+    name: Copilot 指令文件寫入
+    pattern: "(writeFileSync|fs\\.writeFile|appendFileSync)\\s*\\([^)]*\\.github/copilot-instructions/[^)]*\\)"
+    severity: high
+    confidence: high
+    category: critical_paths
+    description: 寫入 Copilot 指令文件（注入 AI 行為指令）
+    remediation: 立即拒絕寫入
+
+  - id: cf-copilot-agents-write
+    name: Copilot Agents 配置寫入
+    pattern: "(writeFileSync|fs\\.writeFile|appendFileSync)\\s*\\([^)]*\\.github/agents/[^)]*\\)"
+    severity: high
+    confidence: high
+    category: critical_paths
+    description: 寫入 Copilot Agents 配置（自定義 AI Agent 配置）
+    remediation: 確認配置內容
+
+  # Roo Code
+  - id: cf-roo-config-write
+    name: Roo Code 配置寫入
+    pattern: "(writeFileSync|fs\\.writeFile|appendFileSync)\\s*\\([^)]*\\.roo/[^)]*\\)"
+    severity: medium
+    confidence: medium
+    category: critical_paths
+    description: 寫入 Roo Code 配置目錄（影響 AI 行為）
+    remediation: 確認配置來自可信來源
+
+  # JetBrains AI Assistant
+  - id: cf-jetbrains-ai-write
+    name: JetBrains AI 配置寫入
+    pattern: "(writeFileSync|fs\\.writeFile|appendFileSync)\\s*\\([^)]*\\.idea/ai-config/[^)]*\\)"
+    severity: medium
+    confidence: medium
+    category: critical_paths
+    description: 寫入 JetBrains AI Assistant 配置
+    remediation: 確認配置來自可信來源
+
+  # Supermaven
+  - id: cf-supermaven-config-write
+    name: Supermaven 配置寫入
+    pattern: "(writeFileSync|fs\\.writeFile|appendFileSync)\\s*\\([^)]*\\.supermaven/[^)]*\\)"
+    severity: low
+    confidence: medium
+    category: critical_paths
+    description: 寫入 Supermaven 配置目錄
+    remediation: 確認配置來自可信來源
+
+  # ============================================================
+  # CI/CD 安全：GitHub Actions / GitLab CI / Jenkinsfile
+  # ============================================================
+
+  - id: ci-gha-curl-bash
+    name: GitHub Actions curl bash
+    pattern: "curl\\s+[^|]*\\|\\s*(ba)?sh"
+    severity: critical
+    confidence: high
+    category: shell
+    description: GitHub Actions 中 curl|bash 是常見攻擊向量（供應鏈投毒）
+    remediation: 永遠不要在 Actions 中執行 curl|bash，優先使用官方 Action
+
+  - id: ci-gha-secrets-expose
+    name: GitHub Actions secrets 暴露
+    pattern: "\\${{\\s*secrets\\.[A-Z_]+\\s*}}"
+    severity: medium
+    confidence: medium
+    category: privacy
+    description: GitHub Actions 中使用 secrets 變數，需確認上下文是否安全
+    remediation: secrets 只在必要範圍使用，避免在 log 中輸出
+
+  - id: ci-gha-untrusted-checkout
+    name: GitHub Actions 不受信任 checkout
+    pattern: "uses:\\s*actions/checkout@v[0-9]+\\s*\\n[^\\n]*persistCredentials"
+    severity: medium
+    confidence: medium
+    category: critical_paths
+    description: checkout 使用 persistCredentials 可能導致憑證洩露
+    remediation: 確認 checkout 後是否有安全的憑證清理步驟
+
+  - id: ci-gha-script-injection
+    name: GitHub Actions 腳本注入
+    pattern: "run:\\s*\\|[\\s\\S]{0,500}?\\${{\\s*github\\.event\\."
+    severity: high
+    confidence: medium
+    category: shell
+    description: GitHub Actions run 中拼接 event 變數可能導致注入攻擊
+    remediation: 使用 $GITHUB_ENV 而非直接拼接 shell 變數
+
+  - id: ci-gl-ci-shell
+    name: GitLab CI curl bash
+    pattern: "curl\\s+[^|]*\\|\\s*(ba)?sh"
+    severity: critical
+    confidence: high
+    category: shell
+    description: GitLab CI 中 curl|bash 與 GitHub Actions 相同風險
+    remediation: 避免在 CI 腳本中使用 curl|bash
+
+  - id: ci-jenkins-credential-expose
+    name: Jenkinsfile 憑證暴露
+    pattern: "withCredentials\\s*\\[|\\$BUILD_USER|\\$password|\\$username"
+    severity: high
+    confidence: high
+    category: credentials
+    description: Jenkinsfile 中使用 withCredentials 但可能通過 log 洩露
+    remediation: 確保 credentials 僅在封閉作用域中使用，log 不輸出敏感值
+
+  - id: ci-jenkins-shell-injection
+    name: Jenkinsfile 參數注入
+    pattern: "sh\\s+['\"]\\s*\\$\\{?params\\.|sh\\s+['\"]\\s*\\$"
+    severity: high
+    confidence: medium
+    category: shell
+    description: Jenkins sh 步驟拼接 params 可能導致注入
+    remediation: 參數化時使用 -notrait 避免 shell 注入
+
+  - id: ci-azure-pipeline-secret
+    name: Azure Pipeline secrets 暴露
+    pattern: "\\$\\({{ secrets\\.[A-Z_]+\\ }}\\)"
+    severity: medium
+    confidence: medium
+    category: credentials
+    description: Azure DevOps Pipeline 中 secrets 使用需注意安全上下文
+    remediation: 確認 secrets 不會在 log 或外部請求中洩露
+
+  # ============================================================
+  # Docker / K8s 安全
+  # ============================================================
+
+  - id: docker-curl-bash
+    name: Dockerfile curl bash
+    pattern: "curl\\s+[^|]*\\|\\s*(ba)?sh"
+    severity: critical
+    confidence: high
+    category: shell
+    description: Dockerfile 中使用 curl|bash 是常見投毒手法
+    remediation: 使用多階段構建或官方鏡像，避免在 Dockerfile 中執行 curl|bash
+
+  - id: docker-privileged
+    name: Docker privileged 模式
+    pattern: "--privileged|--cap-add=all|--security-opt=seccomp:unconfined"
+    severity: critical
+    confidence: high
+    category: critical_paths
+    description: Docker 容器使用 --privileged 或全量_cap-add，等同於 root 權限
+    remediation: 避免 privileged 模式，使用最小權限的 capability
+
+  - id: docker-user-root
+    name: Dockerfile USER root
+    pattern: "^USER\\s+root|^RUN\\s+chmod\\s+777\\s+/"
+    severity: medium
+    confidence: high
+    category: critical_paths
+    description: Docker 容器以 root 用戶運行，增大攻擊面
+    remediation: 始終使用非 root 用戶運行容器
+
+  - id: docker-secrets-arg
+    name: Dockerfile secrets in ARG
+    pattern: "ARG\\s+[A-Z_]+SECRET|ARG\\s+PASSWORD|ARG\\s+TOKEN|ARG\\s+KEY"
+    severity: high
+    confidence: high
+    category: credentials
+    description: Dockerfile ARG 在構建歷史中可見，不適合存放 secrets
+    remediation: 使用 Docker secrets 或 K8s Secrets，而非 ARG
+
+  - id: docker-compose-privileged
+    name: docker-compose privileged 模式
+    pattern: "privileged:\\s*true|cap_add:\\s*-\\s*ALL"
+    severity: critical
+    confidence: high
+    category: critical_paths
+    description: docker-compose.yml 中使用 privileged 或 CAP_ALL
+    remediation: 避免 privileged，使用最小權限配置
+
+  - id: docker-compose-network-host
+    name: docker-compose host 網絡模式
+    pattern: "network_mode:\\s*host"
+    severity: medium
+    confidence: high
+    category: critical_paths
+    description: docker-compose 使用 host 網絡模式繞過網絡隔離
+    remediation: 避免 host 網絡模式，使用 bridge 並正確配置端口映射
+
+  - id: docker-compose-secrets
+    name: docker-compose 明文 secrets
+    pattern: "environment:[\\s\\S]{0,200}PASSWORD[\\s\\S]{0,200}SECRET[\\s\\S]{0,200}KEY"
+    severity: medium
+    confidence: medium
+    category: credentials
+    description: docker-compose 中明文寫入密碼/token 到 environment
+    remediation: 使用 docker secrets 或 K8s Secrets，而非 environment 明文
+
+  - id: kubeconfig-cert-expose
+    name: kubeconfig 直接暴露證書
+    pattern: "client-certificate-data:|client-key-data:|token:\\s*[A-Za-z0-9_\\-\\.=]+"
+    severity: critical
+    confidence: high
+    category: credentials
+    description: kubeconfig 包含明文 client-certificate-data / client-key-data / token
+    remediation: 使用 K8s ServiceAccount Token 而非 kubeconfig 文件
+
+  - id: kube-privileged-container
+    name: K8s  privileged 容器
+    pattern: "privileged:\\s*true|capabilities\\.add:\\s*-\\s*SYS_ADMIN"
+    severity: critical
+    confidence: high
+    category: critical_paths
+    description: Kubernetes Pod 或 Container 使用 privileged 或 SYS_ADMIN capability
+    remediation: 避免 privileged 和高風險 capability，使用 PodSecurityPolicy
+
+  - id: kube-host-path-pv
+    name: K8s HostPath 卷掛載
+    pattern: "hostPath:\\s*path:\\s*/|/hostPath:\\s*path:\\s*/var/run/docker.sock"
+    severity: critical
+    confidence: high
+    category: critical_paths
+    description: Kubernetes 掛載 hostPath 到關鍵系統路徑
+    remediation: 避免 hostPath 掛載，使用 emptyDir 或持久卷

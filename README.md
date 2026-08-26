@@ -2,8 +2,8 @@
 
 > **個人開發者安裝 Skill / MCP 前的安全守護者**
 
-[![Version](https://img.shields.io/badge/version-3.8.0-orange.svg)]()
-[![Rules](https://img.shields.io/badge/rules-201-blue.svg)]()
+[![Version](https://img.shields.io/badge/version-3.9.0-orange.svg)]()
+[![Rules](https://img.shields.io/badge/rules-260-blue.svg)]()
 [![Categories](https://img.shields.io/badge/categories-11-green.svg)]()
 [![VulnFeed](https://img.shields.io/badge/vuln%20feed-OSV%2BAVID%2BCAIVD-purple.svg)]()
 [![License](https://img.shields.io/badge/license-MIT-green.svg)]()
@@ -30,7 +30,7 @@
 - ⚠️ Pi 版本是否在已知漏洞範圍（CVE-2026-54326 / 54327）
 - 🔒 `auth.json` 文件權限是否過寬
 
-> 🆕 v3.8.0：新增 **Rust / Python / Go / PowerShell** 原生檔案刪除 API 檢測，補齊 Shell 層之外的盲區。
+> 🆕 v3.9.0：新增 **多框架配置 + CI/CD + Docker 安全** 28 條規則，覆蓋 Windsurf / Goose / Devin / Copilot / GitHub Actions / Dockerfile / Kubernetes
 
 ---
 
@@ -167,7 +167,7 @@ safety-check --vuln-sources
 
 ---
 
-## 檢測能力（v3.8.0 / 201 條規則 / 11 類檢測）
+## 檢測能力（v3.9.0 / 260 條規則 / 13 類檢測）
 
 ### 🚨 關鍵系統參數修改（最高優先級）
 
@@ -230,6 +230,24 @@ safety-check --vuln-sources
 > 例如 Rust 寫的磁盤清理工具可能使用 `std::fs::remove_dir_all` 永久刪除 C:\ 檔案，
 > 而 `dangerous_shell.yaml` 只檢測 `rm -rf` 等 Shell 命令，無法攔截。
 
+### 🔧 多框架配置 + CI/CD + Docker 安全（v3.9.0 新增）
+
+| 框架 | 檢測目標 |
+|------|---------|
+| **Windsurf** | `.windsurfrc`, `windsurf.json` 寫入 |
+| **Goose** | `goose.json`, `. goose/` 寫入 |
+| **Devin** | `.devin/config.json` 寫入 |
+| **Copilot** | `.github/copilot-instructions/`, `.github/agents/` 寫入 |
+| **Roo Code** | `.roo/config.json` 寫入 |
+| **JetBrains AI** | `.idea/ai-config/` 寫入 |
+| **GitHub Actions** | `curl|bash`、secrets 暴露、腳本注入、不信任 checkout |
+| **GitLab CI** | `curl|bash` 注入 |
+| **Jenkinsfile** | 憑證暴露、參數注入 |
+| **Azure Pipeline** | secrets 暴露 |
+| **Dockerfile** | `curl|bash`、`--privileged`、root 用戶、secrets in ARG |
+| **docker-compose** | privileged、host 網絡、明文 secrets |
+| **Kubernetes** | kubeconfig 證書暴露、privileged 容器、hostPath 掛載 |
+
 ### 第一層：Pi Agent 全局
 
 | 檢測項 | 說明 |
@@ -260,8 +278,9 @@ safety-check --vuln-sources
 | **v3.5.0** | ✅ 已完成 | GitHub URL 自動報告 + 誤報識別 + Pi Package 化 + 版本統一 |
 | **v3.6.0** | ✅ 已完成 | 隱私行為檢測（6 規則）+ .mjs/.cjs 掃描修復 |
 | **v3.7.0** | ✅ 已完成 | Pi 擴展攔截（B-001）+ Web 後端實現（C-006）|
-| **v3.8.0** | 🚀 最新 | 原生檔案刪除檢測（+14 規則）+ OWASP Top 10 程式碼模式（+19 規則）+ 技能首次調用自動啟動 Web |
-| v4.0 | 📋 規劃 | 多框架支持 + MCP 代理網關 + CI/CD |
+| **v3.8.0** | ✅ 已完成 | 原生檔案刪除檢測（+14 規則）+ OWASP Top 10 程式碼模式（+19 規則）+ 技能首次調用自動啟動 Web |
+| **v3.9.0** | 🚀 最新 | 多框架配置 + CI/CD + Docker/K8s 安全（+28 規則）|
+| v4.0 | 📋 規劃 | MCP 代理網關 + 多框架深度整合 |
 
 詳細規劃見 [`docs/PRD_v4_聚焦个人开发者版.MD`](docs/PRD_v4_聚焦个人开发者版.MD)。
 

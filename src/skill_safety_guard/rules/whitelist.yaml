@@ -93,6 +93,7 @@ whitelisted_paths:
   - '*/rules/whitelist.yaml'
   - '*/rules/native_file_ops.yaml'
   - '*/rules/owasp_patterns.yaml'
+  - '*/rules/multi_framework.yaml'
   # 掃描報告（描述漏洞，不是實際攻擊；與 SECURITY_AUDIT.md 同理）
   - '*/SCAN_REPORT_*.md'
   - '*/scan-pi-web-*.md'

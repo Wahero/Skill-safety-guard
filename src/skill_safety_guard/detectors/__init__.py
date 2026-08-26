@@ -10,6 +10,7 @@ from .installed_extensions import InstalledExtensionsDetector
 from .prompt_injection import PromptInjectionDetector
 from .native_file_ops import NativeFileOpsDetector
 from .owasp import OWASPDetector
+from .multi_framework import MultiFrameworkDetector
 
 
 __all__ = [
@@ -26,4 +27,5 @@ __all__ = [
     "PromptInjectionDetector",
     "NativeFileOpsDetector",
     "OWASPDetector",
+    "MultiFrameworkDetector",
 ]
