@@ -1,0 +1,168 @@
+# skill-safety-guard 規則庫：原生檔案刪除操作檢測
+# v3.8 新增：覆蓋 Rust / Python / Go 的檔案/目錄刪除 API
+# 這些 API 在編譯型/腳本語言中直接操作檔案系統，繞過 Shell 層檢測
+
+rules:
+
+  # ============================================================
+  # Rust: std::fs 檔案刪除
+  # ============================================================
+
+  - id: rust-remove-dir-all
+    name: Rust 遞歸刪除目錄 (remove_dir_all)
+    pattern: "std::fs::remove_dir_all\\s*\\("
+    severity: medium
+    confidence: high
+    category: native_file_ops
+    description: |
+      Rust `std::fs::remove_dir_all()` 永久刪除整個目錄樹（不可恢復）。
+      這是 Rust 標準庫最危險的檔案操作之一。
+    remediation: 確認刪除的目標路徑是否為用戶可控；考慮改用 `trash` crate 移到資源回收桶
+
+  - id: rust-remove-file
+    name: Rust 刪除檔案 (remove_file)
+    pattern: "std::fs::remove_file\\s*\\("
+    severity: medium
+    confidence: high
+    category: native_file_ops
+    description: |
+      Rust `std::fs::remove_file()` 永久刪除單個檔案。
+      若搭配用戶輸入的路徑，可能導致任意檔案刪除。
+    remediation: 確認檔案路徑來源；考慮改用 `trash` crate
+
+  - id: rust-trash-delete
+    name: Rust 資源回收桶刪除 (trash crate)
+    pattern: "trash::delete(_all)?\\s*\\("
+    severity: low
+    confidence: high
+    category: native_file_ops
+    description: |
+      Rust `trash` crate 將檔案/目錄移到資源回收桶，可恢復。
+      風險低於永久刪除，但仍需確認操作的目標範圍。
+    remediation: 確認目標路徑範圍，避免誤刪重要檔案
+
+  # ============================================================
+  # Rust: 危險路徑 + 刪除操作的組合模式
+  # ============================================================
+
+  - id: python-os-remove
+    name: Python os.remove / os.unlink 刪除檔案
+    pattern: "\\bos\\.(remove|unlink)\\s*\\("
+    severity: medium
+    confidence: high
+    category: native_file_ops
+    description: |
+      Python `os.remove()` / `os.unlink()` 永久刪除檔案。
+      這是 Python 中最常見的檔案刪除操作。
+    remediation: 確認檔案路徑來源；考慮使用 `send2trash` 模組
+
+  - id: python-shutil-rmtree
+    name: Python shutil.rmtree 遞歸刪除目錄
+    pattern: "\\bshutil\\.rmtree\\s*\\("
+    severity: medium
+    confidence: high
+    category: native_file_ops
+    description: |
+      Python `shutil.rmtree()` 永久刪除整個目錄樹。
+      這是 Python 中最危險的檔案操作之一。
+    remediation: 確認目錄路徑是否為用戶可控；考慮 `send2trash` 或先備份
+
+  - id: python-pathlib-unlink
+    name: Python pathlib.Path.unlink 刪除檔案
+    pattern: "\\.unlink\\s*\\("
+    severity: low
+    confidence: medium
+    category: native_file_ops
+    description: |
+      Python `pathlib.Path.unlink()` 永久刪除檔案。
+      常見於現代 Python 代碼中，`.unlink()` 調用可能是檔案清理。
+    remediation: 確認 Path 對象指向的目標
+
+  - id: python-send2trash
+    name: Python send2trash 資源回收桶刪除
+    pattern: "\\bsend2trash\\.send2trash\\s*\\("
+    severity: low
+    confidence: medium
+    category: native_file_ops
+    description: |
+      Python `send2trash` 將檔案移到資源回收桶，可恢復。
+      比永久刪除安全，但仍需確認目標。
+    remediation: 確認目標檔案範圍
+
+  - id: python-rmdir
+    name: Python os.rmdir / Path.rmdir 刪除目錄
+    pattern: "\\bos\\.rmdir\\s*\\(|\\.rmdir\\s*\\("
+    severity: low
+    confidence: medium
+    category: native_file_ops
+    description: |
+      Python `os.rmdir()` / `Path.rmdir()` 刪除空目錄。
+      風險較低（只刪空目錄），但可能配合其他操作使用。
+    remediation: 確認目錄路徑
+
+  # ============================================================
+  # Go: os 包檔案刪除
+  # ============================================================
+
+  - id: go-os-remove-all
+    name: Go os.RemoveAll 遞歸刪除目錄
+    pattern: "\\bos\\.RemoveAll\\s*\\("
+    severity: medium
+    confidence: high
+    category: native_file_ops
+    description: |
+      Go `os.RemoveAll()` 永久刪除整個目錄樹。
+      這是 Go 中最危險的檔案操作之一。
+    remediation: 確認路徑來源；考慮使用者確認後再執行
+
+  - id: go-os-remove
+    name: Go os.Remove 刪除檔案/空目錄
+    pattern: "\\bos\\.Remove\\s*\\("
+    severity: medium
+    confidence: high
+    category: native_file_ops
+    description: |
+      Go `os.Remove()` 永久刪除檔案或空目錄。
+      常見於 Go 清理腳本和 CLI 工具中。
+    remediation: 確認路徑來源
+
+  # ============================================================
+  # PowerShell: Remove-Item
+  # ============================================================
+
+  - id: ps-remove-item
+    name: PowerShell Remove-Item 刪除檔案
+    pattern: "Remove-Item\\s+-Path\\s+|Remove-Item\\s+-Recurse"
+    severity: medium
+    confidence: high
+    category: native_file_ops
+    description: |
+      PowerShell `Remove-Item` 刪除檔案或目錄。
+      `-Recurse` 參數會遞歸刪除整個目錄樹。
+    remediation: 確認目標路徑；考慮使用 `-WhatIf` 先預覽
+
+  - id: ps-del-command
+    name: PowerShell del / rm 別名
+    pattern: "\\b(del|rm|rd|rmdir)\\s+-((Path|Recurse|Force|LiteralPath)\\s+|-[a-zA-Z]+)"
+    severity: medium
+    confidence: medium
+    category: native_file_ops
+    description: |
+      PowerShell 別名 `del` / `rm` / `rd` 對應 Remove-Item。
+      匹配帶參數的 PowerShell 刪除命令（如 `rm -Path`, `rm -Recurse`）。
+    remediation: 確認目標路徑
+
+  # ============================================================
+  # 跨語言：危險路徑 + 刪除操作的組合模式
+  # ============================================================
+
+  - id: native-delete-system-path
+    name: 原生代碼刪除系統路徑
+    pattern: "(remove_dir_all|remove_file|rmtree|RemoveAll|Remove-Item|unlink|rmdir)\\s*\\([^)]*[\"'](C:\\\\|/etc/|/usr/|/boot/|/sys/|/proc/|/dev/|/var/|/home/|/root/|/tmp/|/opt/|/bin/|/sbin/|/lib/|System32|Windows)"
+    severity: high
+    confidence: medium
+    category: native_file_ops
+    description: |
+      原生代碼刪除操作搭配系統關鍵路徑（C:\、/etc/、/usr/ 等）。
+      這是一個高風險模式：刪除 API + 系統路徑可能導致系統損壞。
+    remediation: 立即審查代碼，確認該刪除操作的必要性與安全邊界

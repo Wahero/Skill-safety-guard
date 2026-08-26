@@ -240,6 +240,23 @@ def main(argv=None):
         print()
         return 0
 
+    # Skill 首次調用（無目標、無子命令）→ 顯示 CLI 面板 + 自動啟動 Web 界面
+    # v3.8.0：優化首次體驗，無需 --web 參數
+    scan_flags = {
+        "pi": args.pi, "all": args.all, "audit_extensions": args.audit_extensions,
+        "pro": args.pro, "no_pi": args.no_pi, "confidence_detail": args.confidence_detail,
+    }
+    is_first_invocation = (
+        args.target == "."  # 預設目標 = 當前目錄
+        and not any(scan_flags.values())
+        and args.output == "markdown"  # 預設輸出格式
+        and args.min_confidence == "low"  # 預設過濾閾值
+    )
+    if is_first_invocation:
+        _cli_welcome_banner(host="127.0.0.1", port=8765)
+        _launch_web_server_silent(host="127.0.0.1", port=8765)
+        return 0
+
     # 解析掃描目標（F-007 殺手場景：支援 URL/粘貼）
     resolved = resolve_target(args.target)
     if resolved is None:
@@ -449,3 +466,72 @@ def _run_scan(args, target: Path, resolved: ScanTarget, output_file: Optional[Pa
 
     grade_to_exit = {"A": 0, "B": 0, "C": 0, "D": 1, "E": 1, "F": 2}
     return grade_to_exit.get(overall_grade, 0)
+
+
+def _probe_web_server(host: str = "127.0.0.1", port: int = 8765, timeout: float = 0.5) -> bool:
+    """探測 Web 服務器是否已在 host:port 運行
+
+    返回 True = 已在運行；False = 未運行。
+    """
+    import socket
+    try:
+        with socket.create_connection((host, port), timeout=timeout):
+            return True
+    except (OSError, socket.timeout):
+        return False
+
+
+def _launch_web_server_silent(host: str = "127.0.0.1", port: int = 8765) -> int:
+    """後台啟動 Web 服務器（不阻塞、打開瀏覽器）
+
+    與 CLI --web 不同：這個版本不需要 --web 參數，在 Skill 首次調用時自動觸發。
+    返回 0 表示服務器已在運行或成功啟動；1 表示啟動失敗。
+    """
+    web_server = Path(__file__).resolve().parent.parent.parent / "web" / "server.py"
+    if not web_server.exists():
+        print(f"[ERROR] 找不到 Web 服務器入口: {web_server}", file=sys.stderr)
+        return 1
+
+    url = f"http://{host}:{port}"
+
+    # 探測是否已運行
+    if _probe_web_server(host, port):
+        print(f"   Web 界面已在運行: {url}/")
+        return 0
+
+    # 自動開啟瀏覽器
+    import webbrowser
+    try:
+        webbrowser.open(url)
+    except Exception:
+        pass
+
+    print(f"   啟動 Web 界面: {url}/")
+    sys.argv = ["web/server.py", "--host", host, "--port", str(port)]
+    try:
+        import runpy
+        runpy.run_path(str(web_server), run_name="__main__")
+        return 0
+    except KeyboardInterrupt:
+        return 0
+
+
+def _cli_welcome_banner(host: str = "127.0.0.1", port: int = 8765) -> None:
+    """Skill 首次調用時的 CLI 歡迎畫面"""
+    url = f"http://{host}:{port}"
+    print()
+    print("=" * 64)
+    print(f"🛡️  skill-safety-guard v{__version__} - Skill 安全掃描工具")
+    print("=" * 64)
+    print()
+    print(f"📡 Web 界面地址: {url}/")
+    print(f"   （如瀏覽器未自動打開，請手動訪問上述網址）")
+    print()
+    print("📋 CLI 用法提示：")
+    print(f"   python -m skill_safety_guard <路徑|URL>     掃描本地路徑或 GitHub URL")
+    print(f"   python -m skill_safety_guard --pi           只檢查 Pi 全局")
+    print(f"   python -m skill_safety_guard --output json  JSON 輸出")
+    print(f"   python -m skill_safety_guard --help         完整幫助")
+    print()
+    print("=" * 64)
+    print()

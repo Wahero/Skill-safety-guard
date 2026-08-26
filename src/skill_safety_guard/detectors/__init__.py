@@ -8,6 +8,8 @@ from .critical_paths import CriticalPathsDetector
 from .privacy import PrivacyDetector
 from .installed_extensions import InstalledExtensionsDetector
 from .prompt_injection import PromptInjectionDetector
+from .native_file_ops import NativeFileOpsDetector
+from .owasp import OWASPDetector
 
 
 __all__ = [
@@ -22,4 +24,6 @@ __all__ = [
     "PrivacyDetector",
     "InstalledExtensionsDetector",
     "PromptInjectionDetector",
+    "NativeFileOpsDetector",
+    "OWASPDetector",
 ]

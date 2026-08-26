@@ -229,6 +229,8 @@ def generate_report(
         "unicode": "🕵️ Unicode 隱寫",
         "critical_paths": "🚨 關鍵系統參數修改",
         "privacy": "👁️ 隱私行為（會話監測/資料外洩）",
+        "native_file_ops": "🗑️ 原生檔案刪除操作（Rust/Python/Go/PS）",
+        "owasp": "🛡️ OWASP Top 10 程式碼模式（A1/A2/A3/A10）",
     }
 
     for cat, result in skill_results.items():
@@ -331,11 +333,38 @@ def generate_report(
     try:
         from .vuln_feed import get_vuln_source_info
         vi = get_vuln_source_info()
-        lines.append(f"- **數據來源**：{vi.get('source', 'N/A')}")
-        lines.append(f"- **更新時間**：{vi.get('last_updated', 'N/A')}")
-        lines.append(f"- **漏洞條目**：{vi.get('count', 0)} 條")
+        lines.append(f"- **CVE 漏洞來源**：{vi.get('source', 'N/A')}")
+        lines.append(f"- **CVE 更新時間**：{vi.get('last_updated', 'N/A')}")
+        lines.append(f"- **CVE 漏洞條目**：{vi.get('count', 0)} 條（Pi Agent 生態）")
     except Exception:
-        lines.append("- 漏洞庫狀態無法取得")
+        lines.append("- CVE 漏洞庫狀態無法取得")
+
+    # OWASP Top 10 規則庫統計
+    try:
+        from .rules_loader import load_rules_file
+        owasp_rules = load_rules_file("owasp_patterns.yaml")
+        if owasp_rules:
+            # 按類別分組統計
+            cats: dict = {}
+            for r in owasp_rules:
+                # 從規則 id 前綴推斷 OWASP 類別
+                rid = r.get("id", "")
+                cat_label = ""
+                if rid.startswith("owasp-path-traversal"):
+                    cat_label = "A1 權限控制失效"
+                elif rid.startswith("owasp-weak-hash") or rid.startswith("owasp-hardcoded") or rid.startswith("owasp-weak-cipher") or rid.startswith("owasp-weak-random"):
+                    cat_label = "A2 加密失敗"
+                elif rid.startswith("owasp-eval") or rid.startswith("owasp-os-system") or rid.startswith("owasp-pickle") or rid.startswith("owasp-sql") or rid.startswith("owasp-template") or rid.startswith("owasp-js-eval") or rid.startswith("owasp-dangerous-import"):
+                    cat_label = "A3 代碼注入"
+                elif rid.startswith("owasp-ssrf") or rid.startswith("owasp-redirect"):
+                    cat_label = "A10 SSRF"
+                cats[cat_label] = cats.get(cat_label, 0) + 1
+            lines.append(f"- **OWASP Top 10 規則總數**：{len(owasp_rules)} 條")
+            if cats:
+                cat_str = " / ".join(f"{k} {v}" for k, v in sorted(cats.items()))
+                lines.append(f"- **OWASP 分類分佈**：{cat_str}")
+    except Exception:
+        pass
     lines.append("")
     lines.append("---")
     lines.append("")

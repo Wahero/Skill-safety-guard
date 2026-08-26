@@ -1,11 +1,11 @@
 ---
 name: skill-safety-guard
-description: 個人開發者安裝 Skill/MCP 前的安全守護者。掃描 Skill 中的憑證洩露、危險 Shell 命令、敏感路徑訪問，並檢查 Pi Agent 全局安全狀態（CVE 版本 + auth.json 權限）。
+description: 個人開發者安裝 Skill/MCP 前的安全守護者。掃描 Skill 中的憑證洩露、危險 Shell 命令、敏感路徑訪問、原生代碼檔案刪除（Rust/Python/Go/PS），並檢查 Pi Agent 全局安全狀態（CVE 版本 + auth.json 權限）。
 allowed-tools:
   - read
   - bash
   - edit
-version: 3.7.0
+version: 3.8.0
 author: Wahero
 license: MIT
 ---
@@ -112,7 +112,7 @@ Markdown 風險報告（帶風險等級 + 修復建議 + 置信度標記）
 
 ## 當前狀態
 
-✅ **v3.7.0 功能線**（187 規則 / 10 類檢測 / 自掃 SAFE / Pi 擴展 + Web 後端）
+✅ **v3.8.0 功能線**（201 規則 / 11 類檢測 / 自掃 SAFE / Pi 擴展 + Web 後端 + 原生檔案刪除檢測）
 
 🚀 **Pi Package 化**：根目錄 `package.json` 已配置 `pi` manifest，可通過 `pi install git:...` 安裝並展示於 [pi.dev/packages](https://pi.dev/packages)。
 

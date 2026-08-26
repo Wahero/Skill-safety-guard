@@ -1,0 +1,219 @@
+# skill-safety-guard 規則庫：OWASP Top 10 程式碼模式檢測
+# v3.8 新增：覆蓋 A1 路徑遍歷 / A2 加密失敗 / A3 代碼注入 / A10 SSRF
+# 這些是 Skill 程式碼中常見的 OWASP 漏洞模式，靜態正則檢測
+
+rules:
+
+  # ============================================================
+  # A1: 權限控制失效 — 路徑遍歷
+  # ============================================================
+
+  - id: owasp-path-traversal-dotdot
+    name: 路徑遍歷（../ 拼接）
+    pattern: "(open|read|write|readFile|writeFile|fs\\.|File::|Path::new|path\\.join|os\\.path\\.join|pathlib\\.Path|read_to_string|create_dir|remove_dir|remove_file)\\s*\\([^)]*\"\\\\.\\\\.|(open|read|write|readFile|writeFile|fs\\.|File::|Path::new|path\\.join|os\\.path\\.join|pathlib\\.Path|read_to_string|create_dir|remove_dir|remove_file)\\s*\\([^)]*'\\\\.\\\\."
+    severity: high
+    confidence: high
+    category: owasp
+    description: |
+      使用 ../ 或 ..\ 進行路徑拼接，可能導致目錄遍歷攻擊。
+      攻擊者可通過構造輸入訪問任意文件。
+    remediation: 使用 os.path.realpath() 或 pathlib.Path.resolve() 規範化路徑後再訪問
+
+  - id: owasp-path-traversal-user-input
+    name: 用戶輸入直接拼接到路徑
+    pattern: "(os\\.path\\.join|pathlib\\.Path|open)\\s*\\([^)]*(\\binput\\b|request\\.|\\.get\\(|params\\[|argv\\[|args\\[|\\.body|\\.query|\\.form)"
+    severity: high
+    confidence: medium
+    category: owasp
+    description: |
+      用戶輸入（request/input/argv/args）直接拼接到檔案路徑中。
+      可能導致任意文件讀取或路徑遍歷。
+    remediation: 對用戶輸入做白名單校驗，或使用安全路徑前綴 + realpath 規範化
+
+  - id: owasp-path-traversal-archive
+    name: Zip Slip 解壓路徑遍歷
+    pattern: "\\.extractall\\s*\\(|\\.extract\\s*\\(|tarfile\\.extract|zipfile\\.extract"
+    severity: medium
+    confidence: medium
+    category: owasp
+    description: |
+      解壓縮操作未檢查路徑遍歷（Zip Slip 漏洞）。
+      惡意壓縮檔可在解壓時將檔案寫入任意目錄。
+    remediation: 解壓前對每個成員的 name 做 os.path.realpath() 檢查，確保不超出目標目錄
+
+  # ============================================================
+  # A2: 加密失敗 — 弱演算法 / 硬編碼密鑰
+  # ============================================================
+
+  - id: owasp-weak-hash-md5
+    name: 弱雜湊演算法（MD5）
+    pattern: "hashlib\\.md5\\s*\\(|Crypto\\.Hash\\.MD5|MD5\\.new\\s*\\(|MessageDigest\\.getInstance\\s*\\(\\s*['\"]MD5"
+    severity: medium
+    confidence: high
+    category: owasp
+    description: |
+      使用 MD5 雜湊演算法。MD5 已被破解，不適合安全用途。
+    remediation: 改用 SHA-256 或 SHA-3
+
+  - id: owasp-weak-hash-sha1
+    name: 弱雜湊演算法（SHA-1）
+    pattern: "hashlib\\.sha1\\s*\\(|Crypto\\.Hash\\.SHA1|SHA1\\.new\\s*\\(|MessageDigest\\.getInstance\\s*\\(\\s*['\"]SHA-?1"
+    severity: medium
+    confidence: high
+    category: owasp
+    description: |
+      使用 SHA-1 雜湊演算法。SHA-1 已存在碰撞攻擊。
+    remediation: 改用 SHA-256 或 SHA-3
+
+  - id: owasp-hardcoded-key
+    name: 硬編碼加密金鑰
+    pattern: "(secret_key|private_key|encryption_key|aes_key|hmac_key|fernet_key)\\s*=\\s*['\"][A-Za-z0-9+/=]{16,}['\"]"
+    severity: high
+    confidence: high
+    category: owasp
+    description: |
+      代碼中硬編碼加密金鑰。金鑰應從環境變數或金鑰管理服務獲取。
+    remediation: 改用 os.environ.get("SECRET_KEY") 或金鑰管理服務
+
+  - id: owasp-weak-cipher-des
+    name: 弱加密演算法（DES）
+    pattern: "Crypto\\.Cipher\\.DES\\b|\\.DES\\.new\\s*\\(|DES3\\.new\\s*\\(|Cipher\\.getInstance\\s*\\(\\s*['\"]DES"
+    severity: medium
+    confidence: high
+    category: owasp
+    description: |
+      使用 DES（Data Encryption Standard）。DES 金鑰過短（56 位），已被暴力破解。
+    remediation: 改用 AES-256-GCM
+
+  - id: owasp-weak-random
+    name: 弱隨機數生成器
+    pattern: "\\brandom\\.(random|randint|choice|shuffle)\\s*\\(|Math\\.random\\s*\\(\\s*\\)|\\brand\\s*\\(\\s*\\)\\s*[^;]*%"
+    severity: low
+    confidence: medium
+    category: owasp
+    description: |
+      使用非加密安全的隨機數生成器（random / Math.random / rand）。
+      在安全場景（Token、密碼、Session ID）中應使用加密安全隨機數。
+    remediation: Python 用 secrets.token_hex()，JS 用 crypto.randomBytes()，Rust 用 rand::rngs::OsRng
+
+  # ============================================================
+  # A3: 代碼注入 — eval / exec / 命令注入
+  # ============================================================
+
+  - id: owasp-eval-exec
+    name: eval / exec 動態代碼執行
+    pattern: "\\b(eval|exec|compile)\\s*\\([^)]*[+`]|\\b(eval|exec|compile)\\s*\\([^)]*format\\s*\\(|\\b(eval|exec|compile)\\s*\\([^)]*%"
+    severity: high
+    confidence: high
+    category: owasp
+    description: |
+      使用 eval() / exec() / compile() 處理動態字串。
+      若輸入來自用戶，可導致任意代碼執行（RCE）。
+    remediation: 避免 eval/exec；若必須使用，確保輸入經過嚴格白名單校驗
+
+  - id: owasp-os-system-injection
+    name: 命令注入（os.system / subprocess shell=True）
+    pattern: "os\\.system\\s*\\([^)]*[+`]|subprocess\\..*\\(\\s*[^)]*shell\\s*=\\s*True|os\\.popen\\s*\\([^)]*[+`]"
+    severity: high
+    confidence: high
+    category: owasp
+    description: |
+      使用 os.system() / shell=True 處理動態字串。
+      若輸入來自用戶，可導致命令注入。
+    remediation: 使用 subprocess.run([...], shell=False) 並傳遞參數列表
+
+  - id: owasp-pickle-deserialization
+    name: 不安全反序列化（pickle / yaml.load）
+    pattern: "pickle\\.(loads|load)\\s*\\(|yaml\\.load\\s*\\(|dill\\.loads\\s*\\(|marshal\\.loads\\s*\\("
+    severity: high
+    confidence: high
+    category: owasp
+    description: |
+      使用 pickle.loads() / yaml.load()（非 safe_load）反序列化。
+      pickle 可執行任意 Python 代碼，yaml.load() 同理。
+    remediation: 改用 yaml.safe_load() 或 json.loads()；永遠不要 pickle.load 不受信任的資料
+
+  - id: owasp-sql-injection
+    name: SQL 注入（字串拼接）
+    pattern: "(execute|cursor\\.execute|\\.raw|\\.query)\\s*\\([^)]*[+`]|(execute|cursor\\.execute)\\s*\\([^)]*format\\s*\\(|(execute|cursor\\.execute)\\s*\\([^)]*%\\s*[sd]"
+    severity: high
+    confidence: medium
+    category: owasp
+    description: |
+      SQL 查詢使用字串拼接（+ / f-string / format / %）。
+      若輸入來自用戶，可導致 SQL 注入。
+    remediation: 使用參數化查詢（cursor.execute("SELECT * FROM t WHERE id=?", (user_id,))）
+
+  - id: owasp-template-injection
+    name: 模板注入（SSTI）
+    pattern: "render_template_string\\s*\\(|\\.from_string\\s*\\(|\\.Template\\s*\\([^)]*[+`]|\\.render\\s*\\([^)]*user"
+    severity: medium
+    confidence: medium
+    category: owasp
+    description: |
+      模板引擎處理用戶輸入（Jinja2 SSTI 等）。
+      若用戶輸入進入模板渲染，可導致服務端模板注入。
+    remediation: 不要將用戶輸入傳入模板引擎；使用沙箱模板
+
+  # ============================================================
+  # A10: SSRF — 服務端請求偽造
+  # ============================================================
+
+  - id: owasp-ssrf-user-url
+    name: SSRF（用戶輸入作為 URL）
+    pattern: "(requests\\.(get|post|put|delete|head|patch)|urllib\\.request\\.urlopen|httpx\\.(get|post)|fetch|axios\\.(get|post)|reqwest::get)\\s*\\([^)]*(\\binput\\b|request\\.|\\.get\\(|params\\[|argv\\[|args\\[|\\.body|\\.query|\\.form)"
+    severity: high
+    confidence: medium
+    category: owasp
+    description: |
+      HTTP 請求的 URL 來自用戶輸入，可能導致 SSRF 攻擊。
+      攻擊者可掃描內網、訪問雲端 metadata 服務。
+    remediation: 對 URL 做白名單校驗（僅允許特定域名），禁用內網 IP 訪問
+
+  - id: owasp-ssrf-curl-user
+    name: SSRF（curl 用戶輸入 URL）
+    pattern: "curl\\s+\\$|curl\\s+\\$\\{|curl\\s+`|curl\\s+\\$\\(|subprocess.*curl.*(input|request|argv|args)"
+    severity: high
+    confidence: medium
+    category: owasp
+    description: |
+      Shell 中 curl 的 URL 來自用戶輸入或變數拼接。
+      可能導致 SSRF 攻擊。
+    remediation: 對 URL 做白名單校驗
+
+  - id: owasp-ssrf-redirect
+    name: 開放重定向
+    pattern: "redirect\\s*\\([^)]*request\\.|redirect\\s*\\([^)]*\\.get\\(|\\.redirect\\s*\\([^)]*params|Location:\\s*[^{]*request\\."
+    severity: medium
+    confidence: medium
+    category: owasp
+    description: |
+      重定向目標來自用戶輸入，可能導致開放重定向漏洞。
+      攻擊者可利用此進行釣魚攻擊。
+    remediation: 對重定向 URL 做白名單校驗；或僅允許相對路徑
+
+  # ============================================================
+  # 跨語言：通用注入模式
+  # ============================================================
+
+  - id: owasp-js-eval
+    name: JavaScript eval / Function 動態執行
+    pattern: "\\beval\\s*\\([^)]*[+`]|\\bnew\\s+Function\\s*\\(|\\.innerHTML\\s*=\\s*[^=]*[+`]|setTimeout\\s*\\([^)]*[+`]|setInterval\\s*\\([^)]*[+`]"
+    severity: high
+    confidence: high
+    category: owasp
+    description: |
+      JavaScript eval() / new Function() / innerHTML / setTimeout(string) 處理動態輸入。
+      可能導致 XSS 或代碼注入。
+    remediation: 避免 eval/new Function；對 innerHTML 使用 sanitizer（DOMPurify）；setTimeout 只用函數引用
+
+  - id: owasp-dangerous-import
+    name: 動態模組導入
+    pattern: "importlib\\.import_module\\s*\\([^)]*[+`]|__import__\\s*\\([^)]*[+`]|require\\s*\\([^)]*[+`]|import\\s*\\([^)]*[+`]"
+    severity: medium
+    confidence: medium
+    category: owasp
+    description: |
+      動態模組導入路徑來自變數或拼接。
+      若輸入來自用戶，可導致任意代碼載入。
+    remediation: 模組路徑使用白名單映射，不接受用戶輸入作為路徑

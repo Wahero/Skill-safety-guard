@@ -2,9 +2,9 @@
 
 > **個人開發者安裝 Skill / MCP 前的安全守護者**
 
-[![Version](https://img.shields.io/badge/version-3.7.0-orange.svg)]()
-[![Rules](https://img.shields.io/badge/rules-187-blue.svg)]()
-[![Categories](https://img.shields.io/badge/categories-10-green.svg)]()
+[![Version](https://img.shields.io/badge/version-3.8.0-orange.svg)]()
+[![Rules](https://img.shields.io/badge/rules-201-blue.svg)]()
+[![Categories](https://img.shields.io/badge/categories-11-green.svg)]()
 [![VulnFeed](https://img.shields.io/badge/vuln%20feed-OSV%2BAVID%2BCAIVD-purple.svg)]()
 [![License](https://img.shields.io/badge/license-MIT-green.svg)]()
 
@@ -29,6 +29,8 @@
 並檢查 Pi Agent 全局：
 - ⚠️ Pi 版本是否在已知漏洞範圍（CVE-2026-54326 / 54327）
 - 🔒 `auth.json` 文件權限是否過寬
+
+> 🆕 v3.8.0：新增 **Rust / Python / Go / PowerShell** 原生檔案刪除 API 檢測，補齊 Shell 層之外的盲區。
 
 ---
 
@@ -96,6 +98,29 @@ python -m skill_safety_guard ./my-skill --output json
 python -m skill_safety_guard --report-fp shell-curl-bash
 ```
 
+### 🌐 Web 界面（v3.8.0 新增，技能首次調用自動啟動）
+
+```bash
+# 技能首次調用時自動啟動 Web 界面，並打開瀏覽器
+# （如果 Web 已運行則自動檢測，不重複啟動）
+python -m skill_safety_guard
+
+# 掃描時也可訪問 Web 界面
+python -m skill_safety_guard ./my-skill
+# → Web 界面地址：http://127.0.0.1:8765/
+```
+
+啟動後：
+- 功能型前端：http://127.0.0.1:8765/
+- 設計原型：http://127.0.0.1:8765/ui
+- REST API（給其他工具用）：
+  - `POST /api/scans` — 提交掃描 job（異步，返回 `job_id`）
+  - `GET /api/scans/{id}` — 查詢結果
+  - `GET /api/scans/{id}/events` — SSE 進度推送
+  - `GET /api/health` — 健康檢查
+
+Web 後端純 stdlib、零外部依賴，背景線程執行掃描，適合個人開發者本地使用。
+
 ---
 
 ## 🛡️ 漏洞情報系統（每日自動更新）
@@ -142,7 +167,7 @@ safety-check --vuln-sources
 
 ---
 
-## 檢測能力（v3.7.0 / 187 條規則 / 10 類檢測）
+## 檢測能力（v3.8.0 / 201 條規則 / 11 類檢測）
 
 ### 🚨 關鍵系統參數修改（最高優先級）
 
@@ -188,6 +213,23 @@ safety-check --vuln-sources
 |--------|
 | 零寬字符、Tag 字符區塊、不可見運算符、混合隱寫 |
 
+### 🗑️ 原生檔案刪除操作（Rust / Python / Go / PS）
+
+> 🆕 v3.8.0 新增：補齊 Shell 層之外的編譯型/腳本語言檔案刪除檢測盲區
+
+| 語言 | 檢測 API | 說明 |
+|------|---------|------|
+| **Rust** | `std::fs::remove_dir_all` / `remove_file` | 永久刪除目錄/檔案 |
+| **Rust** | `trash::delete_all` | 資源回收桶刪除（可恢復） |
+| **Python** | `os.remove` / `os.unlink` / `shutil.rmtree` | 永久刪除檔案/目錄樹 |
+| **Python** | `pathlib.Path.unlink` / `send2trash` | 路徑刪除 / 回收桶 |
+| **Go** | `os.Remove` / `os.RemoveAll` | 永久刪除檔案/目錄樹 |
+| **PowerShell** | `Remove-Item` / `del` / `rm` | Windows 原生刪除命令 |
+
+> 這些 API 在非 Shell 上下文中直接操作檔案系統，傳統 Shell 檢測無法覆蓋。
+> 例如 Rust 寫的磁盤清理工具可能使用 `std::fs::remove_dir_all` 永久刪除 C:\ 檔案，
+> 而 `dangerous_shell.yaml` 只檢測 `rm -rf` 等 Shell 命令，無法攔截。
+
 ### 第一層：Pi Agent 全局
 
 | 檢測項 | 說明 |
@@ -217,7 +259,8 @@ safety-check --vuln-sources
 | **v3.4.x** | ✅ 已完成 | 國內源（CAIVD/AVID）+ 增強狀態顯示 |
 | **v3.5.0** | ✅ 已完成 | GitHub URL 自動報告 + 誤報識別 + Pi Package 化 + 版本統一 |
 | **v3.6.0** | ✅ 已完成 | 隱私行為檢測（6 規則）+ .mjs/.cjs 掃描修復 |
-| **v3.7.0** | 🚀 最新 | Pi 擴展攔截（B-001）+ Web 後端（C-006）|
+| **v3.7.0** | ✅ 已完成 | Pi 擴展攔截（B-001）+ Web 後端實現（C-006）|
+| **v3.8.0** | 🚀 最新 | 原生檔案刪除檢測（+14 規則）+ OWASP Top 10 程式碼模式（+19 規則）+ 技能首次調用自動啟動 Web |
 | v4.0 | 📋 規劃 | 多框架支持 + MCP 代理網關 + CI/CD |
 
 詳細規劃見 [`docs/PRD_v4_聚焦个人开发者版.MD`](docs/PRD_v4_聚焦个人开发者版.MD)。

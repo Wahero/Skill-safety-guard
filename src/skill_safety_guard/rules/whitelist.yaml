@@ -91,12 +91,13 @@ whitelisted_paths:
   - '*/rules/installed_extensions.yaml'
   - '*/rules/privacy.yaml'
   - '*/rules/whitelist.yaml'
+  - '*/rules/native_file_ops.yaml'
+  - '*/rules/owasp_patterns.yaml'
   # 掃描報告（描述漏洞，不是實際攻擊；與 SECURITY_AUDIT.md 同理）
   - '*/SCAN_REPORT_*.md'
   - '*/scan-pi-web-*.md'
   - '*/scan-report-*.md'
   - '*/report/*'
-  # 自掃回歸豁免：P1-1 拆分後根目錄文檔的自指誤報（P0-5 新增 prompt_injection 目錄掃描後暴露）
   # 這些是產品文檔中的檢測能力描述，其中「Ignore previous instructions」「jailbreak」等是示例引用。
   # 不能用 pattern 層級豁免（會全局削弱 pi-ignore-previous 和 pi-jailbreak 規則的檢測能力）。
   - '*/Skill-safety-guard/README.md'

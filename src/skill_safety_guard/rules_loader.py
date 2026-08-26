@@ -46,4 +46,6 @@ def load_all_rules() -> Dict[str, List[Dict]]:
         "mcp": load_rules_file("mcp.yaml"),
         "mcp_injection": load_rules_file("mcp_injection.yaml"),
         "privacy": load_rules_file("privacy.yaml"),
+        "native_file_ops": load_rules_file("native_file_ops.yaml"),
+        "owasp": load_rules_file("owasp_patterns.yaml"),
     }

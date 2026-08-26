@@ -1,7 +1,7 @@
 {
   "name": "skill-safety-guard",
-  "version": "3.7.0",
-  "description": "Security guard before installing third-party Skills/MCPs. One command scans for credential leaks, dangerous shell, prompt injection, and checks your Pi Agent global security — 187 rules, 10 categories, open-source rule library. Scan before you trust.",
+  "version": "3.8.0",
+  "description": "Security guard before installing third-party Skills/MCPs. One command scans for credential leaks, dangerous shell, prompt injection, and checks your Pi Agent global security — 201 rules, 11 categories, open-source rule library. Scan before you trust.",
   "keywords": [
     "pi-package",
     "pi",
