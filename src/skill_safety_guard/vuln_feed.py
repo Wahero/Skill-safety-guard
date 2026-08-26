@@ -108,8 +108,8 @@ DOMESTIC_SOURCES = {
         "name": "NVD JSON 數據饋送鏡像（GitHub）",
         "authority": "社區維護（fkie-cad）",
         "url": "https://github.com/fkie-cad/nvd-json-data-feeds",
-        "access": "可通過 GitHub 加速代理訪問",
-        "auto_usable": True,
+        "access": "鏡像存在但 CPE 匹配太複雜，暫未實作自動查詢",
+        "auto_usable": False,
     },
 }
 
@@ -250,8 +250,8 @@ def _osv_query(package: str, version: Optional[str] = None, ecosystem: str = "np
     if result is not None:
         return result
 
-    # OSV 失敗 → 嘗試 GitHub NVD 鏡像（通過加速代理）
-    return _query_github_nvd_mirror(package, version)
+    # OSV 失敗 → 不再回退到 NVD 鏡像（P3-3：未實作，始終返回 None）
+    return None
 
 
 def _osv_batch_query(packages: List[Dict]) -> Optional[Dict]:
@@ -268,22 +268,6 @@ def _osv_batch_query(packages: List[Dict]) -> Optional[Dict]:
             return json.loads(resp.read().decode("utf-8"))
     except Exception:
         return None
-
-
-def _query_github_nvd_mirror(package: str, version: Optional[str] = None) -> Optional[Dict]:
-    """通過 GitHub NVD 鏡像查詢漏洞（OSV 不可用時的備選）
-
-    使用 fkie-cad/nvd-json-data-feeds 的索引（帶 CPE 匹配太複雜，
-    這裡簡化：拉取最近 CVE 列表做關鍵詞匹配）。
-    注意：這不是完整替代，只是 OSV 完全不可用時的粗糙備選。
-    """
-    # 鏡像上的近期 CVE JSON 索引
-    mirror_urls = _get_proxy_urls(
-        "https://raw.githubusercontent.com/fkie-cad/nvd-json-data-feeds/main/CVE-Modified/"
-    )
-    # 嘗試已知的 CVE 目錄（無法枚舉，直接嘗試常見路徑）
-    # 簡化：此處返回 None，實際用戶配置的鏡像源處理
-    return None
 
 
 def _parse_osv_vuln(v: Dict) -> Dict:
@@ -606,7 +590,7 @@ def update_vulnerabilities(force: bool = False, authoritative: bool = True) -> D
 
     # 保存到本地緩存
     CACHE_DIR.mkdir(parents=True, exist_ok=True)
-    LOCAL_VULNS_CACHE.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
+    _atomic_write_json(data, LOCAL_VULNS_CACHE)
 
     # 更新 meta
     _write_update_meta()
@@ -648,6 +632,23 @@ def auto_update_if_due() -> Dict:
     return {"updated": "background", "reason": f"觸發後台更新（{get_frequency()}）"}
 
 
+def _atomic_write_json(data, path: Path) -> None:
+    """原子寫入 JSON 檔案（P3-4）
+
+    先寫 .tmp 臨時檔，再 rename 替換。進程中斷時不會留下半寫的 JSON。
+    """
+    tmp = path.with_suffix(".json.tmp")
+    try:
+        tmp.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
+        tmp.replace(path)  # 原子替換（Windows 上 os.replace 等價）
+    except Exception:
+        try:
+            tmp.unlink(missing_ok=True)
+        except Exception:
+            pass
+        raise
+
+
 def _read_update_meta() -> Optional[Dict]:
     try:
         if UPDATE_META.exists():
@@ -660,7 +661,7 @@ def _read_update_meta() -> Optional[Dict]:
 def _write_update_meta() -> None:
     try:
         CACHE_DIR.mkdir(parents=True, exist_ok=True)
-        UPDATE_META.write_text(json.dumps({"last_update": time.time()}), encoding="utf-8")
+        _atomic_write_json({"last_update": time.time()}, UPDATE_META)
     except Exception:
         pass
 
