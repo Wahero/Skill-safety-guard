@@ -63,6 +63,22 @@ def _get_vuln_db_info() -> Dict:
         return {"source": "unavailable", "last_updated": "", "count": 0}
 
 
+def _cleanup_reports(max_keep: int = 50) -> int:
+    """清理 report/ 目錄，保留最近 max_keep 份（P2-4）"""
+    report_dir = Path(__file__).resolve().parent.parent.parent / "report"
+    if not report_dir.exists():
+        return 0
+    files = sorted(report_dir.glob("*.md"), key=lambda f: f.stat().st_mtime, reverse=True)
+    removed = 0
+    for f in files[max_keep:]:
+        try:
+            f.unlink()
+            removed += 1
+        except OSError:
+            pass
+    return removed
+
+
 def run_scan(
     target_str: str,
     *,

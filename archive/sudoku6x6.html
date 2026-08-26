@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>6×6 數獨</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #0d0d12;
+    color: #e6e6ea;
+    font-family: "Segoe UI", "Microsoft YaHei", sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    user-select: none;
+  }
+
+  /* 頂部實時時鐘 */
+  #clockbar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    width: 100%;
+    max-width: 520px;
+    margin-bottom: 16px;
+    padding: 12px 18px;
+    border: 1px solid #8a8fa0;
+    border-radius: 12px;
+    background: linear-gradient(180deg, #17171f, #0f0f15);
+    box-shadow: 0 0 12px rgba(150,160,190,0.15), inset 0 0 8px rgba(120,130,160,0.08);
+  }
+  #clockbar .label { font-size: 14px; color: #9aa0b5; letter-spacing: 2px; }
+  #clock {
+    font-family: "Consolas", "Courier New", monospace;
+    font-size: 30px;
+    font-weight: bold;
+    color: #dfe4f0;
+    text-shadow: 0 0 8px rgba(180,190,230,0.5);
+    letter-spacing: 2px;
+  }
+
+  h1 {
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: 4px;
+    margin-bottom: 18px;
+    color: #c9cedd;
+    text-shadow: 0 0 10px rgba(160,170,200,0.3);
+  }
+
+  /* 棋盤 */
+  #board {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    grid-template-rows: repeat(6, 1fr);
+    gap: 0;
+    width: 100%;
+    max-width: 420px;
+    aspect-ratio: 1 / 1;
+    border: 3px solid #b6bccc;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #b6bccc;
+    box-shadow: 0 0 20px rgba(150,160,190,0.25), inset 0 0 12px rgba(0,0,0,0.4);
+  }
+
+  .cell {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: clamp(20px, 6vw, 30px);
+    font-weight: 600;
+    background: #14141c;
+    color: #dfe4f0;
+    border: 1px solid #3a3c4a;
+    cursor: pointer;
+    transition: background 0.15s, box-shadow 0.15s, color 0.15s;
+    position: relative;
+  }
+  .cell:hover { background: #1c1c28; }
+  .cell.given { color: #8f94a8; }
+  .cell.selected {
+    background: #232637;
+    box-shadow: inset 0 0 0 2px #9aa0ff;
+  }
+
+  /* 宮格粗邊（2 行 × 3 列 區塊） */
+  .cell.border-right { border-right: 3px solid #b6bccc; }
+  .cell.border-bottom { border-bottom: 3px solid #b6bccc; }
+
+  /* 正確 / 錯誤提示 */
+  .cell.correct { color: #57e0a0; text-shadow: 0 0 6px rgba(87,224,160,0.5); }
+  .cell.wrong {
+    color: #ff6b7a;
+    text-shadow: 0 0 6px rgba(255,107,122,0.6);
+    animation: shake 0.35s;
+  }
+  @keyframes shake {
+    0%,100% { transform: translateX(0); }
+    25% { transform: translateX(-4px); }
+    75% { transform: translateX(4px); }
+  }
+
+  /* 提示訊息 */
+  #message {
+    margin-top: 16px;
+    min-height: 24px;
+    font-size: 15px;
+    letter-spacing: 1px;
+    color: #9aa0b5;
+    text-align: center;
+  }
+  #message.ok { color: #57e0a0; }
+  #message.err { color: #ff6b7a; }
+
+  #result {
+    margin-top: 12px;
+    font-size: 17px;
+    color: #dfe4f0;
+    text-align: center;
+    line-height: 1.8;
+    display: none;
+  }
+  #result b { color: #9aa0ff; }
+
+  /* 按鈕 */
+  #controls { margin-top: 20px; display: flex; gap: 12px; }
+  button {
+    padding: 10px 22px;
+    font-size: 14px;
+    letter-spacing: 1px;
+    color: #dfe4f0;
+    background: #1a1a24;
+    border: 1px solid #8a8fa0;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  button:hover { background: #26293a; border-color: #b6bccc; box-shadow: 0 0 10px rgba(150,160,190,0.3); }
+</style>
+</head>
+<body>
+
+  <h1>6 × 6 數獨</h1>
+
+  <!-- 上方實時時鐘 -->
+  <div id="clockbar">
+    <span class="label">進行時間</span>
+    <span id="clock">00:00</span>
+  </div>
+
+  <div id="board"></div>
+
+  <div id="message">點擊格子，再按數字鍵 1–6 或点击下方數字</div>
+
+  <div id="result"></div>
+
+  <div id="controls">
+    <button id="clearBtn">清除</button>
+    <button id="newBtn">新遊戲</button>
+  </div>
+
+<script>
+/* ============ 數獨生成 ============ */
+const N = 6;
+let solution = [];      // 完整解答
+let puzzle = [];        // 題目（0 表示空格）
+let selected = null;    // 目前選中的格子 index
+let startTime = null;
+let timerInterval = null;
+
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+}
+
+// 宮格：2 行 × 3 列
+function boxOf(r, c) {
+  return Math.floor(r / 2) * 3 + Math.floor(c / 3);
+}
+
+// 用回溯法填出一個隨機有效解答
+function solve(g) {
+  for (let r = 0; r < N; r++) {
+    for (let c = 0; c < N; c++) {
+      if (g[r][c] === 0) {
+        const nums = [1,2,3,4,5,6];
+        shuffle(nums);
+        for (const n of nums) {
+          if (canPlace(g, r, c, n)) {
+            g[r][c] = n;
+            if (solve(g)) return true;
+            g[r][c] = 0;
+          }
+        }
+        return false;
+      }
+    }
+  }
+  return true;
+}
+
+function canPlace(g, r, c, n) {
+  for (let i = 0; i < N; i++) {
+    if (g[r][i] === n || g[i][c] === n) return false;
+  }
+  const br = Math.floor(r / 2) * 2, bc = Math.floor(c / 3) * 3;
+  for (let dr = 0; dr < 2; dr++)
+    for (let dc = 0; dc < 3; dc++)
+      if (g[br + dr][bc + dc] === n) return false;
+  return true;
+}
+
+// 建立題目：隨機填出解答再挖掉 10 個格子
+function createPuzzle() {
+  solution = Array.from({length:N}, () => new Array(N).fill(0));
+  solve(solution);
+  puzzle = solution.map(r => r.slice());
+
+  const cells = [];
+  for (let r = 0; r < N; r++)
+    for (let c = 0; c < N; c++)
+      cells.push([r, c]);
+  shuffle(cells);
+
+  let removed = 0;
+  const target = 10;
+  for (const [r, c] of cells) {
+    if (removed >= target) break;
+    puzzle[r][c] = 0;
+    removed++;
+  }
+}
+
+/* ============ 渲染 ============ */
+const boardEl = document.getElementById('board');
+const messageEl = document.getElementById('message');
+const resultEl = document.getElementById('result');
+const clockEl = document.getElementById('clock');
+
+function render() {
+  boardEl.innerHTML = '';
+  for (let r = 0; r < N; r++) {
+    for (let c = 0; c < N; c++) {
+      const cell = document.createElement('div');
+      cell.className = 'cell';
+      cell.dataset.r = r;
+      cell.dataset.c = c;
+
+      // 宮格粗邊
+      if (c === 2) cell.classList.add('border-right');  // 右邊粗（第2列後）
+      if (r === 1 || r === 3) cell.classList.add('border-bottom');
+
+      const val = puzzle[r][c];
+      if (val !== 0) {
+        cell.textContent = val;
+        if (isGiven(r, c)) cell.classList.add('given');
+      }
+
+      cell.addEventListener('click', () => selectCell(r, c));
+      boardEl.appendChild(cell);
+    }
+  }
+}
+
+// 標記哪些格子是題目（初始非 0）
+let givenMask = [];
+function isGiven(r, c) { return givenMask[r] && givenMask[r][c]; }
+
+function selectCell(r, c) {
+  document.querySelectorAll('.cell.selected').forEach(el => el.classList.remove('selected'));
+  selected = { r, c };
+  const idx = r * N + c;
+  boardEl.children[idx].classList.add('selected');
+}
+
+/* ============ 輸入處理 ============ */
+function enterNumber(num) {
+  if (!selected) {
+    showMsg('請先點擊一個格子', '');
+    return;
+  }
+  const { r, c } = selected;
+
+  // 題目格子不可改
+  if (isGiven(r, c)) return;
+
+  // 開始計時
+  if (!startTime) startTimer();
+
+  const cell = boardEl.children[r * N + c];
+
+  if (num === 0 || num === null) {
+    cell.textContent = '';
+    cell.classList.remove('correct', 'wrong');
+    puzzle[r][c] = 0;
+    checkBoard();
+    return;
+  }
+
+  cell.textContent = num;
+  puzzle[r][c] = num;
+  cell.classList.remove('correct', 'wrong');
+
+  if (num === solution[r][c]) {
+    cell.classList.add('correct');
+    showMsg('✓ 正確！', 'ok');
+  } else {
+    cell.classList.add('wrong');
+    showMsg('✗ 錯誤，這個位置不是 ' + num, 'err');
+  }
+
+  checkBoard();
+}
+
+// 檢查是否填滿且全對
+function checkBoard() {
+  for (let r = 0; r < N; r++) {
+    for (let c = 0; c < N; c++) {
+      if (puzzle[r][c] === 0) return;
+      if (puzzle[r][c] !== solution[r][c]) return;
+    }
+  }
+  // 完成
+  gameWon();
+}
+
+function gameWon() {
+  stopTimer();
+  const secs = Math.floor((Date.now() - startTime) / 1000);
+  const mm = String(Math.floor(secs / 60)).padStart(2, '0');
+  const ss = String(secs % 60).padStart(2, '0');
+  resultEl.style.display = 'block';
+  resultEl.innerHTML = `🎉 恭喜完成！<br>完成時間：<b>${mm} 分 ${ss} 秒</b>`;
+  showMsg('已完成數獨！', 'ok');
+}
+
+/* ============ 訊息 ============ */
+function showMsg(text, cls) {
+  messageEl.textContent = text;
+  messageEl.className = cls;
+}
+
+/* ============ 時鐘 ============ */
+function pad(n){ return String(n).padStart(2,'0'); }
+function startTimer() {
+  startTime = Date.now();
+  timerInterval = setInterval(updateClock, 1000);
+  updateClock();
+}
+function stopTimer() { clearInterval(timerInterval); timerInterval = null; }
+function updateClock() {
+  if (!startTime) { clockEl.textContent = '00:00'; return; }
+  const secs = Math.floor((Date.now() - startTime) / 1000);
+  const mm = pad(Math.floor(secs / 60));
+  const ss = pad(secs % 60);
+  clockEl.textContent = mm + ':' + ss;
+}
+
+/* ============ 控制 ============ */
+document.getElementById('clearBtn').addEventListener('click', () => {
+  if (selected) enterNumber(0);
+  else {
+    // 清除所有非題目
+    for (let r = 0; r < N; r++)
+      for (let c = 0; c < N; c++)
+        if (!isGiven(r, c)) {
+          boardEl.children[r*N+c].textContent = '';
+          boardEl.children[r*N+c].classList.remove('correct','wrong');
+          puzzle[r][c] = 0;
+        }
+    if (startTime) updateClock();
+    showMsg('已清除填入的數字', '');
+  }
+});
+
+document.getElementById('newBtn').addEventListener('click', newGame);
+
+function newGame() {
+  stopTimer();
+  startTime = null;
+  clockEl.textContent = '00:00';
+  selected = null;
+  resultEl.style.display = 'none';
+  createPuzzle();
+  givenMask = puzzle.map(r => r.map(v => v !== 0));
+  render();
+  showMsg('點擊格子，再按數字鍵 1–6 或點擊下方數字', '');
+}
+
+/* 鍵盤輸入 1-6 與 Backspace */
+document.addEventListener('keydown', (e) => {
+  if (e.key >= '1' && e.key <= '6') enterNumber(parseInt(e.key));
+  else if (e.key === 'Backspace' || e.key === 'Delete') { e.preventDefault(); enterNumber(0); }
+});
+
+/* 下方數字按鈕 */
+(function addNumButtons() {
+  const ctrl = document.getElementById('controls');
+  for (let i = 1; i <= 6; i++) {
+    const b = document.createElement('button');
+    b.textContent = i;
+    b.style.minWidth = '42px';
+    b.addEventListener('click', () => enterNumber(i));
+    ctrl.appendChild(b);
+  }
+})();
+
+/* ============ 啟動 ============ */
+newGame();
+</script>
+</body>
+</html>

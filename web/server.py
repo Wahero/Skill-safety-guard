@@ -36,7 +36,7 @@ if SRC.exists():
     sys.path.insert(0, str(SRC))
 
 from skill_safety_guard import __version__  # noqa: E402
-from skill_safety_guard.web_api import run_scan  # noqa: E402
+from skill_safety_guard.web_api import run_scan, _cleanup_reports  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent
 WEB_INDEX = ROOT / "index.html"
@@ -338,6 +338,11 @@ def main():
     ap.add_argument("--port", type=int, default=8765)
     ap.add_argument("--host", default="127.0.0.1")
     args = ap.parse_args()
+
+    # 啟動時清理舊報告（P2-4：保留最近 50 份）
+    removed = _cleanup_reports(max_keep=50)
+    if removed:
+        print(f"   🧹 清理了 {removed} 份舊報告")
 
     server = ThreadingHTTPServer((args.host, args.port), Handler)
     server.daemon_threads = True
