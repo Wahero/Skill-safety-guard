@@ -2,7 +2,7 @@ name: Update Vulnerability Feed
 
 on:
   schedule:
-    - cron: '0 0 * * *'  # 每天 UTC 00:00 更新（量小，无需每周）
+    - cron: '0 0 * * *'  # 每天 UTC 00:00 更新
   workflow_dispatch:  # 手动触发
 
 permissions:
@@ -20,115 +20,31 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Update vulnerabilities.json from authoritative sources
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Install dependencies
         run: |
-          python - << 'EOF'
-          """从权威源（OSV.dev + GitHub Advisory）抓取 Pi 相关漏洞，更新内置漏洞库
+          python -m pip install --upgrade pip
+          pip install pyyaml
 
-          - OSV.dev：Google 维护，自动排除 withdrawn CVE（撤销清理天然完成）
-          - GitHub Advisory：GitHub 维护
-          只保留本项目关注的包：@earendil-works/pi-coding-agent 等
-          """
-          import json, urllib.request, time
+      - name: Update vulnerabilities.json from authoritative sources
+        run: |
+          pip install .
+          python -c "from skill_safety_guard.vuln_feed import update_vulnerabilities; r = update_vulnerabilities(force=True); print(f'Updated: {r.get(\"updated\")}, count: {r.get(\"count\", 0)}, source: {r.get(\"source\", \"?\")}')"
+
+      - name: Copy cache to built-in rules (for repo commit)
+        run: |
+          python -c "
+          import json, shutil, time
           from pathlib import Path
-
-          TRACKED_PACKAGES = [
-              {"name": "pi", "type": "npm"},
-              {"name": "@earendil-works/pi-coding-agent", "type": "npm"},
-              {"name": "@earendil-works/pi-agent", "type": "npm"},
-          ]
-
-          def query_osv(name):
-              payload = {"package": {"name": name}}
-              req = urllib.request.Request(
-                  "https://api.osv.dev/v1/query",
-                  data=json.dumps(payload).encode(),
-                  headers={"Content-Type": "application/json", "User-Agent": "skill-safety-guard"},
-                  method="POST",
-              )
-              with urllib.request.urlopen(req, timeout=30) as resp:
-                  return json.loads(resp.read().decode())
-
-          # 收集权威源漏洞
-          authoritative = []
-          for pkg in TRACKED_PACKAGES:
-              try:
-                  result = query_osv(pkg["name"])
-                  for v in result.get("vulns", []):
-                      if v.get("withdrawn"):  # OSV 已排除，双重保险
-                          continue
-                      # 提取信息
-                      cve_id = v.get("id", "OSV-unknown")
-                      for alias in v.get("aliases", []):
-                          if alias.startswith("CVE-"):
-                              cve_id = alias
-                              break
-                      # 影响版本
-                      affected_below = None
-                      for affected in v.get("affected", []):
-                          for rng in affected.get("ranges", []):
-                              for event in rng.get("events", []):
-                                  if "fixed" in event:
-                                      affected_below = event["fixed"]
-                      # 严重度
-                      severity = "medium"
-                      for ref in v.get("severity", []):
-                          s = ref.get("score", "")
-                          if s.startswith("CVSS"):
-                              try:
-                                  val = float(s.split(":")[-1])
-                                  severity = "critical" if val >= 9 else "high" if val >= 7 else "medium" if val >= 4 else "low"
-                              except: pass
-                      authoritative.append({
-                          "cve_id": cve_id,
-                          "osv_id": v.get("id", ""),
-                          "package": "pi-coding-agent",
-                          "npm_package": pkg["name"],
-                          "affected_below": affected_below,
-                          "affected_versions": [f"<{affected_below}"] if affected_below else [],
-                          "severity": severity,
-                          "confidence": "high",
-                          "description": (v.get("summary") or v.get("details") or "")[:200],
-                          "remediation": f"升级至 {affected_below}+" if affected_below else "升级至修复版本",
-                          "source": "OSV",
-                          "published": v.get("published", ""),
-                      })
-                  print(f"{pkg['name']}: {len(result.get('vulns', []))} found")
-              except Exception as e:
-                  print(f"{pkg['name']} error: {e}")
-
-          # 去重
-          seen = set()
-          unique = []
-          for v in authoritative:
-              if v["cve_id"] not in seen:
-                  seen.add(v["cve_id"])
-                  unique.append(v)
-
-          # 合并已有内置（保留 OSV 未覆盖的手动补充）
-          feed_path = Path("src/skill_safety_guard/rules/vulnerabilities.json")
-          if feed_path.exists():
-              existing = json.loads(feed_path.read_text(encoding="utf-8"))
-              existing_ids = {v["cve_id"] for v in unique}
-              for v in existing.get("vulnerabilities", []):
-                  if v["cve_id"] not in existing_ids:
-                      unique.append(v)
-                      existing_ids.add(v["cve_id"])
-
-          # 写入
-          feed = {
-              "_comment": "由权威源（OSV.dev）自动更新，每周核对撤销 CVE",
-              "_schema_version": "1.0",
-              "_last_updated": time.strftime("%Y-%m-%d %H:%M UTC", time.gmtime()),
-              "_source": "OSV.dev authoritative",
-              "_updated_by": "github-actions[bot]",
-              "vulnerabilities": unique,
-          }
-          feed_path.write_text(json.dumps(feed, ensure_ascii=False, indent=2), encoding="utf-8")
-          print(f"Feed updated: {len(unique)} active vulns (withdrawn auto-excluded)")
-          EOF
+          cache = Path.home() / '.skill-safety-guard' / 'vulnerabilities_cache.json'
+          target = Path('src/skill_safety_guard/rules/vulnerabilities.json')
+          if cache.exists():
+              data = json.loads(cache.read_text(encoding='utf-8'))
+              data['_updated_by'] = 'github-actions[bot]'
+              target.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding='utf-8')
+              print(f'Copied {len(data.get(\"vulnerabilities\", []))} vulns to built-in')
+          else:
+              print('No cache found, skipping')
+          "
 
       - name: Commit changes
         run: |
@@ -138,6 +54,6 @@ jobs:
           if git diff --cached --quiet; then
             echo "No changes"
           else
-            git commit -m "chore: 更新漏洞库（权威源 OSV.dev）$(date +%Y-%m-%d)"
+            git commit -m "chore: 更新漏洞庫（權威源 OSV.dev）$(date +%Y-%m-%d)"
             git push
           fi
