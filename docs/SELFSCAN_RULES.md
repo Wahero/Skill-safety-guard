@@ -2,7 +2,7 @@
 
 > **用途**：明確哪些目錄/文件可自行改動、哪些禁止，確保自掃結果始終保持 **SAFE / A 級 / 0 發現**
 > **適用對象**：WaBoss 自行複製/新增檔案進倉庫時遵守
-> **更新**：2026-08-19 ｜ **當前版本**：v3.5.0 ｜ **驗證命令**：見文末「快速驗證」
+> **更新**：2026-01-26 ｜ **當前版本**：v3.9.0 ｜ **驗證命令**：見文末「快速驗證」
 
 ---
 
@@ -62,11 +62,11 @@
 
 | 位置 | 禁止原因 |
 |------|----------|
-| `rules/*.yaml`（credentials/dangerous_shell/sensitive_paths/critical_paths/unicode/prompt_injection/mcp/mcp_injection/installed_extensions）| 規則定義，改動影響規則數（181）與檢測能力 |
+| `rules/*.yaml`（credentials/dangerous_shell/sensitive_paths/critical_paths/unicode/prompt_injection/mcp/mcp_injection/installed_extensions/native_file_ops/owasp_patterns/multi_framework）| 規則定義，改動影響規則數（246）與檢測能力 |
 | `rules/whitelist.yaml` | 白名單自身；改錯 → 要麼誤報、要麼檢測失明 |
 | `tests/fixtures/` | 惡意測試樣本；改動破壞檢出率 8/8 驗證 |
 | `src/skill_safety_guard/` | 檢測代碼本體 |
-| `pyproject.toml`、`package.json`、`SKILL.md` frontmatter | 版本一致性（3.5.0）；改動造成版本分裂 |
+| `pyproject.toml`、`package.json`、`SKILL.md` frontmatter | 版本一致性（3.9.0）；改動造成版本分裂 |
 | `CHANGELOG.md` 已歸檔版本節 | 歷史記錄不可竄改 |
 
 > 例外：如需新增**規則**或**白名單條目**，交給開發流程（本會話）處理，勿直接手改。
@@ -118,7 +118,7 @@ PYTHONIOENCODING=utf-8 python -m pytest tests/ -q
 |-----------|------|------|
 | DANGER / F 級，8 個發現 | 新增文件含危險模式未入白名單 | 找到發現位置 → 判斷誤報 → 加白名單（黃區流程）|
 | 檢出率 < 8/8 | 白名單 pattern 過寬誤傷 fixture | 收緊 pattern（如 `https://example\.com` 而非 `example\.com`）|
-| 版本號不一致（報告 v1.5.0 等）| 改了版本文件或 __init__.py | 統一為 3.5.0 |
+| 版本號不一致（報告 v3.5.0 等）| 改了版本文件或 __init__.py | 統一為 3.9.0 |
 
 ---
 

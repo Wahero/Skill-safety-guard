@@ -176,6 +176,19 @@
 - ✅ 通過端到端測試（檢出 ≥90%，誤報 ≤10%）
 - ✅ **GitHub 開源發布**（強調：規則庫開源，社區可貢獻）
 
+> **v3.8.0 完成**（Phase 3 後延伸）：
+> - ✅ OWASP Top 10 程式碼模式檢測（+18 規則：路徑穿越 / 弱哈希 / SQL 注入 / SSRF / 命令注入 / 反序列化）
+> - ✅ 原生檔案刪除檢測（+14 規則：Rust / Python / Go / PowerShell）
+> - ✅ 技能首次調用自動啟動 Web UI（移除 `--web` CLI 參數）
+> - ✅ 每日漏洞庫更新 workflow（Cron + 手動觸發）
+> - ✅ PR 安全審計 workflow
+> - ✅ 自掃 SAFE（A 級）
+
+> **v3.9.0 完成**（Phase 3 後延伸）：
+> - ✅ 多框架配置安全（+10 規則：Windsurf / Goose / Devin / Copilot / Roo Code / JetBrains AI）
+> - ✅ CI/CD 安全（+8 規則：GitHub Actions / GitLab CI / Jenkinsfile / Azure Pipeline）
+> - ✅ Docker / K8s 安全（+10 規則：Dockerfile / docker-compose / kubeconfig / 容器 / Pod）
+
 ---
 
 ### 🚀 Phase 2：功能增強（第 4-6 周，15 個工作日）
@@ -259,6 +272,8 @@
 - ✅ MCP 高級檢測（注入 + 傳輸）
 - ✅ 多格式輸出（JSON/SARIF）
 - ✅ 完整用戶文檔
+
+> **Phase 3 後延伸版本**（2026-01）：v3.8.0 新增 OWASP Top 10 程式碼模式（+18）+ 原生檔案刪除檢測（+14）+ Web 自動啟動 + CI/CD workflows；v3.9.0 新增多框架配置（+10）+ CI/CD 安全（+8）+ Docker/K8s 安全（+10）= +28 規則。
 
 ---
 
@@ -401,7 +416,9 @@
 | **M1：MVP 上線** | 第 3 周末 | v1.0 | Pi檢測 + Skill 檢測 + **安裝前掃描** + **誤報治理** + Markdown 報告 | 完全免費（無限制） |
 | **M2：增強功能上線** | 第 6 周末 | v2.0 | Unicode + 規則版提示詞注入 + `--all` + **Skill 依賴檢查** | 完全免費 |
 | **M3：商業化上線** | 第 9 周末 | v3.0 | Freemium + LLM 檢測 + 多格式輸出 | **Pro $4.99/月**（個人版） |
-| **M4：生態擴展** | 條件觸發 | v4.0 | 多框架 + MCP 代理 + CI/CD | 視場景而定 |
+| **M3.8.0：OWASP + 原生刪除 + Web** | 2026-01 | v3.8.0 | OWASP Top 10 程式碼模式（+18）+ 原生檔案刪除檢測（+14）+ 首次調用自動啟動 Web |
+| **M3.9.0：多框架 + CI/CD 安全** | 2026-01 | v3.9.0 | 多框架配置（+10）+ CI/CD 安全（+8）+ Docker/K8s 安全（+10）= +28 規則 |
+| **M4：生態擴展** | 條件觸發 | v4.0 | MCP 代理網關（進行中）| 視場景而定 |
 
 ---
 

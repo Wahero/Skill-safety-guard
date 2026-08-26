@@ -3,7 +3,7 @@
 > **個人開發者安裝 Skill / MCP 前的安全守護者**
 
 [![Version](https://img.shields.io/badge/version-3.9.0-orange.svg)]()
-[![Rules](https://img.shields.io/badge/rules-260-blue.svg)]()
+[![Rules](https://img.shields.io/badge/rules-246-blue.svg)]()
 [![Categories](https://img.shields.io/badge/categories-11-green.svg)]()
 [![VulnFeed](https://img.shields.io/badge/vuln%20feed-OSV%2BAVID%2BCAIVD-purple.svg)]()
 [![License](https://img.shields.io/badge/license-MIT-green.svg)]()
@@ -167,7 +167,7 @@ safety-check --vuln-sources
 
 ---
 
-## 檢測能力（v3.9.0 / 260 條規則 / 13 類檢測）
+## 檢測能力（v3.9.0 / 246 條規則 / 13 類檢測）
 
 ### 🚨 關鍵系統參數修改（最高優先級）
 
