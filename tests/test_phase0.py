@@ -70,8 +70,6 @@ This is the body content.
     assert "allowed-tools" in validation["missing"]
     print(colored("[OK] 缺失字段檢測正確", GREEN))
 
-    return True
-
 
 def test_v04_detection_rate():
     """V-04: 正則檢測驗證（檢出率 ≥80%）"""
@@ -121,7 +119,6 @@ def test_v04_detection_rate():
     else:
         print(colored(f"  [FAIL] 未通過 V-04 驗證標準", RED))
         assert False, f"V-04 檢出率 {detection_rate:.0%} < 80%（{detected}/{len(malicious_samples)}）"
-    return True
 
 
 def test_v06_false_positive_baseline():
@@ -178,7 +175,6 @@ def test_v06_false_positive_baseline():
             for sample, rules in fp_details.items():
                 print(f"    {sample}: {rules}")
         assert False, f"V-06 誤報率 {fp_rate:.0%} > 10%"
-    return True
 
 
 def main():
@@ -191,21 +187,24 @@ def main():
 
     # V-02
     try:
-        results["V-02"] = test_v02_yaml_parser()
+        test_v02_yaml_parser()
+        results["V-02"] = True
     except Exception as e:
         print(colored(f"✗ V-02 拋出異常: {e}", RED))
         results["V-02"] = False
 
     # V-04
     try:
-        results["V-04"] = test_v04_detection_rate()
+        test_v04_detection_rate()
+        results["V-04"] = True
     except Exception as e:
         print(colored(f"✗ V-04 拋出異常: {e}", RED))
         results["V-04"] = False
 
     # V-06
     try:
-        results["V-06"] = test_v06_false_positive_baseline()
+        test_v06_false_positive_baseline()
+        results["V-06"] = True
     except Exception as e:
         print(colored(f"✗ V-06 拋出異常: {e}", RED))
         results["V-06"] = False
