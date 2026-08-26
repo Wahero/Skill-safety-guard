@@ -1,0 +1,51 @@
+name: "PR Safety Audit"
+
+on:
+  pull_request:
+
+permissions:
+  security-events: write
+  contents: read
+
+jobs:
+  audit-skills:
+    name: "Audit changed Skills"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install pyyaml
+
+      - name: Install skill-safety-guard
+        run: pip install .
+
+      - name: Find changed Skills
+        id: find-skills
+        run: |
+          # 找出 PR 中新增/改動的 SKILL.md 所屬目錄
+          for file in $(git diff --name-only ${{ github.base_ref }}...HEAD | grep 'SKILL.md$' | xargs -I{} dirname {} | sort -u); do
+            echo "skill=$file"
+          done >> $GITHUB_OUTPUT
+
+      - name: Scan changed Skills
+        if: steps.find-skills.outputs.skill != ''
+        run: |
+          for skill_dir in ${{ steps.find-skills.outputs.skill }}; do
+            echo "=== 審計 $skill_dir ==="
+            python -m skill_safety_guard "$skill_dir" --output sarif > "${skill_dir//\//_}.sarif" || true
+          done
+
+      - name: Upload SARIF
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: "*.sarif"
+          category: "skill-safety-guard"
