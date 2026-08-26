@@ -40,6 +40,11 @@ jobs:
           python -m pip install --upgrade pip
           pip install pyyaml pytest
 
+      - name: Check extension rules sync
+        run: |
+          python scripts/generate_extension_rules.py
+          git diff --exit-code extension/safety-guard-rules.ts
+
       - name: Run unit tests
         env:
           PYTHONIOENCODING: utf-8

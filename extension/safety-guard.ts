@@ -13,62 +13,8 @@ import { readFileSync, readdirSync, statSync, existsSync } from "node:fs";
 import { join } from "node:path";
 import { homedir } from "node:os";
 
-// ---------------------------------------------------------------------------
-// 危險 Shell 規則（對齊 rules/dangerous_shell.yaml，正則與 YAML 一致）
-// ---------------------------------------------------------------------------
-interface Rule {
-  id: string;
-  name: string;
-  pattern: RegExp;
-  severity: "critical" | "high" | "medium";
-}
-
-const SHELL_RULES: Rule[] = [
-  { id: "shell-curl-bash", name: "curl piped to bash", severity: "critical",
-    pattern: new RegExp("curl\\s+[^|]*\\|\\s*(sudo\\s+)?(ba)?sh|curl\\s+[^|]*>\\s*/tmp/[^&]+&&\\s*(sudo\\s+)?(ba)?sh") },
-  { id: "shell-wget-sh", name: "wget piped to sh", severity: "critical",
-    pattern: new RegExp("wget\\s+[^|]*\\|\\s*(sudo\\s+)?sh|wget\\s+[^|]*&&\\s*(sudo\\s+)?sh") },
-  { id: "shell-reverse-tcp", name: "Reverse Shell (bash)", severity: "critical",
-    pattern: new RegExp("bash\\s+-i\\s+>&\\s*/dev/tcp/|/dev/tcp/[0-9.]+/\\d+|\\(\\s*bash\\s*\\)\\s*>\\s*/dev/tcp/") },
-  { id: "shell-reverse-nc", name: "Reverse Shell (netcat)", severity: "critical",
-    pattern: new RegExp("nc\\s+-[a-z]*e\\s*/bin/(ba)?sh|ncat\\s+-[a-z]*e\\s*/bin/(ba)?sh|rm\\s*/tmp/\\w+;\\s*mkfifo|mkfifo\\s+/tmp/[^;]+;\\s*") },
-  { id: "shell-rm-rf-root", name: "rm -rf on critical path", severity: "critical",
-    pattern: new RegExp("rm\\s+-[rRfF]+\\s+/\\s*$|rm\\s+-[rRfF]+\\s+/\\*|rm\\s+-[rRfF]+\\s+~/?(\\s|$)|rm\\s+-[rRfF]+\\s+--no-preserve-root\\s+/") },
-  { id: "shell-dd-disk", name: "dd disk wipe", severity: "critical",
-    pattern: new RegExp("dd\\s+if=/dev/(zero|urandom)\\s+of=/dev/(sd|hd|nvme|vd)[a-z]\\b") },
-  { id: "shell-fork-bomb", name: "Fork Bomb", severity: "critical",
-    pattern: new RegExp(":\\(\\)\\s*\\{\\s*:\\|:&\\s*\\}\\s*;:\\s*") },
-  { id: "shell-base64-pipe-exec", name: "Base64-decoded execution", severity: "critical",
-    pattern: new RegExp("base64\\s+-d[^|]*\\|\\s*(ba)?sh|base64\\s+--decode[^|]*\\|\\s*(ba)?sh|\\|\\s*base64\\s+-d") },
-  { id: "shell-disable-firewall", name: "Disable firewall", severity: "critical",
-    pattern: new RegExp("iptables\\s+-F|ufw\\s+disable|systemctl\\s+stop\\s+firewalld|netsh\\s+advfirewall\\s+set\\s+allprofiles\\s+state\\s+off") },
-  { id: "shell-curl-env", name: "exfiltrate env via curl", severity: "critical",
-    pattern: new RegExp("curl\\s+[^|]*\\$\\(env\\)|curl\\s+[^|]*\\$?(PATH|HOME|USER|AWS_|GITHUB_)|env\\s*\\|\\s*curl") },
-  { id: "shell-history-clear", name: "Clear bash history", severity: "high",
-    pattern: new RegExp("history\\s+-c.*&&\\s*rm\\s+~/.bash_history|unset\\s+HISTFILE.*&&\\s*exit") },
-  { id: "shell-chmod-777", name: "chmod 777", severity: "high",
-    pattern: new RegExp("chmod\\s+(-R\\s+)?777\\s+/|chmod\\s+(-R\\s+)?777\\s+~") },
-];
-
-// 憑證規則（對齊 rules/credentials.yaml 的精簡版）
-const CRED_RULES: Rule[] = [
-  { id: "cred-openai", name: "OpenAI API Key", severity: "high",
-    pattern: new RegExp("sk-[A-Za-z0-9]{20,}T3BlbkFJ[A-Za-z0-9]{20,}|sk-proj-[A-Za-z0-9_-]{40,}|sk-[A-Za-z0-9]{40,}") },
-  { id: "cred-anthropic", name: "Anthropic API Key", severity: "high",
-    pattern: new RegExp("sk-ant-[A-Za-z0-9-]{40,}") },
-  { id: "cred-aws-access-key", name: "AWS Access Key ID", severity: "high",
-    pattern: new RegExp("AKIA[0-9A-Z]{16}") },
-  { id: "cred-github-token", name: "GitHub PAT", severity: "high",
-    pattern: new RegExp("ghp_[A-Za-z0-9]{36}|gho_[A-Za-z0-9]{36}|github_pat_[A-Za-z0-9_]{82}") },
-  { id: "cred-slack", name: "Slack Token", severity: "high",
-    pattern: new RegExp("xox[baprs]-[0-9a-zA-Z]{10,48}") },
-  { id: "cred-stripe", name: "Stripe API Key", severity: "high",
-    pattern: new RegExp("sk_live_[0-9a-zA-Z]{24,}|pk_live_[0-9a-zA-Z]{24,}|rk_live_[0-9a-zA-Z]{24,}") },
-  { id: "cred-google-api", name: "Google API Key", severity: "high",
-    pattern: new RegExp("AIza[0-9A-Za-z_-]{35}") },
-  { id: "cred-private-key", name: "PEM Private Key", severity: "high",
-    pattern: new RegExp("-----BEGIN (RSA |EC |DSA |OPENSSH |PGP )?PRIVATE KEY-----") },
-];
+// 規則從 safety-guard-rules.ts 匯入（P3-1：generator 自動同步 YAML → TS）
+import { SHELL_RULES, CRED_RULES, type Rule } from "./safety-guard-rules";
 
 // ---------------------------------------------------------------------------
 // 輕量掃描（純 TS，無 subprocess 依賴）

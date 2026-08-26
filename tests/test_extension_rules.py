@@ -11,7 +11,8 @@ import yaml
 # 路徑
 ROOT = Path(__file__).resolve().parent.parent
 RULES_DIR = ROOT / "src" / "skill_safety_guard" / "rules"
-TS_FILE = ROOT / "extension" / "safety-guard.ts"
+# P3-1: 規則已從 safety-guard.ts 拆到 safety-guard-rules.ts（generator 產出）
+TS_FILE = ROOT / "extension" / "safety-guard-rules.ts"
 
 
 def _load_yaml_rules(filename: str) -> list:

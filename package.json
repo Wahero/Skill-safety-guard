@@ -26,6 +26,9 @@
     "skills": ["./SKILL.md"],
     "extensions": ["./extension/safety-guard.ts"]
   },
+  "scripts": {
+    "generate-rules": "python scripts/generate_extension_rules.py"
+  },
   "files": [
     "SKILL.md",
     "src",
