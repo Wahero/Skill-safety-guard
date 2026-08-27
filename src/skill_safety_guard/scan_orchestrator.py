@@ -24,7 +24,7 @@ def resolve_output_file(args, resolved) -> Optional[Path]:
 
     優先序：
     1. 用戶顯式指定 --output-file
-    2. GitHub URL 掃描 → 自動生成 scan-report-<repo>.md 到當前工作目錄
+    2. GitHub URL 掃描 → 自動生成 scan-report-<repo>.md 到 LocalReport/
     3. 其他情況 → None（只印 stdout，不寫檔）
     """
     if getattr(args, "output_file", None):
@@ -32,7 +32,9 @@ def resolve_output_file(args, resolved) -> Optional[Path]:
     if args.output == "markdown" and resolved and resolved.kind.startswith("github"):
         display = resolved.display_name  # e.g. github.com/user/repo
         repo = display.split("/")[-1] if display else "scan"
-        return Path.cwd() / f"scan-report-{repo}.md"
+        report_dir = Path(__file__).resolve().parent.parent.parent / "LocalReport"
+        report_dir.mkdir(parents=True, exist_ok=True)
+        return report_dir / f"scan-report-{repo}.md"
     return None
 
 
