@@ -240,22 +240,8 @@ def main(argv=None):
         print()
         return 0
 
-    # Skill 首次調用（無目標、無子命令）→ 顯示 CLI 面板 + 自動啟動 Web 界面
-    # v3.8.0：優化首次體驗，無需 --web 參數
-    scan_flags = {
-        "pi": args.pi, "all": args.all, "audit_extensions": args.audit_extensions,
-        "pro": args.pro, "no_pi": args.no_pi, "confidence_detail": args.confidence_detail,
-    }
-    is_first_invocation = (
-        args.target == "."  # 預設目標 = 當前目錄
-        and not any(scan_flags.values())
-        and args.output == "markdown"  # 預設輸出格式
-        and args.min_confidence == "low"  # 預設過濾閾值
-    )
-    if is_first_invocation:
-        _cli_welcome_banner(host="127.0.0.1", port=8765)
-        _launch_web_server_silent(host="127.0.0.1", port=8765)
-        return 0
+    # 首次運行自動啟動 Web 界面（不分參數，用標記檔避免重複啟動）
+    _auto_launch_web_once(host="127.0.0.1", port=8765)
 
     # 解析掃描目標（F-007 殺手場景：支援 URL/粘貼）
     resolved = resolve_target(args.target)
@@ -481,6 +467,29 @@ def _probe_web_server(host: str = "127.0.0.1", port: int = 8765, timeout: float 
         return False
 
 
+FIRST_RUN_MARKER = Path.home() / ".skill-safety-guard" / ".web_first_run"
+
+
+def _auto_launch_web_once(host: str = "127.0.0.1", port: int = 8765) -> None:
+    """每次 Skill 調用檢查：首次運行自動啟動 Web，之後僅顯示 URL 提示"""
+    if FIRST_RUN_MARKER.exists():
+        # 已啟動過，僅提示 URL
+        url = f"http://{host}:{port}"
+        if _probe_web_server(host, port):
+            print(f"   Web 界面: {url}/")
+        return
+
+    # 首次運行：啟動 Web 並寫標記
+    print(f"   🛡️ 首次運行，自動啟動 Web 界面…")
+    _cli_welcome_banner(host=host, port=port)
+    _launch_web_server_silent(host=host, port=port)
+    try:
+        FIRST_RUN_MARKER.parent.mkdir(parents=True, exist_ok=True)
+        FIRST_RUN_MARKER.write_text("")
+    except Exception:
+        pass
+
+
 def _launch_web_server_silent(host: str = "127.0.0.1", port: int = 8765) -> int:
     """後台啟動 Web 服務器（不阻塞、打開瀏覽器）
 
@@ -507,13 +516,24 @@ def _launch_web_server_silent(host: str = "127.0.0.1", port: int = 8765) -> int:
         pass
 
     print(f"   啟動 Web 界面: {url}/")
-    sys.argv = ["web/server.py", "--host", host, "--port", str(port)]
     try:
-        import runpy
-        runpy.run_path(str(web_server), run_name="__main__")
+        import subprocess, os
+        python = sys.executable
+        env = os.environ.copy()
+        # 確保 src/ 在 PYTHONPATH
+        src_path = str(web_server.parent.parent / "src")
+        if "PYTHONPATH" in env:
+            env["PYTHONPATH"] = src_path + os.pathsep + env["PYTHONPATH"]
+        else:
+            env["PYTHONPATH"] = src_path
+        subprocess.Popen(
+            [python, "-B", str(web_server), "--host", host, "--port", str(port)],
+            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+            env=env, creationflags=subprocess.CREATE_NO_WINDOW if sys.platform == "win32" else 0
+        )
         return 0
-    except KeyboardInterrupt:
-        return 0
+    except Exception:
+        return 1
 
 
 def _cli_welcome_banner(host: str = "127.0.0.1", port: int = 8765) -> None:
