@@ -1,45 +1,73 @@
 {
-  "_comment": "由权威源（OSV.dev）自动更新，每周核对撤销 CVE",
+  "_comment": "由 OSV.dev 權威源自動更新",
   "_schema_version": "1.0",
-  "_last_updated": "2026-08-19 01:16 UTC",
+  "_last_updated": "2026-08-27 07:57 UTC",
   "_source": "OSV.dev authoritative",
-  "_updated_by": "github-actions[bot]",
   "vulnerabilities": [
     {
       "cve_id": "CVE-2026-54326",
-      "package": "pi",
-      "affected_below": "0.82.0",
-      "severity": "high",
-      "confidence": "high",
-      "description": "權限升級漏洞：skill 聲明的 allowed-tools 邊界可被繞過",
-      "remediation": "升級 Pi 至 0.82.0 或更高版本",
-      "source": "NVD",
-      "published": "2026-07-15"
-    },
-    {
-      "cve_id": "CVE-2026-54327",
-      "package": "pi",
-      "affected_below": "0.85.0",
-      "severity": "critical",
-      "confidence": "high",
-      "description": "任意文件讀取漏洞：特定 SKILL.md frontmatter 可觸發讀取系統任意文件",
-      "remediation": "升級 Pi 至 0.85.0 或更高版本",
-      "source": "NVD",
-      "published": "2026-07-28"
-    },
-    {
-      "cve_id": "CVE-2026-54328",
+      "osv_id": "GHSA-7v5m-pr3q-6453",
       "package": "pi-coding-agent",
-      "npm_package": "@earendil-works/pi-coding-agent",
+      "affected_below": "0.78.1",
       "affected_versions": [
         "<0.78.1"
       ],
-      "severity": "high",
-      "confidence": "medium",
-      "description": "依賴鏈漏洞：0.74.0-0.78.0 版本存在漏洞（含傳遞依賴）",
-      "remediation": "升級至 0.78.1 或更高，並更新依賴",
+      "severity": "medium",
+      "confidence": "high",
+      "description": "Pi Agent: Potential XSS in HTML session exports via Markdown URL sanitization bypass",
+      "remediation": "升級至 0.78.1+",
       "source": "OSV",
-      "published": "2026-08-01"
+      "published": "2026-06-16T23:43:15Z",
+      "withdrawn": null
+    },
+    {
+      "cve_id": "CVE-2026-54328",
+      "osv_id": "GHSA-jfgx-wxx8-mp94",
+      "package": "pi-coding-agent",
+      "affected_below": "0.78.1",
+      "affected_versions": [
+        "<0.78.1"
+      ],
+      "severity": "medium",
+      "confidence": "high",
+      "description": "Pi Agent: Predictable temporary extension install paths allow local privilege escalation on shared Linux hosts",
+      "remediation": "升級至 0.78.1+",
+      "source": "OSV",
+      "published": "2026-06-17T13:55:13Z",
+      "withdrawn": null
+    },
+    {
+      "cve_id": "CVE-2026-54325",
+      "osv_id": "GHSA-mqxh-6gq7-558m",
+      "package": "pi-coding-agent",
+      "affected_below": "0.79.0",
+      "affected_versions": [
+        "<0.79.0"
+      ],
+      "severity": "medium",
+      "confidence": "high",
+      "description": "Pi Agent: Pi loads project-local extensions without approval",
+      "remediation": "升級至 0.79.0+",
+      "source": "OSV",
+      "published": "2026-06-17T13:55:44Z",
+      "withdrawn": null
+    },
+    {
+      "cve_id": "CVE-2026-54327",
+      "osv_id": "GHSA-r95r-rj6r-c39x",
+      "package": "pi-coding-agent",
+      "affected_below": "0.78.1",
+      "affected_versions": [
+        "<0.78.1"
+      ],
+      "severity": "medium",
+      "confidence": "high",
+      "description": "Pi Agent: Race condition in Pi auth.json writes could expose stored credentials",
+      "remediation": "升級至 0.78.1+",
+      "source": "OSV",
+      "published": "2026-06-17T13:54:37Z",
+      "withdrawn": null
     }
-  ]
+  ],
+  "_updated_by": "github-actions[bot]"
 }
