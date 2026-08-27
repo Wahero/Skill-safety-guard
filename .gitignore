@@ -56,3 +56,5 @@ SCAN_REPORT_*.md
 scan-*.md
 scan-*.json
 Skill-safety-guard待跟進*
+/docs
+docs/
