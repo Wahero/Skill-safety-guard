@@ -87,6 +87,10 @@ def parse_args(argv=None):
     parser.add_argument("--pro", action="store_true", help="啟用 Pro 功能（LLM 輔助檢測）")
     parser.add_argument("--update-vulns", action="store_true", help="更新漏洞庫（每日漏洞情報）")
     parser.add_argument("--osv", action="store_true", help="啟用 OSV.dev 實時漏洞查詢")
+    parser.add_argument(
+        "--chk-myself", action="store_true",
+        help="包含掃描本工具自身（skill-safety-guard）；默認自動跳過自身",
+    )
     parser.add_argument("--vuln-frequency", choices=["daily", "weekly", "monthly", "off"], help="設置漏洞庫自動更新頻率")
     parser.add_argument("--vuln-status", action="store_true", help="查看漏洞庫狀態")
     parser.add_argument("--vuln-sources", action="store_true", help="查看所有漏洞源（含國內源）")

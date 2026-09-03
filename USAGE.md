@@ -180,6 +180,7 @@ skill-safety-guard v3.0.0 覆盖 **9 大检测类别，181 条规则**：
 | `safety-check <target>` | 扫描指定目标 |
 | `safety-check --pi` | 只检查 Pi 全局 |
 | `safety-check --all` | 完整扫描（Pi + Skill + MCP）|
+| `safety-check --chk-myself` | 包含扫描本工具自身（skill-safety-guard）；默认自动跳过自身 |
 | `safety-check --no-pi` | 跳过 Pi 检查（加速）|
 | `safety-check --pro` | 启用 LLM 辅助检测（Pro）|
 | `safety-check --min-confidence <level>` | 置信度过滤 |

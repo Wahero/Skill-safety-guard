@@ -176,10 +176,14 @@ class BaseDetector(ABC):
                     finding.confidence = dem["new_confidence"]
         return finding
 
-    def detect_directory(self, directory: Path) -> DetectionResult:
-        """檢測整個目錄"""
+    def detect_directory(self, directory: Path, include_self: bool = False) -> DetectionResult:
+        """檢測整個目錄
+
+        include_self=True 時包含本工具自身（skill-safety-guard）目錄；
+        預設 False 跳過自身，避免掃描時掃到自己產生大量誤報。
+        """
         result = DetectionResult(category=self.category)
-        files = self._collect_files(directory)
+        files = self._collect_files(directory, include_self=include_self)
         result.scanned_files = len(files)
 
         for fp in files:
@@ -199,11 +203,31 @@ class BaseDetector(ABC):
 
         return result
 
-    def _collect_files(self, directory: Path) -> List[Path]:
-        """收集目錄下所有應掃描的文件"""
+    def _collect_files(self, directory: Path, include_self: bool = False) -> List[Path]:
+        """收集目錄下所有應掃描的文件
+
+        include_self=False（預設）時跳過本工具自身目錄（skill-safety-guard），
+        避免掃描時掃到自己產生大量誤報；True 時包含自身。
+        """
         files = []
         # 構建產物 / 依賴目錄（按目錄組件匹配，避免 substring 誤傷如 .github、dist.py）
         skip_dirs = {".git", "node_modules", "__pycache__", "venv", ".venv", "build", "dist"}
+        # 本工具自身目錄：預設跳過（避免掃描時掃到自己），僅 --chk-myself 時包含
+        # base.py 位於 <root>/src/skill_safety_guard/detectors/base.py → 向上 4 層為 <root>
+        own_dir = Path(__file__).resolve().parent.parent.parent.parent
+        root_res = directory.resolve()
+        # 自身目錄是否位於掃描目標內（即掃描根是自身目錄的祖先）——此時才需跳過自身子树；
+        # 若掃描根自身就是本工具目錄（或在其內部，如掃 tests/fixtures 樣本），不跳。
+        own_is_subtree = False
+        try:
+            if root_res.is_relative_to(own_dir):
+                # 掃描根在自身內部（掃自身 or tests/fixtures）→ 由 include_self 決定
+                own_is_subtree = False
+            elif own_dir.is_relative_to(root_res):
+                # 自身目錄在掃描根內部（掃父目錄）→ 需跳過自身子树
+                own_is_subtree = True
+        except ValueError:
+            pass
         # 當掃描目標本身就是 tests/fixtures（或其子目錄，如測試套件直接掃樣本）時不跳過 fixture
         scan_root = directory.resolve().as_posix()
         scanning_fixtures = "tests/fixtures" in scan_root
@@ -213,9 +237,15 @@ class BaseDetector(ABC):
                 continue
             posix = item.as_posix()
             parts = posix.split("/")
-            # 構建產物 / 依賴目錄：任意層級出現即跳過（as_posix 兼容 Windows 反斜杠路徑）
             if any(bad in parts for bad in skip_dirs):
                 continue
+            # 跳過本工具自身目錄（僅當自身是掃描目標的子樹時，且未指定 --chk-myself）
+            if not include_self and own_is_subtree:
+                try:
+                    if item.resolve().is_relative_to(own_dir):
+                        continue
+                except (ValueError, OSError):
+                    pass
             # 測試 fixtures：僅在掃描整個倉庫時跳過；直接掃描 fixture 目錄時保留全部文件
             if "tests" in parts and "fixtures" in parts and not scanning_fixtures:
                 continue

@@ -61,6 +61,9 @@ def scan_target(target: Path, args) -> Dict:
             print(f"[ERROR] 目標路徑不存在：{target}", file=sys.stderr)
             sys.exit(2)
 
+        # 是否掃描本工具自身（--chk-myself）；預設 False → 自動跳過 skill-safety-guard
+        include_self = bool(getattr(args, "chk_myself", False))
+
         cred_det = CredentialsDetector(all_rules.get("credentials", []), whitelist)
         shell_det = ShellDetector(all_rules.get("shell", []), whitelist)
         path_det = PathsDetector(all_rules.get("paths", []), whitelist)
@@ -97,7 +100,7 @@ def scan_target(target: Path, args) -> Dict:
             # 對文檔性 curl/wget 提及過度敏感。擴展審計走 --audit-extensions。
             for det in [cred_det, shell_det, path_det, unicode_det, critical_det,
                         privacy_det, prompt_inj_det, native_fs_det, owasp_det, mf_det]:
-                result = det.detect_directory(target)
+                result = det.detect_directory(target, include_self=include_self)
                 skill_results[det.category] = result
 
         # SKILL.md frontmatter 驗證

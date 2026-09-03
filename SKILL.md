@@ -36,6 +36,7 @@ pip install pyyaml
 | `/safety-check <url> --output-file <path>` | 掃描遠端 Skill 並指定報告路徑 | `/safety-check <url> --output-file ./report.md` |
 | `/safety-check --pi` | 只掃描 Pi Agent 全局 | `/safety-check --pi` |
 | `/safety-check --all` | 完整掃描（Pi + Skill + 依賴） | `/safety-check --all` |
+| `/safety-check --chk-myself` | 🆕 包含掃描本工具自身（skill-safety-guard）；**默認自動跳過自身**，避免自掃誤報 | `/safety-check --chk-myself ./my-skill` |
 | `/safety-check --output json` | JSON 輸出 | `/safety-check --output json` |
 | `/safety-check --report-fp <id>` | 🆕 報告誤報 | `/safety-check --report-fp shell-curl-bash` |
 | `/safety-check --help` | 幫助 | `/safety-check --help` |
@@ -58,6 +59,24 @@ safety-check https://github.com/Wahero/url-extract
 - ✅ **尾段自動生成「📌 掃描結論」**（統一三部分格式）：① 文字結論 ② 結論說明 ③ 漏洞數字卡片，誤報不計入風險評分
 - ℹ️ 本地路徑掃描不自動寫檔（避免污染目錄），需要時用 `--output-file`
 - ℹ️ 報告同時印到終端與寫入檔案，不會遺失即時輸出
+
+## 預設行為：跳過本工具自身（skill-safety-guard）
+
+> 🎯 **默認自動跳過掃描 skill-safety-guard 自身**，避免把工具自己的測試樣本 / 文檔中的惡意示例當成風險，產生大量誤報。僅在指定 `--chk-myself` 時才掃描自身。
+
+```bash
+# 默認：掃描目標目錄時，自動跳過 skill-safety-guard 子树
+safety-check /my/working/dir
+# → 只掃描目錄內其他 skill 內容，不含 skill-safety-guard
+
+# 掃自身：明確包含 skill-safety-guard（自掃 / 自檢）
+safety-check --chk-myself /my/working/dir
+```
+
+**規則：**
+- ✅ 默認（不加 `--chk-myself`）→ 只要 `skill-safety-guard` 是被掃描目錄的子目錄，就自動整棵跳過
+- ✅ `--chk-myself` → 包含掃描 skill-safety-guard 自身全部文件
+- ✅ 掃描目標就在 skill-safety-guard 內部（如掃 `tests/fixtures` 樣本）時，不受跳過影響，正常掃描
 
 ## 安裝方式
 
