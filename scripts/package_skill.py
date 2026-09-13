@@ -16,13 +16,14 @@ SKILL_NAME = "skill-safety-guard"
 DIST_DIR = REPO_ROOT / "dist"
 
 # 運行必需 + 用戶文檔；其餘（tests/demo/web/extension/.github/memory 等）為開發文件
+# 注意：不放 package.json——其 pi manifest（skills + extensions）會讓部分平台的
+# 上傳檢查誤判「多個入口」；package.json 僅服務 pi install / npm 分發。
 INCLUDE_FILES = [
     "SKILL.md",
     "README.md",
     "USAGE.md",
     "CHANGELOG.md",
     "LICENSE",
-    "package.json",
 ]
 INCLUDE_DIRS = ["scripts", "src"]
 EXCLUDE_SUFFIXES = {".pyc"}

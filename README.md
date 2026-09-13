@@ -77,19 +77,30 @@
 
 ### 安裝
 
+**方式 A：下載標準 Skill zip（推薦，單一入口，可直接上傳 claude.ai 等平台）**
+
+> ⚠️ 不要用 GitHub 頁面的「Download ZIP」——那會帶上 `tests/fixtures/` 下 12 個測試樣本 SKILL.md，
+> 上傳平台會誤判「含多個入口」。請從 [Releases](https://github.com/Wahero/Skill-safety-guard/releases) 下載 `skill-safety-guard.zip`。
+
+```bash
+unzip skill-safety-guard.zip
+cp -r skill-safety-guard ~/.claude/skills/   # 或目標 Agent 的 skills 目錄
+```
+
+**方式 B：從源碼安裝（必須整個資料夾，引擎在 scripts/ + src/）**
+
 ```bash
 git clone https://github.com/Wahero/Skill-safety-guard.git
 cd Skill-safety-guard
-
-# 安裝依賴（可選，建議虛擬環境）
 pip install pyyaml
 
-# 安裝為 Skill
-mkdir -p ~/.pi/agent/skills/skill-safety-guard
-cp SKILL.md ~/.pi/agent/skills/skill-safety-guard/
-ln -s "$(pwd)/src" ~/.pi/agent/skills/skill-safety-guard/src
+mkdir -p ~/.claude/skills
+cp -r . ~/.claude/skills/skill-safety-guard   # 整個資料夾，勿只複製 SKILL.md
+```
 
-# 或獨立使用（無需 Pi Agent）
+**獨立使用（無需任何 Agent）**
+
+```bash
 python -m skill_safety_guard ./tests/fixtures/malicious/dangerous_shell
 ```
 
