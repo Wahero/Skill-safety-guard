@@ -2,7 +2,7 @@
 
 > **個人開發者安裝 Skill / MCP 前的安全守護者**
 
-[![Version](https://img.shields.io/badge/version-3.9.0-orange.svg)]()
+[![Version](https://img.shields.io/badge/version-3.10.0-orange.svg)]()
 [![Rules](https://img.shields.io/badge/rules-246-blue.svg)]()
 [![Categories](https://img.shields.io/badge/categories-11-green.svg)]()
 [![VulnFeed](https://img.shields.io/badge/vuln%20feed-OSV%2BAVID%2BCAIVD-purple.svg)]()
@@ -26,9 +26,23 @@
 - 📁 敏感路徑訪問（`~/.ssh`、`/etc/passwd`、`.env`）
 - 🕵️ Unicode 隱寫（Phase 2）
 
-並檢查 Pi Agent 全局：
+並檢查 Pi Agent 全局與本機環境：
 - ⚠️ Pi 版本是否在已知漏洞範圍（CVE-2026-54326 / 54327）
 - 🔒 `auth.json` 文件權限是否過寬
+- 🆕 **本機已安裝的高危服務版本漏洞**（langflow / n8n / flowise / open-webui）
+
+> 🆕 **v3.10.0 亮點：無需登錄的高危後門檢測（CVE-2025-3248 同類）**
+>
+> [CVE-2025-3248](https://nvd.nist.gov/vuln/detail/CVE-2025-3248)——Langflow < 1.3.0 的 `/api/v1/validate/code` 端點**無需登錄即可遠程代碼執行**，已被 CISA 列入在野利用目錄（KEV）。這類「個人開發者本地跑的 AI/自動化服務」漏洞，傳統 Skill 掃描工具完全覆蓋不到。
+>
+> 本版本新增**本地高危服務 CVE 檢查**：自動探測本機已安裝的 **langflow / open-webui / n8n / flowise** 版本，比對漏洞庫（308 條 high/critical 條目，每日從 OSV.dev 權威源同步）。舊版 langflow 1.2.0 會被直接標記：
+>
+> ```
+> ### 本地高危服務
+> - ⚠️ **langflow** `1.2.0`（pip）：發現 3 個已知漏洞：
+>   - **CVE-2025-3248** (CRITICAL): Langflow < 1.3.0 Unauthenticated RCE via /api/v1/validate/code
+>     - 💡 升級至 1.3.0+
+> ```
 
 > 🆕 v3.9.0：新增 **多框架配置 + CI/CD + Docker 安全** 28 條規則，覆蓋 Windsurf / Goose / Devin / Copilot / GitHub Actions / Dockerfile / Kubernetes
 
@@ -88,7 +102,7 @@ python -m skill_safety_guard
 # 掃描指定路徑
 python -m skill_safety_guard ./my-skill
 
-# 掃描 Pi 全局
+# 掃描 Pi 全局（含本機 langflow / n8n / flowise / open-webui 高危服務版本檢查）
 python -m skill_safety_guard --pi
 
 # JSON 輸出（給其他工具用）
@@ -142,7 +156,7 @@ Web 後端純 stdlib、零外部依賴，背景線程執行掃描，適合個人
 
 # 查看漏洞庫狀態
 safety-check --vuln-status
-# 📊 漏洞條目: 4 ｜ 🕐 更新日期 ｜ 🎯 漏洞清單
+# 📊 漏洞條目: 300+（Pi 生態 + 本地高危服務）｜ 🕐 更新日期 ｜ 🎯 漏洞清單
 
 # 手動更新
 safety-check --update-vulns
@@ -167,7 +181,7 @@ safety-check --vuln-sources
 
 ---
 
-## 檢測能力（v3.9.0 / 246 條規則 / 13 類檢測）
+## 檢測能力（v3.10.0 / 246 條規則 / 13 類檢測 + 本地服務 CVE 檢查）
 
 ### 🚨 關鍵系統參數修改（最高優先級）
 
@@ -255,6 +269,22 @@ safety-check --vuln-sources
 | ⚠️ Pi 版本 CVE | 檢查版本是否在 CVE-2026-54326/54327 受影響範圍 |
 | 🔒 auth.json 權限 | 檢查權限（Windows ACL / Linux POSIX）|
 
+### 🖥️ 本地高危服務 CVE 檢查（v3.10.0 新增）
+
+> 自動探測本機已安裝版本並比對漏洞庫，命中即列出具體 CVE 與升級建議。
+> pip 包走當前 Python 環境 + 命令行回退，npm 包走命令行探測，結果緩存 1 小時。
+
+| 服務 | 生態 | 典型漏洞 |
+|------|------|---------|
+| **langflow** | pip | 🔴 CVE-2025-3248 無需登錄 RCE（<1.3.0，CISA KEV）、CVE-2025-57760 提權、CVE-2025-34291 CORS 接管+RCE |
+| **open-webui** | pip | 🟠 CVE-2026-44551 LDAP 空密碼認證繞過 等 70+ 條 |
+| **n8n** | npm | 🟠 CVE-2026-25631 憑證外洩、CVE-2026-54306 原型污染 等 120+ 條 |
+| **flowise** | npm | 🔴 CVE-2025-59528 RCE、CVE-2026-69254 NodeVM 沙箱逃逸 RCE 等 80+ 條 |
+
+> **版本比對細節**：支持 OSV ECOSYSTEM 範圍（PyPI）+ 多分支修復區間（如 n8n 的 1.x/2.x 雙分支），
+> 按包名過濾比對，避免跨包誤報；每日同步只保留 high/critical 且有明確修復版本的條目。
+> ComfyUI 因不走 pip/npm 安裝、本機版本無法可靠探測，暫未納入。
+
 ---
 
 ## 路線圖
@@ -279,7 +309,8 @@ safety-check --vuln-sources
 | **v3.6.0** | ✅ 已完成 | 隱私行為檢測（6 規則）+ .mjs/.cjs 掃描修復 |
 | **v3.7.0** | ✅ 已完成 | Pi 擴展攔截（B-001）+ Web 後端實現（C-006）|
 | **v3.8.0** | ✅ 已完成 | 原生檔案刪除檢測（+14 規則）+ OWASP Top 10 程式碼模式（+19 規則）+ 技能首次調用自動啟動 Web |
-| **v3.9.0** | 🚀 最新 | 多框架配置 + CI/CD + Docker/K8s 安全（+28 規則）|
+| **v3.9.0** | ✅ 已完成 | 多框架配置 + CI/CD + Docker/K8s 安全（+28 規則）|
+| **v3.10.0** | 🚀 最新 | **本地高危服務 CVE 檢查**——CVE-2025-3248（Langflow 無需登錄 RCE）同類漏洞檢測，覆蓋 langflow / open-webui / n8n / flowise（漏洞庫 4 → 308 條）|
 | v4.0 | 📋 規劃 | MCP 代理網關 + 多框架深度整合 |
 
 詳細規劃見 [`docs/PRD_v4_聚焦个人开发者版.MD`](docs/PRD_v4_聚焦个人开发者版.MD)。

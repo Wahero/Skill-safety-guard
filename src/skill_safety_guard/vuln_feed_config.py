@@ -25,10 +25,22 @@ OSV_QUERY_URL = "https://api.osv.dev/v1/query"
 OSV_BATCH_URL = "https://api.osv.dev/v1/querybatch"
 
 # 追蹤的 Pi Agent 相關包
+PI_PACKAGE_NAMES = [
+    "pi",
+    "@earendil-works/pi-coding-agent",
+    "@earendil-works/pi-agent",
+]
+
+# 個人開發者常本地運行的高危服務（V-04：本地服務版本 CVE 檢查）
+# type = 版本探測方式（pip/npm）；ecosystem = OSV.dev 生態名；bin = 本機版本探測命令
 TRACKED_PACKAGES = [
-    {"name": "pi", "type": "npm"},
-    {"name": "@earendil-works/pi-coding-agent", "type": "npm"},
-    {"name": "@earendil-works/pi-agent", "type": "npm"},
+    {"name": "pi", "type": "npm", "ecosystem": "npm"},
+    {"name": "@earendil-works/pi-coding-agent", "type": "npm", "ecosystem": "npm"},
+    {"name": "@earendil-works/pi-agent", "type": "npm", "ecosystem": "npm"},
+    {"name": "langflow", "type": "pip", "ecosystem": "PyPI", "bin": "langflow"},
+    {"name": "open-webui", "type": "pip", "ecosystem": "PyPI", "bin": "open-webui"},
+    {"name": "n8n", "type": "npm", "ecosystem": "npm", "bin": "n8n"},
+    {"name": "flowise", "type": "npm", "ecosystem": "npm", "bin": "flowise"},
 ]
 
 # 頻率 → TTL 秒數

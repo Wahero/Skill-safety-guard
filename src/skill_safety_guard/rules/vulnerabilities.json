@@ -67,6 +67,108 @@
       "source": "OSV",
       "published": "2026-06-17T13:54:37Z",
       "withdrawn": null
+    },
+    {
+      "cve_id": "CVE-2025-3248",
+      "osv_id": "GHSA-rvqx-wpfh-mfx7",
+      "package": "langflow",
+      "affected_below": "1.3.0",
+      "affected_versions": [
+        "<1.3.0"
+      ],
+      "severity": "critical",
+      "confidence": "high",
+      "description": "Langflow < 1.3.0 Unauthenticated RCE via /api/v1/validate/code（無需登錄即可遠程代碼執行，已列入 CISA KEV）",
+      "remediation": "升級至 1.3.0+",
+      "source": "OSV",
+      "published": "2025-04-07T00:00:00Z",
+      "withdrawn": null,
+      "seed": true
+    },
+    {
+      "cve_id": "CVE-2025-57760",
+      "osv_id": "GHSA-4gv9-mp8m-592r",
+      "package": "langflow",
+      "affected_below": "1.5.1",
+      "affected_versions": [
+        "<1.5.1"
+      ],
+      "severity": "high",
+      "confidence": "high",
+      "description": "Langflow Vulnerable to Privilege Escalation via CLI Superuser Creation (Post-RCE)",
+      "remediation": "升級至 1.5.1+",
+      "source": "OSV",
+      "published": "2025-08-25T16:22:17Z",
+      "withdrawn": null,
+      "seed": true
+    },
+    {
+      "cve_id": "CVE-2025-34291",
+      "osv_id": "GHSA-577h-p2hh-v4mv",
+      "package": "langflow",
+      "affected_below": "1.7.0",
+      "affected_versions": [
+        "<1.7.0"
+      ],
+      "severity": "critical",
+      "confidence": "high",
+      "description": "Langflow CORS misconfiguration enables Account Takeover and RCE",
+      "remediation": "升級至 1.7.0+",
+      "source": "OSV",
+      "published": "2025-12-05T22:27:26Z",
+      "withdrawn": null,
+      "seed": true
+    },
+    {
+      "cve_id": "CVE-2026-25631",
+      "osv_id": "GHSA-2xcx-75h9-vr9h",
+      "package": "n8n",
+      "affected_below": "1.121.0",
+      "affected_versions": [
+        "<1.121.0"
+      ],
+      "severity": "high",
+      "confidence": "high",
+      "description": "n8n's domain allowlist bypass enables credential exfiltration",
+      "remediation": "升級至 1.121.0+",
+      "source": "OSV",
+      "published": "2026-02-06T20:34:53Z",
+      "withdrawn": null,
+      "seed": true
+    },
+    {
+      "cve_id": "CVE-2025-59528",
+      "osv_id": "GHSA-3gcm-f6qx-ff7p",
+      "package": "flowise",
+      "affected_below": "3.0.6",
+      "affected_versions": [
+        "<3.0.6"
+      ],
+      "severity": "critical",
+      "confidence": "high",
+      "description": "Flowise Remote Code Execution vulnerability",
+      "remediation": "升級至 3.0.6+",
+      "source": "OSV",
+      "published": "2025-09-22T19:54:58Z",
+      "withdrawn": null,
+      "seed": true
+    },
+    {
+      "cve_id": "CVE-2026-44551",
+      "osv_id": "GHSA-2r4p-jpmg-48f4",
+      "package": "open-webui",
+      "affected_below": "0.9.0",
+      "affected_versions": [
+        "<0.9.0"
+      ],
+      "severity": "high",
+      "confidence": "high",
+      "description": "Open WebUI has an LDAP Empty Password Authentication Bypass",
+      "remediation": "升級至 0.9.0+",
+      "source": "OSV",
+      "published": "2026-05-15T19:59:35Z",
+      "withdrawn": null,
+      "seed": true
     }
   ],
   "_updated_by": "github-actions[bot]"

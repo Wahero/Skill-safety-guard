@@ -247,6 +247,11 @@ Layer 3: OSV.dev 实时查询（零日覆盖）
   → 按包名+版本实时查询最新 CVE
 ```
 
+**追踪的包**：Pi Agent 生态（pi / pi-coding-agent / pi-agent，全量保留）+
+本地高危服务（langflow / open-webui / n8n / flowise，只保留 high/critical 且有明确修复版本的条目；
+OSV 查询生態：pip 包 → PyPI，npm 包 → npm）。
+手工种子条目（`seed: true`，如 OSV 只有 GIT 范围无法解析版本阈值的 CVE-2025-3248）在每日自动更新时会被保护不被冲掉。
+
 ### 权威漏洞源（多源回退）
 
 | 来源 | 权威性 | 说明 |
@@ -359,7 +364,18 @@ python scripts/safety-check --pi --osv
 - 📡 漏洞库: 3 条（来源: https://github.com/Wahero/Skill-safety-guard）
 - ⚠️ 发现 1 个已知漏洞：
   - **CVE-2026-54327** (CRITICAL): 任意文件读取漏洞（来源: NVD）
+
+### 本地高危服务
+- ⚠️ **langflow** `1.2.0`（pip）：发现 3 个已知漏洞：
+  - **CVE-2025-3248** (CRITICAL): Langflow < 1.3.0 Unauthenticated RCE via /api/v1/validate/code（来源: OSV）
+    - 💡 升级至 1.3.0+
+- ✅ **n8n** `2.30.1`（npm）：不在已知漏洞范围
 ```
+
+> **本地高危服务检查**：自动探测本机已安装的 langflow / n8n / flowise / open-webui
+> 版本并比对漏洞库（pip 走当前 Python 环境 + 命令行探测，npm 走命令行探测，结果缓存 1 小时）。
+> 未安装的服务不会出现在报告中；`--no-pi` 会连同本地服务检查一起跳过。
+> ComfyUI 因不走 pip/npm 安装、本机版本无法可靠探测，暂未纳入。
 
 ---
 

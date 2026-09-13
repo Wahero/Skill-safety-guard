@@ -89,6 +89,15 @@ def get_all_cves() -> List[Dict]:
     return data.get("vulnerabilities", [])
 
 
+def _load_seed_vulns() -> List[Dict]:
+    """讀取內置庫中手工維護的種子條目（seed=true）"""
+    try:
+        data = json.loads(BUILTIN_VULNS.read_text(encoding="utf-8"))
+        return [v for v in data.get("vulnerabilities", []) if v.get("seed")]
+    except Exception:
+        return []
+
+
 def get_vuln_source_info() -> Dict:
     """獲取漏洞庫狀態"""
     data = load_vulnerabilities()
@@ -124,6 +133,19 @@ def update_vulnerabilities(force: bool = False, authoritative: bool = True) -> D
         if osv_findings is None:
             avid_findings = fetch_avid_vulns(limit_per_year=30)
 
+    # 種子條目保護：內置庫中手工維護的條目（seed=true）在自動更新時必須保留。
+    # 例如 CVE-2025-3248（Langflow 未授權 RCE）在 OSV 上只有 GIT 範圍，
+    # 權威源拉取解析不出版本閾值，不保護就會被每日同步沖掉。
+    seed_vulns = _load_seed_vulns()
+
+    def _append_seeds(vulns):
+        existing_ids = {v["cve_id"] for v in vulns}
+        for v in seed_vulns:
+            if v["cve_id"] not in existing_ids:
+                vulns.append(v)
+                existing_ids.add(v["cve_id"])
+        return vulns
+
     if osv_findings is not None:
         merged_vulns = osv_findings
         if remote_data:
@@ -131,8 +153,9 @@ def update_vulnerabilities(force: bool = False, authoritative: bool = True) -> D
             for v in remote_data.get("vulnerabilities", []):
                 if v["cve_id"] not in remote_ids:
                     merged_vulns.append(v)
+        merged_vulns = _append_seeds(merged_vulns)
         data = {
-            "_comment": "由 OSV.dev 權威源自動更新",
+            "_comment": "由 OSV.dev 權威源自動更新（含手工種子條目）",
             "_schema_version": "1.0",
             "_last_updated": time.strftime("%Y-%m-%d %H:%M UTC", time.gmtime()),
             "_source": "OSV.dev authoritative",
@@ -145,8 +168,9 @@ def update_vulnerabilities(force: bool = False, authoritative: bool = True) -> D
             for v in remote_data.get("vulnerabilities", []):
                 if v["cve_id"] not in remote_ids:
                     merged_vulns.append(v)
+        merged_vulns = _append_seeds(merged_vulns)
         data = {
-            "_comment": "由 AVID 開源庫回退更新（OSV 不可用）",
+            "_comment": "由 AVID 開源庫回退更新（OSV 不可用，含手工種子條目）",
             "_schema_version": "1.0",
             "_last_updated": time.strftime("%Y-%m-%d %H:%M UTC", time.gmtime()),
             "_source": "AVID (fallback)",
@@ -276,9 +300,29 @@ def check_and_update_vulns(progress_cb=None) -> Dict:
 
 # ============ OSV 實時查詢 + 版本檢查 ============
 
-def query_osv(package: str, version: str) -> List[Dict]:
+def _norm_package_name(name: str) -> str:
+    """包名歸一化（大小寫 / - _ 差異無關化）"""
+    return (name or "").strip().lower().replace("_", "-")
+
+
+def _version_in_intervals(version_str: str, intervals) -> bool:
+    """判斷版本是否落在任一 (lo, hi) 受影響區間內（hi=None 為開放區間）"""
+    parsed = _parse_simple_version(version_str)
+    if parsed is None:
+        return False
+    for lo, hi in intervals:
+        lo_v = _parse_simple_version(lo) if lo not in (None, "") else (0, 0, 0)
+        hi_v = _parse_simple_version(hi) if hi not in (None, "") else None
+        if lo_v is None:
+            lo_v = (0, 0, 0)
+        if parsed >= lo_v and (hi_v is None or parsed < hi_v):
+            return True
+    return False
+
+
+def query_osv(package: str, version: str, ecosystem: str = "npm") -> List[Dict]:
     """實時查詢 OSV.dev 獲取該包+版本的漏洞"""
-    result = _osv_query(package, version)
+    result = _osv_query(package, version, ecosystem=ecosystem)
     if not result:
         return []
 
@@ -286,24 +330,37 @@ def query_osv(package: str, version: str) -> List[Dict]:
     for v in result.get("vulns", []):
         if v.get("withdrawn"):
             continue
-        parsed = _parse_osv_vuln(v)
+        parsed = _parse_osv_vuln(v, package=package)
         findings.append(parsed)
     return findings
 
 
-def check_version_against_vulns(version_str: str) -> Dict:
-    """檢查版本是否命中漏洞（Layer 1+2 內置+遠程+本地緩存）"""
+def check_version_against_vulns(version_str: str, packages: Optional[List[str]] = None) -> Dict:
+    """檢查版本是否命中漏洞（Layer 1+2 內置+遠程+本地緩存）
+
+    packages: 允許比對的包名列表（歸一化後匹配 CVE 條目的 package 字段）。
+    傳入時只比對這些包的條目，避免把 langflow 的閾值誤套到 pi 版本上；
+    不傳時保持舊行為（比對全部條目）。
+    """
     parsed = _parse_simple_version(version_str)
     if parsed is None:
         return {"vulnerabilities": [], "clean": True}
 
+    allowed = {_norm_package_name(p) for p in packages} if packages else None
     vulnerabilities = []
     all_cves = get_all_cves()
 
     for cve in all_cves:
         if cve.get("withdrawn"):
             continue
-        if "affected_below" in cve and cve["affected_below"]:
+        if allowed is not None and _norm_package_name(cve.get("package", "")) not in allowed:
+            continue
+        # 優先使用 OSV 區間數據（支持多分支修復，減少誤報）
+        intervals = cve.get("affected_ranges")
+        if intervals:
+            if _version_in_intervals(version_str, intervals):
+                vulnerabilities.append(cve)
+        elif "affected_below" in cve and cve["affected_below"]:
             threshold = _parse_simple_version(cve["affected_below"])
             if threshold and parsed < threshold:
                 vulnerabilities.append(cve)

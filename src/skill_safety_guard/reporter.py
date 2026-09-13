@@ -202,6 +202,26 @@ def generate_report(
         lines.append(f"- 💡 確保 Pi 已正確安裝並在 PATH 中")
     lines.append("")
 
+    # 本地高危服務（langflow/n8n 等，V-04）
+    local_services = pi_check.get("local_services") or []
+    if local_services:
+        installed = [s for s in local_services if s.get("available")]
+        lines.append(f"### 本地高危服務")
+        if not installed:
+            lines.append(f"- ✅ 未檢測到已安裝的本地高危服務（langflow / n8n / flowise / open-webui）")
+        for svc in installed:
+            eco_note = f"（{svc['ecosystem']}）" if svc.get("ecosystem") else ""
+            osv_note = " + OSV 實時查詢" if svc.get("osv_checked") else ""
+            if svc.get("clean"):
+                lines.append(f"- ✅ **{svc['name']}** `{svc['version']}`{eco_note}：不在已知漏洞範圍")
+            else:
+                lines.append(f"- ⚠️ **{svc['name']}** `{svc['version']}`{eco_note}：發現 {len(svc['vulnerabilities'])} 個已知漏洞{osv_note}：")
+                for v in svc["vulnerabilities"]:
+                    src_note = f"（來源: {v.get('source', 'builtin')}）" if v.get("source") else ""
+                    lines.append(f"  - **{v['cve_id']}** ({v.get('severity', 'medium').upper()}): {v.get('description', '')}{src_note}")
+                    lines.append(f"    - 💡 {v.get('remediation', '升級至修復版本')}")
+        lines.append("")
+
     # auth.json 權限
     lines.append(f"### auth.json 權限")
     auth = pi_check.get("auth_check", {})

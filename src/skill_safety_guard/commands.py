@@ -76,6 +76,7 @@ def format_json_output(target: str, pi_check: Dict, skill_results: Dict, overall
             "version": pi_check.get("version", ""),
             "pi_available": pi_check.get("pi_available", False),
             "vulnerabilities": pi_check.get("vulnerabilities", []),
+            "local_services": pi_check.get("local_services", []),
             "auth_check": pi_check.get("auth_check", {}),
         },
         "findings": all_findings,

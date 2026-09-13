@@ -178,10 +178,12 @@ def check_pi_version(use_osv: bool = False) -> Dict:
     osv_checked = False
 
     if info["available"]:
-        # Layer 1+2: 內置 + 遠程漏洞庫
+        # Layer 1+2: 內置 + 遠程漏洞庫（只比對 Pi 生態的包，避免其他包的閾值誤套）
         from ..vuln_feed import check_version_against_vulns, get_vuln_source_info
 
-        result = check_version_against_vulns(info["version"])
+        result = check_version_against_vulns(info["version"], packages=[
+            "pi", "pi-coding-agent", "@earendil-works/pi-coding-agent", "pi-agent",
+        ])
         vulnerabilities = result["vulnerabilities"]
 
         # Layer 3: OSV.dev 實時查詢（可選）
@@ -206,6 +208,14 @@ def check_pi_version(use_osv: bool = False) -> Dict:
     except Exception:
         pass
 
+    # 本地高危服務檢查（langflow/n8n 等，V-04）；失敗不影響 Pi 檢查本身
+    local_services = []
+    try:
+        from .local_services import check_local_services
+        local_services = check_local_services(use_osv=use_osv)
+    except Exception:
+        pass
+
     return {
         "pi_available": info["available"],
         "version": info["version"],
@@ -215,4 +225,5 @@ def check_pi_version(use_osv: bool = False) -> Dict:
         "vuln_source": source_info.get("source", "builtin"),
         "vuln_count": source_info.get("count", len(KNOWN_CVES)),
         "osv_checked": osv_checked,
+        "local_services": local_services,
     }
