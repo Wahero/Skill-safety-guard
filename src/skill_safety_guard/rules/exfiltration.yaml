@@ -1,0 +1,85 @@
+# skill-safety-guard 規則庫：工作區外洩檢測（Workspace Exfiltration Guard - 靜態層）
+# 將 ZCode「通用外洩監控 Skill 方案」的指紋（R1–R8）轉化為靜態掃描規則。
+# 純靜態分析，不執行任何代碼。
+#
+# 本文件覆蓋可逐行正則表達的規則（R2 / R3 / R4）。
+# R1 / R5 / R6 / R7 / R8 為整文件結構型啟發式，由 detectors/exfiltration.py 處理。
+#
+# severity: critical / high / medium / low
+# confidence: high / medium / low
+
+rules:
+
+  # === R2: 外洩快照 manifest 指紋（極高）===
+  # repo_snapshot_extra_manifest/v1 是該外洩方案的專屬 manifest 標記
+
+  - id: exfil-manifest-extra
+    name: 外洩快照 manifest 標記 (repo_snapshot_extra_manifest)
+    pattern: 'repo_snapshot_extra_manifest'
+    severity: critical
+    confidence: high
+    category: exfiltration
+    description: |
+      檢測到 repo_snapshot_extra_manifest 標記，這是 ZCode 外洩方案的專屬
+      manifest 指紋（R2）。該 Skill 極可能在構建 workspace 文件快照準備外傳。
+    remediation: 立即拒絕；審查該 Skill 是否收集 workspace 文件清單。
+
+  - id: exfil-extra-manifest-file
+    name: extra_manifest 文件/路徑引用
+    pattern: 'extra_manifest(s)?(/v1)?'
+    severity: high
+    confidence: medium
+    category: exfiltration
+    description: |
+      檢測到 extra_manifest 文件/路徑引用（R2 / R4 相關）。
+      外洩方案以 extra_manifest 承載待外傳的增量快照。
+    remediation: 審查該 Skill 是否在打包 workspace 文件。
+
+  # === R3: 外洩狀態指紋（極高）===
+  # lastAcceptedManifestHash / snapshotTraceId 標記快照鏈路狀態
+
+  - id: exfil-state-hash
+    name: 外洩狀態指紋 lastAcceptedManifestHash
+    pattern: 'lastAcceptedManifestHash'
+    severity: critical
+    confidence: high
+    category: exfiltration
+    description: |
+      檢測到 lastAcceptedManifestHash，外洩方案用於記錄已接受 manifest
+      哈希的狀態指紋（R3），表明存在「已確認可外傳」的清單狀態機。
+    remediation: 立即拒絕。
+
+  - id: exfil-snapshot-trace
+    name: 外洩狀態指紋 snapshotTraceId
+    pattern: 'snapshotTraceId'
+    severity: critical
+    confidence: high
+    category: exfiltration
+    description: |
+      檢測到 snapshotTraceId，外洩方案追蹤快照鏈路的標識（R3）。
+    remediation: 立即拒絕。
+
+  # === R4: 外洩打包目錄命名（中）===
+  # pending / manifests / extra-manifests 是打包產物的典型目錄命名
+
+  - id: exfil-packaging-dirs
+    name: 外洩打包目錄命名 (pending/manifests/extra-manifests)
+    pattern: '(pending|manifests|extra-manifests)/(repo_snapshot|extra_manifest|snapshot)'
+    severity: medium
+    confidence: medium
+    category: exfiltration
+    description: |
+      檢測到外洩方案的典型打包目錄命名（R4）。
+      這些目錄用於暫存 / 歸檔 / 存放 extra-manifest。
+    remediation: 審查該 Skill 是否在打包 workspace 文件準備外傳。
+
+  - id: exfil-packaging-dir-name
+    name: 外洩打包目錄名 (pending|manifests|extra-manifests)
+    pattern: '(^|/)(pending|manifests|extra-manifests)(/|")'
+    severity: low
+    confidence: low
+    category: exfiltration
+    description: |
+      檢測到 pending / manifests / extra-manifests 目錄名（R4 弱信號）。
+      單獨出現可能為正常打包邏輯，需結合上下文判斷。
+    remediation: 結合其他外洩指紋綜合判斷。

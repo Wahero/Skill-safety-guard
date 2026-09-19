@@ -5,6 +5,20 @@ All notable changes to `skill-safety-guard` are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.11.0] - 2026-09-19
+
+### Added
+- **工作區外洩檢測（Workspace Exfiltration Guard）靜態層**：`rules/exfiltration.yaml`（6 條規則）+ `detectors/exfiltration.py`（`ExfiltrationDetector`），覆蓋 ZCode 外洩方案指紋 R1–R8（manifest 指紋 `repo_snapshot_extra_manifest/v1`、狀態指紋 `lastAcceptedManifestHash`/`snapshotTraceId`、`.git/` 路徑枚舉 >10、加密信封共現 `keyWrapAlgorithm`+`publicKeySpkiPem`+`aes-256-ctr`、TEMP 內打包產物、子進程+歸檔/加密相關性、工作區外落地寫入）。掃描時自動運行，結果歸入 `exfiltration` 分類。
+- **可選 Windows 運行時守禦子包 `tools/exfil_guard/`**：L1 文件監控（`ReadDirectoryChangesW`）+ L2 產物啟發式 + L3 網絡關聯（`GetExtendedTcpTable`）；響應模式 `audit`/`block`/`nuke`（後兩者需管理員，會修改 ACL / 防火牆）。零第三方依賴（ctypes + 標準庫），完全獨立於靜態引擎，不影響「純靜態」保證。含 `selftest.py` / `redteam_sim.py` / `install_autostart.py` 與 `SKILL.md`。
+- `ExfiltrationDetector` 單元測試（正/負樣本）。
+
+### Changed
+- 規則總數：246 → 252（+6）
+- 規則類別：13 → 14（新增 `exfiltration`）
+- 版本：3.10.0 → 3.11.0
+
+---
+
 ## [3.9.0] - 2026-01-26
 
 ### Added

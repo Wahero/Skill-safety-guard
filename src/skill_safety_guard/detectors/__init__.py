@@ -11,6 +11,7 @@ from .prompt_injection import PromptInjectionDetector
 from .native_file_ops import NativeFileOpsDetector
 from .owasp import OWASPDetector
 from .multi_framework import MultiFrameworkDetector
+from .exfiltration import ExfiltrationDetector
 
 
 __all__ = [
@@ -28,4 +29,5 @@ __all__ = [
     "NativeFileOpsDetector",
     "OWASPDetector",
     "MultiFrameworkDetector",
+    "ExfiltrationDetector",
 ]

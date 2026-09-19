@@ -78,5 +78,6 @@ PYTHONIOENCODING=utf-8 python -m pytest tests/test_phase0.py::test_v04_detection
 | **v3.5.0** | URL 自動報告 + 誤報識別 + Pi Package 化 + 版本統一 |
 | **v3.6.0** | 隱私行為檢測（6 規則）+ .mjs/.cjs 掃描修復 |
 | **v3.7.0** | Pi 擴展攔截 + Web 後端 |
+| **v3.11.0** | 工作區外洩檢測（Workspace Exfiltration Guard）：靜態層 R1–R8 指紋 + 可選 Windows 運行時守禦子包 `tools/exfil_guard/` |
 
 *完整變更見 CHANGELOG.md*

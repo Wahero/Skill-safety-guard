@@ -1,0 +1,58 @@
+# exfil_guard 運行時規則：ZCode「通用外洩監控 Skill 方案」指紋（R1–R8）
+#
+# 規則類型（guard.py 解釋）：
+#   path_enum   : 統計某正則在文件內容/路徑中出現次數，超過 threshold 即命中
+#   co_occur    : 多個 marker 同時出現即命中（加密信封 / 狀態指紋）
+#   ext_in_temp : 監控目錄內出現指定擴展名產物即命中（打包落地）
+#   substring   : 出現任一 substring 即命中（manifest 指紋）
+
+rules:
+  - id: r2-manifest-extra
+    name: 外洩快照 manifest 指紋
+    type: substring
+    markers: ["repo_snapshot_extra_manifest"]
+    severity: critical
+
+  - id: r3-state-hash
+    name: 外洩狀態指紋 lastAcceptedManifestHash
+    type: substring
+    markers: ["lastAcceptedManifestHash"]
+    severity: critical
+
+  - id: r3-snapshot-trace
+    name: 外洩狀態指紋 snapshotTraceId
+    type: substring
+    markers: ["snapshotTraceId"]
+    severity: critical
+
+  - id: r4-packaging-dirs
+    name: 外洩打包目錄命名
+    type: substring
+    markers: ["pending/manifests", "extra-manifests/snapshot"]
+    severity: medium
+
+  - id: r5-git-enum
+    name: 敏感路徑枚舉（.git/ > 10）
+    type: path_enum
+    pattern: "\\.git/"
+    threshold: 10
+    severity: critical
+
+  - id: r6-temp-archive
+    name: TEMP 內打包產物
+    type: ext_in_temp
+    extensions: [".zip", ".tar", ".tgz", ".enc"]
+    severity: high
+
+  - id: r7-crypto-envelope
+    name: 加密信封共現（keyWrap + spki + aes-256-ctr）
+    type: co_occur
+    markers: ["keyWrapAlgorithm", "publicKeySpkiPem", "aes-256-ctr"]
+    severity: high
+
+  - id: r8-process-correlation
+    name: 進程相關性（子進程 + 歸檔/加密）
+    type: co_occur
+    markers: ["subprocess", "Popen"]
+    # 第二組判斷由 guard.py 結合 ext_in_temp 上下文，此處僅標記弱信號
+    severity: medium

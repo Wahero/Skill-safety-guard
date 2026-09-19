@@ -14,6 +14,7 @@ from .detectors import (
     NativeFileOpsDetector,
     OWASPDetector,
     MultiFrameworkDetector,
+    ExfiltrationDetector,
 )
 from .detectors.base import Finding
 from .parser import parse_skill_file, validate_skill_frontmatter
@@ -75,6 +76,7 @@ def scan_target(target: Path, args) -> Dict:
         native_fs_det = NativeFileOpsDetector(all_rules.get("native_file_ops", []), whitelist)
         owasp_det = OWASPDetector(all_rules.get("owasp", []), whitelist)
         mf_det = MultiFrameworkDetector(all_rules.get("multi_framework", []), whitelist)
+        exfil_det = ExfiltrationDetector(all_rules.get("exfiltration", []), whitelist)
 
         # 檢測目標是文件還是目錄
         if target.is_file():
@@ -86,7 +88,7 @@ def scan_target(target: Path, args) -> Dict:
                 content = ""
 
             for det in [cred_det, shell_det, path_det, unicode_det, critical_det,
-                        privacy_det, installed_ext_det, prompt_inj_det, native_fs_det, owasp_det, mf_det]:
+                        privacy_det, installed_ext_det, prompt_inj_det, native_fs_det, owasp_det, mf_det, exfil_det]:
                 result = DetectionResult(category=det.category, scanned_files=1)
                 findings = det.detect_file(target, content)
                 for f in findings:
@@ -99,7 +101,7 @@ def scan_target(target: Path, args) -> Dict:
             # 擴展代碼（JS/TS），而非掃描一般 Skill 源碼；ext-curl-wget 等規則
             # 對文檔性 curl/wget 提及過度敏感。擴展審計走 --audit-extensions。
             for det in [cred_det, shell_det, path_det, unicode_det, critical_det,
-                        privacy_det, prompt_inj_det, native_fs_det, owasp_det, mf_det]:
+                        privacy_det, prompt_inj_det, native_fs_det, owasp_det, mf_det, exfil_det]:
                 result = det.detect_directory(target, include_self=include_self)
                 skill_results[det.category] = result
 

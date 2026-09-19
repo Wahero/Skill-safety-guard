@@ -1,0 +1,20 @@
+# exfil_guard 運行時規則：通用外洩啟發式（與具體方案無關）
+
+rules:
+  - id: g-archive-burst
+    name: 短時間內大量歸檔產物
+    type: ext_in_temp
+    extensions: [".zip", ".tar", ".tgz", ".7z", ".enc"]
+    severity: medium
+
+  - id: g-cloud-cli-upload
+    name: 調用雲端 CLI 上傳
+    type: substring
+    markers: ["rclone", "aws s3 cp", "az storage", "gsutil cp", "coscli", "ossutil"]
+    severity: high
+
+  - id: g-curl-upload
+    name: curl/wget 外傳
+    type: substring
+    markers: ["curl -T", "curl --upload", "wget --post-file", "scp "]
+    severity: high

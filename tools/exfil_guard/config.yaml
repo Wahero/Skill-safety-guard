@@ -1,0 +1,40 @@
+# exfil_guard 運行時守禦配置（Windows-only, opt-in, 需管理員權限）
+#
+# 本模塊為「Workspace Exfiltration Guard」的運行時層（L1/L2/L3），
+# 與 skill_safety_guard 的純靜態掃描層互補，但完全獨立：
+#   - 不被 scan_orchestrator 引用，不影響「純靜態」保證
+#   - 需顯式啟用（python tools/exfil_guard/guard.py）且通常需要管理員權限
+#   - 啟用即可能對文件系統 / 防火牆做修改（block / nuke），須經審批
+
+watch:
+  # 監控根目錄（落地目錄 / TEMP / LOCALAPPDATA）。支援 %VAR% 展開。
+  paths:
+    - "%TEMP%"
+    - "%LOCALAPPDATA%"
+  recursive: true
+  # 僅對這些擴展名的產物做深度規則評估（降低開銷）
+  extensions_deep:
+    - ".zip"
+    - ".tar"
+    - ".tgz"
+    - ".enc"
+    - ".7z"
+
+response:
+  # audit = 僅記錄 + 通知；block = 拒絕寫入 ACL（icacls /deny）；nuke = 額外防火牆封鎖
+  mode: audit
+  block_via: icacls
+  nuke_firewall: true
+  # nuke 模式下封鎖的外連目標（IP 或域名）；留空則封鎖全部外連
+  block_targets: []
+
+notify:
+  method: messagebox          # messagebox | toast | both
+  toast_via: powershell
+
+rules:
+  builtin_zcode: true         # 載入 rules/builtin_zcode.yaml（ZCode 方案指紋）
+  generic: true               # 載入 rules/generic.yaml（通用外洩啟發式）
+
+self_test:
+  enabled: true

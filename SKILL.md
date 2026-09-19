@@ -1,13 +1,13 @@
 ---
 name: skill-safety-guard
-description: 個人開發者安裝 Skill/MCP 前的安全守護者。掃描 Skill 中的憑證洩露、危險 Shell、原生代碼刪除（Rust/Python/Go/PS）、OWASP 程式碼模式（SQL 注入/SSRF/命令注入）、多框架配置（Windsurf/Copilot/Docker/K8s）、CI/CD 安全（GitHub Actions/Jenkinsfile），檢查 Pi Agent 全局安全狀態（CVE 版本 + auth.json 權限），並檢測本機已安裝的高危服務版本漏洞（langflow/n8n/flowise/open-webui）。
+description: 個人開發者安裝 Skill/MCP 前的安全守護者。掃描 Skill 中的憑證洩露、危險 Shell、原生代碼刪除（Rust/Python/Go/PS）、OWASP 程式碼模式（SQL 注入/SSRF/命令注入）、多框架配置（Windsurf/Copilot/Docker/K8s）、CI/CD 安全（GitHub Actions/Jenkinsfile），檢查 Pi Agent 全局安全狀態（CVE 版本 + auth.json 權限），並檢測本機已安裝的高危服務版本漏洞（langflow/n8n/flowise/open-webui）；新增工作區外洩檢測（Workspace Exfiltration Guard 靜態層，覆蓋 ZCode 外洩方案 R1–R8 指紋）。
 license: MIT
 allowed-tools:
   - Read
   - Bash
   - Edit
 metadata:
-  version: 3.10.0
+  version: 3.11.0
   author: Wahero
 ---
 
