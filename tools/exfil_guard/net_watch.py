@@ -8,6 +8,7 @@
 import ctypes
 import ipaddress
 import logging
+import struct
 import sys
 
 logger = logging.getLogger("exfil_guard.net_watch")
