@@ -1,7 +1,7 @@
 {
   "_comment": "由 OSV.dev 權威源自動更新（含手工種子條目）",
   "_schema_version": "1.0",
-  "_last_updated": "2026-09-21 03:45 UTC",
+  "_last_updated": "2026-09-22 03:43 UTC",
   "_source": "OSV.dev authoritative",
   "vulnerabilities": [
     {
@@ -2190,6 +2190,2085 @@
       "remediation": "升級至 0.9.6+",
       "source": "OSV",
       "published": "2026-07-13T15:46:19.013253Z",
+      "withdrawn": null
+    },
+    {
+      "cve_id": "CVE-2026-73488",
+      "osv_id": "GHSA-2364-jh4q-m9vm",
+      "package": "flowise",
+      "affected_below": "3.1.3",
+      "affected_ranges": [
+        [
+          "0",
+          "3.1.3"
+        ]
+      ],
+      "affected_versions": [
+        "<3.1.3"
+      ],
+      "severity": "high",
+      "confidence": "high",
+      "description": "Flowise: IDOR vulnerability exists at the GET /api/v1/organization/customer-default-source endpoint",
+      "remediation": "升級至 3.1.3+",
+      "source": "OSV",
+      "published": "2026-08-04T14:16:46Z",
+      "withdrawn": null
+    },
+    {
+      "cve_id": "CVE-2026-41274",
+      "osv_id": "GHSA-28g4-38q8-3cwc",
+      "package": "flowise",
+      "affected_below": "3.1.0",
+      "affected_ranges": [
+        [
+          "0",
+          "3.1.0"
+        ],
+        [
+          "0",
+          "3.1.0"
+        ]
+      ],
+      "affected_versions": [
+        "<3.1.0"
+      ],
+      "severity": "high",
+      "confidence": "high",
+      "description": "Flowise: Cypher Injection in GraphCypherQAChain",
+      "remediation": "升級至 3.1.0+",
+      "source": "OSV",
+      "published": "2026-04-16T21:54:26Z",
+      "withdrawn": null
+    },
+    {
+      "cve_id": "CVE-2026-41272",
+      "osv_id": "GHSA-2x8m-83vc-6wv4",
+      "package": "flowise",
+      "affected_below": "3.1.0",
+      "affected_ranges": [
+        [
+          "0",
+          "3.1.0"
+        ],
+        [
+          "0",
+          "3.1.0"
+        ]
+      ],
+      "affected_versions": [
+        "<3.1.0"
+      ],
+      "severity": "high",
+      "confidence": "high",
+      "description": "Flowise: SSRF Protection Bypass (TOCTOU & Default Insecure)",
+      "remediation": "升級至 3.1.0+",
+      "source": "OSV",
+      "published": "2026-04-16T21:51:00Z",
+      "withdrawn": null
+    },
+    {
+      "cve_id": "CVE-2025-61687",
+      "osv_id": "GHSA-35g6-rrw3-v6xc",
+      "package": "flowise",
+      "affected_below": "3.0.8",
+      "affected_ranges": [
+        [
+          "3.0.7",
+          "3.0.8"
+        ]
+      ],
+      "affected_versions": [
+        "<3.0.8"
+      ],
+      "severity": "high",
+      "confidence": "high",
+      "description": "FlowiseAI/Flosise has File Upload vulnerability",
+      "remediation": "升級至 3.0.8+",
+      "source": "OSV",
+      "published": "2025-10-08T19:34:21Z",
+      "withdrawn": null
+    },
+    {
+      "cve_id": "CVE-2026-69254",
+      "osv_id": "GHSA-3769-jgqc-cxm7",
+      "package": "flowise",
+      "affected_below": "3.1.3",
+      "affected_ranges": [
+        [
+          "0",
+          "3.1.3"
+        ],
+        [
+          "0",
+          "3.1.3"
+        ]
+      ],
+      "affected_versions": [
+        "<3.1.3"
+      ],
+      "severity": "high",
+      "confidence": "high",
+      "description": "Flowise: RCE via NodeVM Sandbox Escape in executeJavaScriptCode() nodeVMOptions Override",
+      "remediation": "升級至 3.1.3+",
+      "source": "OSV",
+      "published": "2026-08-04T15:29:12Z",
+      "withdrawn": null
+    },
+    {
+      "cve_id": "CVE-2025-59528",
+      "osv_id": "GHSA-3gcm-f6qx-ff7p",
+      "package": "flowise",
+      "affected_below": "3.0.6",
+      "affected_ranges": [
+        [
+          "3.0.5",
+          "3.0.6"
+        ]
+      ],
+      "affected_versions": [
+        "<3.0.6"
+      ],
+      "severity": "critical",
+      "confidence": "high",
+      "description": "Flowise has Remote Code Execution vulnerability",
+      "remediation": "升級至 3.0.6+",
+      "source": "OSV",
+      "published": "2025-09-15T19:59:57Z",
+      "withdrawn": null
+    },
+    {
+      "cve_id": "CVE-2026-41264",
+      "osv_id": "GHSA-3hjv-c53m-58jj",
+      "package": "flowise",
+      "affected_below": "3.1.0",
+      "affected_ranges": [
+        [
+          "0",
+          "3.1.0"
+        ],
+        [
+          "0",
+          "3.1.0"
+        ]
+      ],
+      "affected_versions": [
+        "<3.1.0"
+      ],
+      "severity": "critical",
+      "confidence": "high",
+      "description": "Flowise: CSV Agent Prompt Injection Remote Code Execution Vulnerability",
+      "remediation": "升級至 3.1.0+",
+      "source": "OSV",
+      "published": "2026-04-21T20:19:52Z",
+      "withdrawn": null
+    },
+    {
+      "cve_id": "CVE-2026-41277",
+      "osv_id": "GHSA-3prp-9gf7-4rxx",
+      "package": "flowise",
+      "affected_below": "3.1.0",
+      "affected_ranges": [
+        [
+          "0",
+          "3.1.0"
+        ]
+      ],
+      "affected_versions": [
+        "<3.1.0"
+      ],
+      "severity": "high",
+      "confidence": "high",
+      "description": "Flowise: Mass Assignment in DocumentStore Create Endpoint Leads to Cross-Workspace Object Takeover (IDOR)",
+      "remediation": "升級至 3.1.0+",
+      "source": "OSV",
+      "published": "2026-04-17T21:34:16Z",
+      "withdrawn": null
+    },
+    {
+      "cve_id": "CVE-2026-41267",
+      "osv_id": "GHSA-48m6-ch88-55mj",
+      "package": "flowise",
+      "affected_below": "3.1.0",
+      "affected_ranges": [
+        [
+          "0",
+          "3.1.0"
+        ]
+      ],
+      "affected_versions": [
+        "<3.1.0"
+      ],
+      "severity": "high",
+      "confidence": "high",
+      "description": "Flowise: Improper Mass Assignment in Account Registration Enables Unauthorized Organization Association",
+      "remediation": "升級至 3.1.0+",
+      "source": "OSV",
+      "published": "2026-04-16T21:44:24Z",
+      "withdrawn": null
+    },
+    {
+      "cve_id": "CVE-2025-71331",
+      "osv_id": "GHSA-4fr9-3x69-36wv",
+      "package": "flowise",
+      "affected_below": "3.0.8",
+      "affected_ranges": [
+        [
+          "0",
+          "3.0.8"
+        ]
+      ],
+      "affected_versions": [
+        "<3.0.8"
+      ],
+      "severity": "high",
+      "confidence": "high",
+      "description": "Flowise vulnerable to XSS",
+      "remediation": "升級至 3.0.8+",
+      "source": "OSV",
+      "published": "2025-10-03T19:27:06Z",
+      "withdrawn": null
+    },
+    {
+      "cve_id": "CVE-2026-69264",
+      "osv_id": "GHSA-4j8x-x6v7-w9rq",
+      "package": "flowise",
+      "affected_below": "3.1.3",
+      "affected_ranges": [
+        [
+          "0",
+          "3.1.3"
+        ],
+        [
+          "0",
+          "3.1.3"
+        ]
+      ],
+      "affected_versions": [
+        "<3.1.3"
+      ],
+      "severity": "high",
+      "confidence": "high",
+      "description": "Flowise: RCE via CSVAgent csvFile data URI base64 segment is interpolated into Python source without validation",
+      "remediation": "升級至 3.1.3+",
+      "source": "OSV",
+      "published": "2026-08-04T17:43:48Z",
+      "withdrawn": null
+    },
+    {
+      "cve_id": "CVE-2026-41266",
+      "osv_id": "GHSA-4jpm-cgx2-8h37",
+      "package": "flowise",
+      "affected_below": "3.1.0",
+      "affected_ranges": [
+        [
+          "0",
+          "3.1.0"
+        ]
+      ],
+      "affected_versions": [
+        "<3.1.0"
+      ],
+      "severity": "high",
+      "confidence": "high",
+      "description": "Flowise: Sensitive Data Leak in public-chatbotConfig ",
+      "remediation": "升級至 3.1.0+",
+      "source": "OSV",
+      "published": "2026-04-16T21:44:49Z",
+      "withdrawn": null
+    },
+    {
+      "cve_id": "CVE-2026-70470",
+      "osv_id": "GHSA-52fh-8v99-63c2",
+      "package": "flowise",
+      "affected_below": "3.1.3",
+      "affected_ranges": [
+        [
+          "0",
+          "3.1.3"
+        ],
+        [
+          "0",
+          "3.1.3"
+        ]
+      ],
+      "affected_versions": [
+        "<3.1.3"
+      ],
+      "severity": "critical",
+      "confidence": "high",
+      "description": "Flowise: Pyodide validator Unicode homoglyph bypass leads to RCE",
+      "remediation": "升級至 3.1.3+",
+      "source": "OSV",
+      "published": "2026-08-04T17:31:09Z",
+      "withdrawn": null
+    },
+    {
+      "cve_id": "CVE-2026-56276",
+      "osv_id": "GHSA-59fh-9f3p-7m39",
+      "package": "flowise",
+      "affected_below": "3.1.2",
+      "affected_ranges": [
+        [
+          "0",
+          "3.1.2"
+        ]
+      ],
+      "affected_versions": [
+        "<3.1.2"
+      ],
+      "severity": "high",
+      "confidence": "high",
+      "description": "Flowise: Mass Assignment in PUT /api/v1/user Allows Authenticated Users to Override Password Hash and Bypass Password Change Verification",
+      "remediation": "升級至 3.1.2+",
+      "source": "OSV",
+      "published": "2026-05-20T15:44:40Z",
+      "withdrawn": null
+    },
+    {
+      "cve_id": "CVE-2024-58351",
+      "osv_id": "GHSA-5cph-wvm9-45gj",
+      "package": "flowise",
+      "affected_below": "2.1.4",
+      "affected_ranges": [
+        [
+          "0",
+          "2.1.4"
+        ]
+      ],
+      "affected_versions": [
+        "<2.1.4"
+      ],
+      "severity": "high",
+      "confidence": "high",
+      "description": "Flowise OverrideConfig security vulnerability",
+      "remediation": "升級至 2.1.4+",
+      "source": "OSV",
+      "published": "2024-11-21T22:21:03Z",
+      "withdrawn": null
+    },
+    {
+      "cve_id": "CVE-2026-30824",
+      "osv_id": "GHSA-5f53-522j-j454",
+      "package": "flowise",
+      "affected_below": "3.0.13",
+      "affected_ranges": [
+        [
+          "0",
+          "3.0.13"
+        ]
+      ],
+      "affected_versions": [
+        "<3.0.13"
+      ],
+      "severity": "high",
+      "confidence": "high",
+      "description": "Flowise Missing Authentication on NVIDIA NIM Endpoints",
+      "remediation": "升級至 3.0.13+",
+      "source": "OSV",
+      "published": "2026-03-06T22:21:38Z",
+      "withdrawn": null
+    },
+    {
+      "cve_id": "CVE-2026-41279",
+      "osv_id": "GHSA-5fw2-mwhh-9947",
+      "package": "flowise",
+      "affected_below": "3.1.0",
+      "affected_ranges": [
+        [
+          "0",
+          "3.1.0"
+        ]
+      ],
+      "affected_versions": [
+        "<3.1.0"
+      ],
+      "severity": "high",
+      "confidence": "high",
+      "description": "Flowise: Unauthenticated TTS endpoint accepts arbitrary credential IDs — enables API credit abuse via stored credentials",
+      "remediation": "升級至 3.1.0+",
+      "source": "OSV",
+      "published": "2026-04-17T21:35:14Z",
+      "withdrawn": null
+    },
+    {
+      "cve_id": "CVE-2026-46477",
+      "osv_id": "GHSA-5h9v-837x-m97r",
+      "package": "flowise",
+      "affected_below": "3.1.2",
+      "affected_ranges": [
+        [
+          "0",
+          "3.1.2"
+        ]
+      ],
+      "affected_versions": [
+        "<3.1.2"
+      ],
+      "severity": "high",
+      "confidence": "high",
+      "description": "FlowiseAI: Dataset create+update mass-assignment allows cross-workspace dataset takeover",
+      "remediation": "升級至 3.1.2+",
+      "source": "OSV",
+      "published": "2026-05-14T16:19:39Z",
+      "withdrawn": null
+    },
+    {
+      "cve_id": "CVE-2026-42863",
+      "osv_id": "GHSA-5wxp-qjgq-fx6m",
+      "package": "flowise",
+      "affected_below": "3.1.2",
+      "affected_ranges": [
+        [
+          "0",
+          "3.1.2"
+        ]
+      ],
+      "affected_versions": [
+        "<3.1.2"
+      ],
+      "severity": "high",
+      "confidence": "high",
+      "description": "FlowiseAI has Mass Assignment in Chatflow Update Endpoint that Allows Cross-Workspace AgentFlow Reassignment",
+      "remediation": "升級至 3.1.2+",
+      "source": "OSV",
+      "published": "2026-05-14T14:54:28Z",
+      "withdrawn": null
+    },
+    {
+      "cve_id": "CVE-2026-70477",
+      "osv_id": "GHSA-5xvg-pmgg-3mxr",
+      "package": "flowise",
+      "affected_below": "3.1.3",
+      "affected_ranges": [
+        [
+          "0",
+          "3.1.3"
+        ],
+        [
+          "0",
+          "3.1.3"
+        ]
+      ],
+      "affected_versions": [
+        "<3.1.3"
+      ],
+      "severity": "critical",
+      "confidence": "high",
+      "description": "Flowise: CSV Agent Prompt Injection Remote Code Execution Vulnerability",
+      "remediation": "升級至 3.1.3+",
+      "source": "OSV",
+      "published": "2026-08-04T19:29:26Z",
+      "withdrawn": null
+    },
+    {
+      "cve_id": "CVE-2025-71336",
+      "osv_id": "GHSA-6933-jpx5-q87q",
+      "package": "flowise",
+      "affected_below": "3.0.6",
+      "affected_ranges": [
+        [
+          "2.2.7-patch.1",
+          "3.0.6"
+        ]
+      ],
+      "affected_versions": [
+        "<3.0.6"
+      ],
+      "severity": "critical",
+      "confidence": "high",
+      "description": "Flowise has unsandboxed remote code execution via Custom MCP",
+      "remediation": "升級至 3.0.6+",
+      "source": "OSV",
+      "published": "2025-09-15T20:30:30Z",
+      "withdrawn": null
+    },
+    {
+      "cve_id": "CVE-2026-41273",
+      "osv_id": "GHSA-6f7g-v4pp-r667",
+      "package": "flowise",
+      "affected_below": "3.1.0",
+      "affected_ranges": [
+        [
+          "0",
+          "3.1.0"
+        ]
+      ],
+      "affected_versions": [
+        "<3.1.0"
+      ],
+      "severity": "high",
+      "confidence": "high",
+      "description": "Flowise: Unauthenticated OAuth 2.0 Access Token Disclosure via Public Chatflow in Flowise",
+      "remediation": "升級至 3.1.0+",
+      "source": "OSV",
+      "published": "2026-04-16T21:52:46Z",
+      "withdrawn": null
+    },
+    {
+      "cve_id": "CVE-2026-42861",
+      "osv_id": "GHSA-6fw7-3q8r-m5vj",
+      "package": "flowise",
+      "affected_below": "3.1.2",
+      "affected_ranges": [
+        [
+          "0",
+          "3.1.2"
+        ]
+      ],
+      "affected_versions": [
+        "<3.1.2"
+      ],
+      "severity": "high",
+      "confidence": "high",
+      "description": "FlowiseAI has Mass Assignment in Variable Update Endpoint that Allows Cross-Workspace Resource Reassignment",
+      "remediation": "升級至 3.1.2+",
+      "source": "OSV",
+      "published": "2026-05-14T14:52:24Z",
+      "withdrawn": null
+    },
+    {
+      "cve_id": "CVE-2026-41271",
+      "osv_id": "GHSA-6r77-hqx7-7vw8",
+      "package": "flowise",
+      "affected_below": "3.1.0",
+      "affected_ranges": [
+        [
+          "0",
+          "3.1.0"
+        ],
+        [
+          "0",
+          "3.1.0"
+        ]
+      ],
+      "affected_versions": [
+        "<3.1.0"
+      ],
+      "severity": "high",
+      "confidence": "high",
+      "description": "Flowise:  APIChain Prompt Injection SSRF in GET/POST API Chains",
+      "remediation": "升級至 3.1.0+",
+      "source": "OSV",
+      "published": "2026-04-16T21:52:11Z",
+      "withdrawn": null
+    },
+    {
+      "cve_id": "CVE-2026-69258",
+      "osv_id": "GHSA-6vh2-wg4h-4vwj",
+      "package": "flowise",
+      "affected_below": "3.1.3",
+      "affected_ranges": [
+        [
+          "0",
+          "3.1.3"
+        ]
+      ],
+      "affected_versions": [
+        "<3.1.3"
+      ],
+      "severity": "critical",
+      "confidence": "high",
+      "description": "Flowise: Unauthenticated Property Injection into Flow Execution Context via Ungated `overrideConfig` Spread in Prediction API",
+      "remediation": "升級至 3.1.3+",
+      "source": "OSV",
+      "published": "2026-08-04T15:56:11Z",
+      "withdrawn": null
+    },
+    {
+      "cve_id": "CVE-2024-31621",
+      "osv_id": "GHSA-6wp6-22x5-rr3w",
+      "package": "flowise",
+      "affected_below": "1.8.1",
+      "affected_ranges": [
+        [
+          "0",
+          "1.8.1"
+        ]
+      ],
+      "affected_versions": [
+        "<1.8.1"
+      ],
+      "severity": "high",
+      "confidence": "high",
+      "description": "Flowise vulnerable to code injection via api/v1",
+      "remediation": "升級至 1.8.1+",
+      "source": "OSV",
+      "published": "2024-04-29T18:30:45Z",
+      "withdrawn": null
+    },
+    {
+      "cve_id": "CVE-2026-46476",
+      "osv_id": "GHSA-728h-4mwj-f2p4",
+      "package": "flowise",
+      "affected_below": "3.1.2",
+      "affected_ranges": [
+        [
+          "0",
+          "3.1.2"
+        ]
+      ],
+      "affected_versions": [
+        "<3.1.2"
+      ],
+      "severity": "high",
+      "confidence": "high",
+      "description": "FlowiseAI: CustomTemplate create+update mass-assignment allows cross-workspace template takeover",
+      "remediation": "升級至 3.1.2+",
+      "source": "OSV",
+      "published": "2026-05-14T16:19:32Z",
+      "withdrawn": null
+    },
+    {
+      "cve_id": "CVE-2026-46475",
+      "osv_id": "GHSA-78pr-c5x5-jggc",
+      "package": "flowise",
+      "affected_below": "3.1.2",
+      "affected_ranges": [
+        [
+          "0",
+          "3.1.2"
+        ]
+      ],
+      "affected_versions": [
+        "<3.1.2"
+      ],
+      "severity": "high",
+      "confidence": "high",
+      "description": "FlowiseAI: Assistant create+update mass-assignment allows cross-workspace assistant takeover",
+      "remediation": "升級至 3.1.2+",
+      "source": "OSV",
+      "published": "2026-05-14T16:19:28Z",
+      "withdrawn": null
+    },
+    {
+      "cve_id": "CVE-2025-57164",
+      "osv_id": "GHSA-7944-7c6r-55vv",
+      "package": "flowise",
+      "affected_below": "3.0.6",
+      "affected_ranges": [
+        [
+          "3.0.5",
+          "3.0.6"
+        ]
+      ],
+      "affected_versions": [
+        "<3.0.6"
+      ],
+      "severity": "critical",
+      "confidence": "high",
+      "description": "FlowiseAI Pre-Auth Arbitrary Code Execution",
+      "remediation": "升級至 3.0.6+",
+      "source": "OSV",
+      "published": "2025-09-15T19:51:08Z",
+      "withdrawn": null
+    },
+    {
+      "cve_id": "CVE-2026-46443",
+      "osv_id": "GHSA-7g73-99r4-m4mj",
+      "package": "flowise",
+      "affected_below": "3.1.2",
+      "affected_ranges": [
+        [
+          "0",
+          "3.1.2"
+        ]
+      ],
+      "affected_versions": [
+        "<3.1.2"
+      ],
+      "severity": "high",
+      "confidence": "high",
+      "description": "FlowiseAI Vulnerable to Credential Data Leak",
+      "remediation": "升級至 3.1.2+",
+      "source": "OSV",
+      "published": "2026-05-14T14:58:12Z",
+      "withdrawn": null
+    },
+    {
+      "cve_id": "CVE-2026-46478",
+      "osv_id": "GHSA-7j65-65cr-6644",
+      "package": "flowise",
+      "affected_below": "3.1.2",
+      "affected_ranges": [
+        [
+          "0",
+          "3.1.2"
+        ]
+      ],
+      "affected_versions": [
+        "<3.1.2"
+      ],
+      "severity": "high",
+      "confidence": "high",
+      "description": "FlowiseAI: DatasetRow create+update mass-assignment allows cross-workspace row takeover",
+      "remediation": "升級至 3.1.2+",
+      "source": "OSV",
+      "published": "2026-05-14T16:19:44Z",
+      "withdrawn": null
+    },
+    {
+      "cve_id": "GHSA-88pr-878c-24wf",
+      "osv_id": "GHSA-88pr-878c-24wf",
+      "package": "flowise",
+      "affected_below": "3.1.3",
+      "affected_ranges": [
+        [
+          "0",
+          "3.1.3"
+        ],
+        [
+          "0",
+          "3.1.3"
+        ]
+      ],
+      "affected_versions": [
+        "<3.1.3"
+      ],
+      "severity": "high",
+      "confidence": "high",
+      "description": "Flowise: Authenticated arbitrary file write in the `S3 Directory` document loader via unsanitized S3 object keys                                                                                        ",
+      "remediation": "升級至 3.1.3+",
+      "source": "OSV",
+      "published": "2026-08-04T17:43:45Z",
+      "withdrawn": null
+    },
+    {
+      "cve_id": "CVE-2026-73603",
+      "osv_id": "GHSA-8gj2-2cvc-6xx7",
+      "package": "flowise",
+      "affected_below": "3.1.4",
+      "affected_ranges": [
+        [
+          "0",
+          "3.1.4"
+        ]
+      ],
+      "affected_versions": [
+        "<3.1.4"
+      ],
+      "severity": "high",
+      "confidence": "high",
+      "description": "Flowise: Unauthenticated Credential Abuse via Text-to-Speech Endpoint Allows Unauthorized Use of Private Chatflow TTS Credentials",
+      "remediation": "升級至 3.1.4+",
+      "source": "OSV",
+      "published": "2026-08-04T19:19:44Z",
+      "withdrawn": null
+    },
+    {
+      "cve_id": "CVE-2026-70471",
+      "osv_id": "GHSA-8r8h-6vcc-xhrv",
+      "package": "flowise",
+      "affected_below": "3.1.3",
+      "affected_ranges": [
+        [
+          "0",
+          "3.1.3"
+        ]
+      ],
+      "affected_versions": [
+        "<3.1.3"
+      ],
+      "severity": "high",
+      "confidence": "high",
+      "description": "Flowise: RBAC Bypass Leading to Unauthorized Workspace Variables Disclosure",
+      "remediation": "升級至 3.1.3+",
+      "source": "OSV",
+      "published": "2026-08-04T17:43:36Z",
+      "withdrawn": null
+    },
+    {
+      "cve_id": "CVE-2025-50538",
+      "osv_id": "GHSA-964p-j4gg-mhwc",
+      "package": "flowise",
+      "affected_below": "3.0.8",
+      "affected_ranges": [
+        [
+          "0",
+          "3.0.8"
+        ]
+      ],
+      "affected_versions": [
+        "<3.0.8"
+      ],
+      "severity": "critical",
+      "confidence": "high",
+      "description": "Flowise is vulnerable to stored XSS via \"View Messages\" allows credential theft in FlowiseAI admin panel",
+      "remediation": "升級至 3.0.8+",
+      "source": "OSV",
+      "published": "2025-10-03T21:47:37Z",
+      "withdrawn": null
+    },
+    {
+      "cve_id": "CVE-2025-71324",
+      "osv_id": "GHSA-99pg-hqvx-r4gf",
+      "package": "flowise",
+      "affected_below": "3.0.6",
+      "affected_ranges": [
+        [
+          "3.0.5",
+          "3.0.6"
+        ]
+      ],
+      "affected_versions": [
+        "<3.0.6"
+      ],
+      "severity": "critical",
+      "confidence": "high",
+      "description": "Flowise has an Arbitrary File Read",
+      "remediation": "升級至 3.0.6+",
+      "source": "OSV",
+      "published": "2025-09-15T20:00:39Z",
+      "withdrawn": null
+    },
+    {
+      "cve_id": "CVE-2026-56275",
+      "osv_id": "GHSA-9hrv-gvrv-6gf2",
+      "package": "flowise",
+      "affected_below": "3.1.0",
+      "affected_ranges": [
+        [
+          "0",
+          "3.1.0"
+        ],
+        [
+          "0",
+          "3.1.0"
+        ]
+      ],
+      "affected_versions": [
+        "<3.1.0"
+      ],
+      "severity": "high",
+      "confidence": "high",
+      "description": "Flowise Execute Flow function has an SSRF vulnerability",
+      "remediation": "升級至 3.1.0+",
+      "source": "OSV",
+      "published": "2026-04-16T21:23:17Z",
+      "withdrawn": null
+    },
+    {
+      "cve_id": "CVE-2026-46442",
+      "osv_id": "GHSA-9rvc-vf7m-pgm2",
+      "package": "flowise",
+      "affected_below": "3.1.2",
+      "affected_ranges": [
+        [
+          "0",
+          "3.1.2"
+        ]
+      ],
+      "affected_versions": [
+        "<3.1.2"
+      ],
+      "severity": "high",
+      "confidence": "high",
+      "description": "FlowiseAI: Authenticated Host RCE via POST /api/v1/node-custom-function and NodeVM Sandbox Escape",
+      "remediation": "升級至 3.1.2+",
+      "source": "OSV",
+      "published": "2026-05-14T14:57:53Z",
+      "withdrawn": null
+    },
+    {
+      "cve_id": "CVE-2026-41137",
+      "osv_id": "GHSA-9wc7-mj3f-74xv",
+      "package": "flowise",
+      "affected_below": "3.1.0",
+      "affected_ranges": [
+        [
+          "0",
+          "3.1.0"
+        ],
+        [
+          "0",
+          "3.1.0"
+        ]
+      ],
+      "affected_versions": [
+        "<3.1.0"
+      ],
+      "severity": "high",
+      "confidence": "high",
+      "description": "Flowise: Code Injection in CSVAgent leads to Authenticated RCE",
+      "remediation": "升級至 3.1.0+",
+      "source": "OSV",
+      "published": "2026-04-16T21:44:15Z",
+      "withdrawn": null
+    },
+    {
+      "cve_id": "CVE-2026-56268",
+      "osv_id": "GHSA-c2c9-mfw7-p8hw",
+      "package": "flowise",
+      "affected_below": "3.1.2",
+      "affected_ranges": [
+        [
+          "0",
+          "3.1.2"
+        ]
+      ],
+      "affected_versions": [
+        "<3.1.2"
+      ],
+      "severity": "high",
+      "confidence": "high",
+      "description": "Flowise: Cross-Workspace Chatflow Disclosure via chatflows/apikey Endpoint Returns All Unprotected Chatflows",
+      "remediation": "升級至 3.1.2+",
+      "source": "OSV",
+      "published": "2026-05-20T15:45:19Z",
+      "withdrawn": null
+    },
+    {
+      "cve_id": "CVE-2026-69257",
+      "osv_id": "GHSA-c6xh-wv4j-ppv5",
+      "package": "flowise",
+      "affected_below": "3.1.3",
+      "affected_ranges": [
+        [
+          "0",
+          "3.1.3"
+        ]
+      ],
+      "affected_versions": [
+        "<3.1.3"
+      ],
+      "severity": "high",
+      "confidence": "high",
+      "description": "Flowise: SSRF Protection Bypass via IPv4-Mapped IPv6 Addresses",
+      "remediation": "升級至 3.1.3+",
+      "source": "OSV",
+      "published": "2026-08-04T15:51:58Z",
+      "withdrawn": null
+    },
+    {
+      "cve_id": "CVE-2026-40933",
+      "osv_id": "GHSA-c9gw-hvqq-f33r",
+      "package": "flowise",
+      "affected_below": "3.1.0",
+      "affected_ranges": [
+        [
+          "0",
+          "3.1.0"
+        ],
+        [
+          "0",
+          "3.1.0"
+        ]
+      ],
+      "affected_versions": [
+        "<3.1.0"
+      ],
+      "severity": "critical",
+      "confidence": "high",
+      "description": "Flowise: Authenticated RCE Via MCP Adapters",
+      "remediation": "升級至 3.1.0+",
+      "source": "OSV",
+      "published": "2026-04-16T21:18:17Z",
+      "withdrawn": null
+    },
+    {
+      "cve_id": "CVE-2026-70472",
+      "osv_id": "GHSA-chm3-vqcf-52rx",
+      "package": "flowise",
+      "affected_below": "3.1.3",
+      "affected_ranges": [
+        [
+          "0",
+          "3.1.3"
+        ]
+      ],
+      "affected_versions": [
+        "<3.1.3"
+      ],
+      "severity": "high",
+      "confidence": "high",
+      "description": "Flowise: Cross-workspace credential IDOR in openai-assistants-vector-store",
+      "remediation": "升級至 3.1.3+",
+      "source": "OSV",
+      "published": "2026-08-04T17:51:48Z",
+      "withdrawn": null
+    },
+    {
+      "cve_id": "CVE-2026-41268",
+      "osv_id": "GHSA-cvrr-qhgw-2mm6",
+      "package": "flowise",
+      "affected_below": "3.1.0",
+      "affected_ranges": [
+        [
+          "0",
+          "3.1.0"
+        ],
+        [
+          "0",
+          "3.1.0"
+        ]
+      ],
+      "affected_versions": [
+        "<3.1.0"
+      ],
+      "severity": "high",
+      "confidence": "high",
+      "description": "Flowise: Parameter Override Bypass Remote Command Execution",
+      "remediation": "升級至 3.1.0+",
+      "source": "OSV",
+      "published": "2026-04-16T21:46:39Z",
+      "withdrawn": null
+    },
+    {
+      "cve_id": "CVE-2026-30823",
+      "osv_id": "GHSA-cwc3-p92j-g7qm",
+      "package": "flowise",
+      "affected_below": "3.0.13",
+      "affected_ranges": [
+        [
+          "0",
+          "3.0.13"
+        ]
+      ],
+      "affected_versions": [
+        "<3.0.13"
+      ],
+      "severity": "high",
+      "confidence": "high",
+      "description": "Flowise has IDOR leading to Account Takeover and Enterprise Feature Bypass via SSO Configuration",
+      "remediation": "升級至 3.0.13+",
+      "source": "OSV",
+      "published": "2026-03-06T22:20:50Z",
+      "withdrawn": null
+    },
+    {
+      "cve_id": "CVE-2026-41138",
+      "osv_id": "GHSA-f228-chmx-v6j6",
+      "package": "flowise",
+      "affected_below": "3.1.0",
+      "affected_ranges": [
+        [
+          "0",
+          "3.1.0"
+        ],
+        [
+          "0",
+          "3.1.0"
+        ]
+      ],
+      "affected_versions": [
+        "<3.1.0"
+      ],
+      "severity": "high",
+      "confidence": "high",
+      "description": "Flowise: Remote code execution vulnerability in AirtableAgent.ts caused by lack of input verification when using `Pandas`.",
+      "remediation": "升級至 3.1.0+",
+      "source": "OSV",
+      "published": "2026-04-16T21:43:57Z",
+      "withdrawn": null
+    },
+    {
+      "cve_id": "CVE-2026-41276",
+      "osv_id": "GHSA-f6hc-c5jr-878p",
+      "package": "flowise",
+      "affected_below": "3.1.0",
+      "affected_ranges": [
+        [
+          "0",
+          "3.1.0"
+        ]
+      ],
+      "affected_versions": [
+        "<3.1.0"
+      ],
+      "severity": "critical",
+      "confidence": "high",
+      "description": "Flowise: resetPassword Authentication Bypass Vulnerability",
+      "remediation": "升級至 3.1.0+",
+      "source": "OSV",
+      "published": "2026-04-16T21:55:18Z",
+      "withdrawn": null
+    },
+    {
+      "cve_id": "CVE-2026-70475",
+      "osv_id": "GHSA-fm2f-4339-4p2f",
+      "package": "flowise",
+      "affected_below": "3.1.3",
+      "affected_ranges": [
+        [
+          "0",
+          "3.1.3"
+        ]
+      ],
+      "affected_versions": [
+        "<3.1.3"
+      ],
+      "severity": "high",
+      "confidence": "high",
+      "description": "Flowise: Missing Authorization on Execution Update Endpoint",
+      "remediation": "升級至 3.1.3+",
+      "source": "OSV",
+      "published": "2026-08-04T19:18:47Z",
+      "withdrawn": null
+    },
+    {
+      "cve_id": "CVE-2026-70473",
+      "osv_id": "GHSA-fr6g-7cq8-fg82",
+      "package": "flowise",
+      "affected_below": "3.1.3",
+      "affected_ranges": [
+        [
+          "0",
+          "3.1.3"
+        ]
+      ],
+      "affected_versions": [
+        "<3.1.3"
+      ],
+      "severity": "high",
+      "confidence": "high",
+      "description": "Flowise: Information Disclosure in GET /api/v1/upsert-history returns the entire server-wide upsert history",
+      "remediation": "升級至 3.1.3+",
+      "source": "OSV",
+      "published": "2026-08-04T17:57:27Z",
+      "withdrawn": null
+    },
+    {
+      "cve_id": "CVE-2026-31829",
+      "osv_id": "GHSA-fvcw-9w9r-pxc7",
+      "package": "flowise",
+      "affected_below": "3.0.13",
+      "affected_ranges": [
+        [
+          "0",
+          "3.0.13"
+        ],
+        [
+          "0",
+          "3.0.13"
+        ]
+      ],
+      "affected_versions": [
+        "<3.0.13"
+      ],
+      "severity": "high",
+      "confidence": "high",
+      "description": "Flowise affected by Server-Side Request Forgery (SSRF) in HTTP Node Leading to Internal Network Access",
+      "remediation": "升級至 3.0.13+",
+      "source": "OSV",
+      "published": "2026-03-11T00:24:05Z",
+      "withdrawn": null
+    },
+    {
+      "cve_id": "CVE-2026-69251",
+      "osv_id": "GHSA-g32j-mmxr-gfq5",
+      "package": "flowise",
+      "affected_below": "3.1.3",
+      "affected_ranges": [
+        [
+          "0",
+          "3.1.3"
+        ],
+        [
+          "0",
+          "3.1.3"
+        ]
+      ],
+      "affected_versions": [
+        "<3.1.3"
+      ],
+      "severity": "high",
+      "confidence": "high",
+      "description": "Flowise RCE via TypeORM DataSource",
+      "remediation": "升級至 3.1.3+",
+      "source": "OSV",
+      "published": "2026-08-04T14:28:04Z",
+      "withdrawn": null
+    },
+    {
+      "cve_id": "CVE-2026-70476",
+      "osv_id": "GHSA-gmmw-qg98-6j6p",
+      "package": "flowise",
+      "affected_below": "3.1.3",
+      "affected_ranges": [
+        [
+          "0",
+          "3.1.3"
+        ]
+      ],
+      "affected_versions": [
+        "<3.1.3"
+      ],
+      "severity": "critical",
+      "confidence": "high",
+      "description": "Flowise: Broken Access Control in Stripe Subscription Endpoints Allows Cross-Tenant Billing Manipulation",
+      "remediation": "升級至 3.1.3+",
+      "source": "OSV",
+      "published": "2026-08-04T19:24:07Z",
+      "withdrawn": null
+    },
+    {
+      "cve_id": "CVE-2026-46444",
+      "osv_id": "GHSA-hmg2-jjjx-jcp2",
+      "package": "flowise",
+      "affected_below": "3.1.2",
+      "affected_ranges": [
+        [
+          "0",
+          "3.1.2"
+        ]
+      ],
+      "affected_versions": [
+        "<3.1.2"
+      ],
+      "severity": "high",
+      "confidence": "high",
+      "description": "FlowiseAI: Vector Store No Permission Checks",
+      "remediation": "升級至 3.1.2+",
+      "source": "OSV",
+      "published": "2026-05-14T16:19:23Z",
+      "withdrawn": null
+    },
+    {
+      "cve_id": "CVE-2026-46441",
+      "osv_id": "GHSA-hp26-q66v-q2w7",
+      "package": "flowise",
+      "affected_below": "3.1.2",
+      "affected_ranges": [
+        [
+          "0",
+          "3.1.2"
+        ]
+      ],
+      "affected_versions": [
+        "<3.1.2"
+      ],
+      "severity": "high",
+      "confidence": "high",
+      "description": "FlowiseAI has Mass Assignment in Assistant Update Endpoint that Allows Cross-Workspace Resource Reassignment",
+      "remediation": "升級至 3.1.2+",
+      "source": "OSV",
+      "published": "2026-05-14T14:57:46Z",
+      "withdrawn": null
+    },
+    {
+      "cve_id": "CVE-2025-59527",
+      "osv_id": "GHSA-hr92-4q35-4j3m",
+      "package": "flowise",
+      "affected_below": "3.0.6",
+      "affected_ranges": [
+        [
+          "3.0.5",
+          "3.0.6"
+        ]
+      ],
+      "affected_versions": [
+        "<3.0.6"
+      ],
+      "severity": "high",
+      "confidence": "high",
+      "description": "FlowiseAI/Flowise has Server-Side Request Forgery (SSRF) vulnerability",
+      "remediation": "升級至 3.0.6+",
+      "source": "OSV",
+      "published": "2025-09-15T19:53:46Z",
+      "withdrawn": null
+    },
+    {
+      "cve_id": "GHSA-j44m-5v8f-gc9c",
+      "osv_id": "GHSA-j44m-5v8f-gc9c",
+      "package": "flowise",
+      "affected_below": "3.0.8",
+      "affected_ranges": [
+        [
+          "0",
+          "3.0.8"
+        ],
+        [
+          "0",
+          "3.0.8"
+        ]
+      ],
+      "affected_versions": [
+        "<3.0.8"
+      ],
+      "severity": "high",
+      "confidence": "high",
+      "description": "Flowise is vulnerable to arbitrary file exposure through its ReadFileTool",
+      "remediation": "升級至 3.0.8+",
+      "source": "OSV",
+      "published": "2025-10-10T22:55:09Z",
+      "withdrawn": null
+    },
+    {
+      "cve_id": "CVE-2026-30821",
+      "osv_id": "GHSA-j8g8-j7fc-43v6",
+      "package": "flowise",
+      "affected_below": "3.0.13",
+      "affected_ranges": [
+        [
+          "0",
+          "3.0.13"
+        ]
+      ],
+      "affected_versions": [
+        "<3.0.13"
+      ],
+      "severity": "critical",
+      "confidence": "high",
+      "description": "Flowise has Arbitrary File Upload via MIME Spoofing",
+      "remediation": "升級至 3.0.13+",
+      "source": "OSV",
+      "published": "2026-03-06T18:49:20Z",
+      "withdrawn": null
+    },
+    {
+      "cve_id": "CVE-2026-56267",
+      "osv_id": "GHSA-jc5m-wrp2-qq38",
+      "package": "flowise",
+      "affected_below": "3.0.13",
+      "affected_ranges": [
+        [
+          "0",
+          "3.0.13"
+        ]
+      ],
+      "affected_versions": [
+        "<3.0.13"
+      ],
+      "severity": "high",
+      "confidence": "high",
+      "description": "Flowise Vulnerable to PII Disclosure on Unauthenticated Forgot Password Endpoint",
+      "remediation": "升級至 3.0.13+",
+      "source": "OSV",
+      "published": "2026-03-05T21:58:02Z",
+      "withdrawn": null
+    },
+    {
+      "cve_id": "CVE-2025-61913",
+      "osv_id": "GHSA-jv9m-vf54-chjj",
+      "package": "flowise",
+      "affected_below": "3.0.8",
+      "affected_ranges": [
+        [
+          "0",
+          "3.0.8"
+        ],
+        [
+          "0",
+          "3.0.8"
+        ],
+        [
+          "0",
+          "3.0.8"
+        ]
+      ],
+      "affected_versions": [
+        "<3.0.8"
+      ],
+      "severity": "critical",
+      "confidence": "high",
+      "description": "Flowise is vulnerable to arbitrary file write through its WriteFileTool ",
+      "remediation": "升級至 3.0.8+",
+      "source": "OSV",
+      "published": "2025-10-09T15:21:39Z",
+      "withdrawn": null
+    },
+    {
+      "cve_id": "CVE-2024-9148",
+      "osv_id": "GHSA-m5p9-xvxj-64c8",
+      "package": "flowise",
+      "affected_below": "2.1.1",
+      "affected_ranges": [
+        [
+          "0",
+          "2.0.0"
+        ],
+        [
+          "0",
+          "2.1.1"
+        ]
+      ],
+      "affected_versions": [
+        "<2.0.0",
+        "<2.1.1"
+      ],
+      "severity": "critical",
+      "confidence": "high",
+      "description": "Flowise and Flowise Chat Embed vulnerable to Stored Cross-site Scripting",
+      "remediation": "升級至 2.1.1+",
+      "source": "OSV",
+      "published": "2024-09-25T03:30:36Z",
+      "withdrawn": null
+    },
+    {
+      "cve_id": "CVE-2026-56277",
+      "osv_id": "GHSA-m837-xvxr-vqwg",
+      "package": "flowise",
+      "affected_below": "3.1.2",
+      "affected_ranges": [
+        [
+          "0",
+          "3.1.2"
+        ]
+      ],
+      "affected_versions": [
+        "<3.1.2"
+      ],
+      "severity": "high",
+      "confidence": "high",
+      "description": "Flowise: Hardcoded CORS wildcard on TTS endpoint enables cross-origin credential abuse from any webpage",
+      "remediation": "升級至 3.1.2+",
+      "source": "OSV",
+      "published": "2026-05-20T15:38:02Z",
+      "withdrawn": null
+    },
+    {
+      "cve_id": "CVE-2026-56274",
+      "osv_id": "GHSA-m99r-2hxc-cp3q",
+      "package": "flowise",
+      "affected_below": "3.1.2",
+      "affected_ranges": [
+        [
+          "0",
+          "3.1.2"
+        ],
+        [
+          "0",
+          "3.1.2"
+        ]
+      ],
+      "affected_versions": [
+        "<3.1.2"
+      ],
+      "severity": "high",
+      "confidence": "high",
+      "description": "Flowise has an MCP Security Bypass that Enables RCE",
+      "remediation": "升級至 3.1.2+",
+      "source": "OSV",
+      "published": "2026-05-14T14:57:30Z",
+      "withdrawn": null
+    },
+    {
+      "cve_id": "CVE-2026-30822",
+      "osv_id": "GHSA-mq4r-h2gh-qv7x",
+      "package": "flowise",
+      "affected_below": "3.0.13",
+      "affected_ranges": [
+        [
+          "0",
+          "3.0.13"
+        ]
+      ],
+      "affected_versions": [
+        "<3.0.13"
+      ],
+      "severity": "high",
+      "confidence": "high",
+      "description": "Flowise Allows Mass Assignment in `/api/v1/leads` Endpoint",
+      "remediation": "升級至 3.0.13+",
+      "source": "OSV",
+      "published": "2026-03-06T22:19:14Z",
+      "withdrawn": null
+    },
+    {
+      "cve_id": "CVE-2026-46479",
+      "osv_id": "GHSA-mq53-pc65-wjc4",
+      "package": "flowise",
+      "affected_below": "3.1.2",
+      "affected_ranges": [
+        [
+          "0",
+          "3.1.2"
+        ]
+      ],
+      "affected_versions": [
+        "<3.1.2"
+      ],
+      "severity": "high",
+      "confidence": "high",
+      "description": "FlowiseAI: Evaluation create+update mass-assignment allows cross-workspace evaluation takeover",
+      "remediation": "升級至 3.1.2+",
+      "source": "OSV",
+      "published": "2026-05-14T16:19:49Z",
+      "withdrawn": null
+    },
+    {
+      "cve_id": "CVE-2026-69262",
+      "osv_id": "GHSA-p5w8-m249-4r4v",
+      "package": "flowise",
+      "affected_below": "3.1.3",
+      "affected_ranges": [
+        [
+          "0",
+          "3.1.3"
+        ]
+      ],
+      "affected_versions": [
+        "<3.1.3"
+      ],
+      "severity": "high",
+      "confidence": "high",
+      "description": "Flowise: `DELETE /api/v1/chatflows/:id` does not validate resource type, allowing `agentflows:delete` and `chatflows:delete` to delete each other’s flow type",
+      "remediation": "升級至 3.1.3+",
+      "source": "OSV",
+      "published": "2026-08-04T16:50:32Z",
+      "withdrawn": null
+    },
+    {
+      "cve_id": "CVE-2026-46440",
+      "osv_id": "GHSA-php6-83fg-gw3g",
+      "package": "flowise",
+      "affected_below": "3.1.2",
+      "affected_ranges": [
+        [
+          "0",
+          "3.1.2"
+        ]
+      ],
+      "affected_versions": [
+        "<3.1.2"
+      ],
+      "severity": "high",
+      "confidence": "high",
+      "description": "FlowiseAI Exposes Basic Auth Credentials via API",
+      "remediation": "升級至 3.1.2+",
+      "source": "OSV",
+      "published": "2026-05-14T14:54:46Z",
+      "withdrawn": null
+    },
+    {
+      "cve_id": "CVE-2025-71334",
+      "osv_id": "GHSA-q67q-549q-p849",
+      "package": "flowise",
+      "affected_below": "3.0.6",
+      "affected_ranges": [
+        [
+          "2.2.8",
+          "3.0.6"
+        ]
+      ],
+      "affected_versions": [
+        "<3.0.6"
+      ],
+      "severity": "critical",
+      "confidence": "high",
+      "description": "Flowise has arbitrary file access due to missing chat flow id validation",
+      "remediation": "升級至 3.0.6+",
+      "source": "OSV",
+      "published": "2025-09-15T20:11:39Z",
+      "withdrawn": null
+    },
+    {
+      "cve_id": "CVE-2026-70478",
+      "osv_id": "GHSA-qgvm-j2hm-6m38",
+      "package": "flowise",
+      "affected_below": "3.1.3",
+      "affected_ranges": [
+        [
+          "0",
+          "3.1.3"
+        ]
+      ],
+      "affected_versions": [
+        "<3.1.3"
+      ],
+      "severity": "critical",
+      "confidence": "high",
+      "description": "Flowise: Unauthenticated OAuth2 token refresh endpoint returns access tokens — enables token theft for any connected service",
+      "remediation": "升級至 3.1.3+",
+      "source": "OSV",
+      "published": "2026-08-04T19:37:36Z",
+      "withdrawn": null
+    },
+    {
+      "cve_id": "CVE-2026-43995",
+      "osv_id": "GHSA-qqvm-66q4-vf5c",
+      "package": "flowise",
+      "affected_below": "3.1.0",
+      "affected_ranges": [
+        [
+          "0",
+          "3.1.0"
+        ],
+        [
+          "0",
+          "3.1.0"
+        ]
+      ],
+      "affected_versions": [
+        "<3.1.0"
+      ],
+      "severity": "high",
+      "confidence": "high",
+      "description": "Flowise: SSRF Protection Bypass via Direct node-fetch / axios Usage (Patch Enforcement Failure)",
+      "remediation": "升級至 3.1.0+",
+      "source": "OSV",
+      "published": "2026-04-16T21:23:03Z",
+      "withdrawn": null
+    },
+    {
+      "cve_id": "CVE-2025-34267",
+      "osv_id": "GHSA-r4hh-pcgx-j5r2",
+      "package": "flowise",
+      "affected_below": "3.0.8",
+      "affected_ranges": [
+        [
+          "3.0.1",
+          "3.0.8"
+        ]
+      ],
+      "affected_versions": [
+        "<3.0.8"
+      ],
+      "severity": "high",
+      "confidence": "high",
+      "description": "Flowise: Authenticated Command Execution and Sandbox Bypass via Puppeteer and Playwright Packages",
+      "remediation": "升級至 3.0.8+",
+      "source": "OSV",
+      "published": "2025-10-14T21:30:47Z",
+      "withdrawn": null
+    },
+    {
+      "cve_id": "CVE-2026-69250",
+      "osv_id": "GHSA-r745-8hwv-h473",
+      "package": "flowise",
+      "affected_below": "3.1.3",
+      "affected_ranges": [
+        [
+          "0",
+          "3.1.3"
+        ]
+      ],
+      "affected_versions": [
+        "<3.1.3"
+      ],
+      "severity": "high",
+      "confidence": "high",
+      "description": "Flowise: Unauthenticated OAuth2 Refresh Enables Non-Blind SSRF and Secret Exfiltration",
+      "remediation": "升級至 3.1.3+",
+      "source": "OSV",
+      "published": "2026-08-04T14:20:49Z",
+      "withdrawn": null
+    },
+    {
+      "cve_id": "CVE-2026-41269",
+      "osv_id": "GHSA-rh7v-6w34-w2rr",
+      "package": "flowise",
+      "affected_below": "3.1.0",
+      "affected_ranges": [
+        [
+          "0",
+          "3.1.0"
+        ]
+      ],
+      "affected_versions": [
+        "<3.1.0"
+      ],
+      "severity": "high",
+      "confidence": "high",
+      "description": "Flowise: File Upload Validation Bypass in createAttachment",
+      "remediation": "升級至 3.1.0+",
+      "source": "OSV",
+      "published": "2026-04-16T21:49:28Z",
+      "withdrawn": null
+    },
+    {
+      "cve_id": "CVE-2026-41265",
+      "osv_id": "GHSA-v38x-c887-992f",
+      "package": "flowise",
+      "affected_below": "3.1.0",
+      "affected_ranges": [
+        [
+          "0",
+          "3.1.0"
+        ],
+        [
+          "0",
+          "3.1.0"
+        ]
+      ],
+      "affected_versions": [
+        "<3.1.0"
+      ],
+      "severity": "critical",
+      "confidence": "high",
+      "description": "Flowise: Airtable_Agent Code Injection Remote Code Execution Vulnerability",
+      "remediation": "升級至 3.1.0+",
+      "source": "OSV",
+      "published": "2026-04-18T00:46:04Z",
+      "withdrawn": null
+    },
+    {
+      "cve_id": "CVE-2026-69255",
+      "osv_id": "GHSA-vmv7-4m6c-3cg5",
+      "package": "flowise",
+      "affected_below": "3.1.3",
+      "affected_ranges": [
+        [
+          "0",
+          "3.1.3"
+        ],
+        [
+          "0",
+          "3.1.3"
+        ]
+      ],
+      "affected_versions": [
+        "<3.1.3"
+      ],
+      "severity": "critical",
+      "confidence": "high",
+      "description": "Flowise: CSV Agent Remote Code Execution via Pyodide Code Injection — Root Shell Verified",
+      "remediation": "升級至 3.1.3+",
+      "source": "OSV",
+      "published": "2026-08-04T15:40:28Z",
+      "withdrawn": null
+    },
+    {
+      "cve_id": "CVE-2026-41278",
+      "osv_id": "GHSA-w47f-j8rh-wx87",
+      "package": "flowise",
+      "affected_below": "3.1.0",
+      "affected_ranges": [
+        [
+          "0",
+          "3.1.0"
+        ]
+      ],
+      "affected_versions": [
+        "<3.1.0"
+      ],
+      "severity": "high",
+      "confidence": "high",
+      "description": "Flowise: Public chatflow endpoints return unsanitized flowData including plaintext API keys, passwords, and credential IDs",
+      "remediation": "升級至 3.1.0+",
+      "source": "OSV",
+      "published": "2026-04-17T21:34:30Z",
+      "withdrawn": null
+    },
+    {
+      "cve_id": "CVE-2026-56273",
+      "osv_id": "GHSA-w6v6-49gh-mc9w",
+      "package": "flowise",
+      "affected_below": "3.1.0",
+      "affected_ranges": [
+        [
+          "0",
+          "3.1.0"
+        ],
+        [
+          "0",
+          "3.1.0"
+        ]
+      ],
+      "affected_versions": [
+        "<3.1.0"
+      ],
+      "severity": "high",
+      "confidence": "high",
+      "description": "Flowise: Path Traversal in Vector Store basePath",
+      "remediation": "升級至 3.1.0+",
+      "source": "OSV",
+      "published": "2026-04-16T21:22:49Z",
+      "withdrawn": null
+    },
+    {
+      "cve_id": "CVE-2026-70474",
+      "osv_id": "GHSA-wch5-xp77-fxg4",
+      "package": "flowise",
+      "affected_below": "3.1.3",
+      "affected_ranges": [
+        [
+          "0",
+          "3.1.3"
+        ]
+      ],
+      "affected_versions": [
+        "<3.1.3"
+      ],
+      "severity": "high",
+      "confidence": "high",
+      "description": "Flowise: Cross-Workspace OAuth2 Credential Metadata Leak",
+      "remediation": "升級至 3.1.3+",
+      "source": "OSV",
+      "published": "2026-08-04T18:01:29Z",
+      "withdrawn": null
+    },
+    {
+      "cve_id": "CVE-2026-69253",
+      "osv_id": "GHSA-wg86-r78f-74mp",
+      "package": "flowise",
+      "affected_below": "3.1.3",
+      "affected_ranges": [
+        [
+          "0",
+          "3.1.3"
+        ],
+        [
+          "0",
+          "3.1.3"
+        ]
+      ],
+      "affected_versions": [
+        "<3.1.3"
+      ],
+      "severity": "high",
+      "confidence": "high",
+      "description": "Flowise Sandbox Escape to RCE",
+      "remediation": "升級至 3.1.3+",
+      "source": "OSV",
+      "published": "2026-08-04T15:13:33Z",
+      "withdrawn": null
+    },
+    {
+      "cve_id": "CVE-2025-58434",
+      "osv_id": "GHSA-wgpv-6j63-x5ph",
+      "package": "flowise",
+      "affected_below": "3.0.6",
+      "affected_ranges": [
+        [
+          "0",
+          "3.0.6"
+        ]
+      ],
+      "affected_versions": [
+        "<3.0.6"
+      ],
+      "severity": "critical",
+      "confidence": "high",
+      "description": "Flowise Cloud and Local Deployments have Unauthenticated Password Reset Token Disclosure that Leads to Account Takeover",
+      "remediation": "升級至 3.0.6+",
+      "source": "OSV",
+      "published": "2025-09-12T20:02:40Z",
+      "withdrawn": null
+    },
+    {
+      "cve_id": "CVE-2026-69252",
+      "osv_id": "GHSA-wp74-f5hh-5f3r",
+      "package": "flowise",
+      "affected_below": "3.1.3",
+      "affected_ranges": [
+        [
+          "0",
+          "3.1.3"
+        ]
+      ],
+      "affected_versions": [
+        "<3.1.3"
+      ],
+      "severity": "high",
+      "confidence": "high",
+      "description": "Flowise: Missing authorization on `/api/v1/files` allows low-privileged API keys to list and delete files across workspaces within the same organization",
+      "remediation": "升級至 3.1.3+",
+      "source": "OSV",
+      "published": "2026-08-04T14:54:03Z",
+      "withdrawn": null
+    },
+    {
+      "cve_id": "CVE-2026-30820",
+      "osv_id": "GHSA-wvhq-wp8g-c7vq",
+      "package": "flowise",
+      "affected_below": "3.0.13",
+      "affected_ranges": [
+        [
+          "0",
+          "3.0.13"
+        ]
+      ],
+      "affected_versions": [
+        "<3.0.13"
+      ],
+      "severity": "high",
+      "confidence": "high",
+      "description": "Flowise has Authorization Bypass via Spoofed x-request-from Header",
+      "remediation": "升級至 3.0.13+",
+      "source": "OSV",
+      "published": "2026-03-06T18:48:22Z",
+      "withdrawn": null
+    },
+    {
+      "cve_id": "CVE-2026-46480",
+      "osv_id": "GHSA-wxrr-jp8m-qq7f",
+      "package": "flowise",
+      "affected_below": "3.1.2",
+      "affected_ranges": [
+        [
+          "0",
+          "3.1.2"
+        ]
+      ],
+      "affected_versions": [
+        "<3.1.2"
+      ],
+      "severity": "high",
+      "confidence": "high",
+      "description": "FlowiseAI: Evaluator create+update mass-assignment allows cross-workspace evaluator takeover",
+      "remediation": "升級至 3.1.2+",
+      "source": "OSV",
+      "published": "2026-05-14T16:19:52Z",
+      "withdrawn": null
+    },
+    {
+      "cve_id": "CVE-2026-69259",
+      "osv_id": "GHSA-x3hf-7cj6-3r4m",
+      "package": "flowise",
+      "affected_below": "3.1.3",
+      "affected_ranges": [
+        [
+          "0",
+          "3.1.3"
+        ],
+        [
+          "0",
+          "3.1.3"
+        ]
+      ],
+      "affected_versions": [
+        "<3.1.3"
+      ],
+      "severity": "high",
+      "confidence": "high",
+      "description": "Flowise RCE via SQLite Record Manager Node",
+      "remediation": "升級至 3.1.3+",
+      "source": "OSV",
+      "published": "2026-08-04T16:05:10Z",
+      "withdrawn": null
+    },
+    {
+      "cve_id": "CVE-2026-42862",
+      "osv_id": "GHSA-x5v6-pj28-cwwm",
+      "package": "flowise",
+      "affected_below": "3.1.2",
+      "affected_ranges": [
+        [
+          "0",
+          "3.1.2"
+        ]
+      ],
+      "affected_versions": [
+        "<3.1.2"
+      ],
+      "severity": "high",
+      "confidence": "high",
+      "description": "FlowiseAI has Mass Assignment in Tool Update Endpoint that Allows Cross-Workspace Resource Reassignment",
+      "remediation": "升級至 3.1.2+",
+      "source": "OSV",
+      "published": "2026-05-14T14:52:40Z",
+      "withdrawn": null
+    },
+    {
+      "cve_id": "CVE-2026-41275",
+      "osv_id": "GHSA-x5w6-38gp-mrqh",
+      "package": "flowise",
+      "affected_below": "3.1.0",
+      "affected_ranges": [
+        [
+          "0",
+          "3.1.0"
+        ]
+      ],
+      "affected_versions": [
+        "<3.1.0"
+      ],
+      "severity": "high",
+      "confidence": "high",
+      "description": "Flowise: Password Reset Link Sent Over Unsecured HTTP",
+      "remediation": "升級至 3.1.0+",
+      "source": "OSV",
+      "published": "2026-04-16T21:53:16Z",
+      "withdrawn": null
+    },
+    {
+      "cve_id": "CVE-2026-69256",
+      "osv_id": "GHSA-x6vm-w76m-8j7g",
+      "package": "flowise",
+      "affected_below": "3.1.3",
+      "affected_ranges": [
+        [
+          "0",
+          "3.1.3"
+        ],
+        [
+          "0",
+          "3.1.3"
+        ]
+      ],
+      "affected_versions": [
+        "<3.1.3"
+      ],
+      "severity": "high",
+      "confidence": "high",
+      "description": "Flowise: Remote Code Execution Vulnerability in CSVAgent",
+      "remediation": "升級至 3.1.3+",
+      "source": "OSV",
+      "published": "2026-08-04T15:46:20Z",
+      "withdrawn": null
+    },
+    {
+      "cve_id": "CVE-2025-71335",
+      "osv_id": "GHSA-x7rp-qj2h-ghgw",
+      "package": "flowise",
+      "affected_below": "3.0.10",
+      "affected_ranges": [
+        [
+          "0",
+          "3.0.10"
+        ]
+      ],
+      "affected_versions": [
+        "<3.0.10"
+      ],
+      "severity": "high",
+      "confidence": "high",
+      "description": "Flowise Fails to Invalidate Existing Sessions After Password Changes",
+      "remediation": "升級至 3.0.10+",
+      "source": "OSV",
+      "published": "2025-11-14T20:50:36Z",
+      "withdrawn": null
+    },
+    {
+      "cve_id": "CVE-2026-69263",
+      "osv_id": "GHSA-xc48-889x-5qmw",
+      "package": "flowise",
+      "affected_below": "3.1.3",
+      "affected_ranges": [
+        [
+          "0",
+          "3.1.3"
+        ],
+        [
+          "0",
+          "3.1.3"
+        ]
+      ],
+      "affected_versions": [
+        "<3.1.3"
+      ],
+      "severity": "high",
+      "confidence": "high",
+      "description": "Flowise: CVE-2025-8943 Patch Bypass: npm_config_yes bypasses MCP environment variable blocklist (Unauthenticated RCE)",
+      "remediation": "升級至 3.1.3+",
+      "source": "OSV",
+      "published": "2026-08-04T17:09:48Z",
+      "withdrawn": null
+    },
+    {
+      "cve_id": "CVE-2026-41270",
+      "osv_id": "GHSA-xhmj-rg95-44hv",
+      "package": "flowise",
+      "affected_below": "3.1.0",
+      "affected_ranges": [
+        [
+          "0",
+          "3.1.0"
+        ],
+        [
+          "0",
+          "3.1.0"
+        ]
+      ],
+      "affected_versions": [
+        "<3.1.0"
+      ],
+      "severity": "high",
+      "confidence": "high",
+      "description": "Flowise: SSRF Protection Bypass via Unprotected Built-in HTTP Modules in Custom Function Sandbox",
+      "remediation": "升級至 3.1.0+",
+      "source": "OSV",
+      "published": "2026-04-16T21:50:12Z",
       "withdrawn": null
     },
     {
@@ -5682,2085 +7761,6 @@
       "remediation": "升級至 2.32.1+",
       "source": "OSV",
       "published": "2026-07-22T22:12:33Z",
-      "withdrawn": null
-    },
-    {
-      "cve_id": "CVE-2026-73488",
-      "osv_id": "GHSA-2364-jh4q-m9vm",
-      "package": "flowise",
-      "affected_below": "3.1.3",
-      "affected_ranges": [
-        [
-          "0",
-          "3.1.3"
-        ]
-      ],
-      "affected_versions": [
-        "<3.1.3"
-      ],
-      "severity": "high",
-      "confidence": "high",
-      "description": "Flowise: IDOR vulnerability exists at the GET /api/v1/organization/customer-default-source endpoint",
-      "remediation": "升級至 3.1.3+",
-      "source": "OSV",
-      "published": "2026-08-04T14:16:46Z",
-      "withdrawn": null
-    },
-    {
-      "cve_id": "CVE-2026-41274",
-      "osv_id": "GHSA-28g4-38q8-3cwc",
-      "package": "flowise",
-      "affected_below": "3.1.0",
-      "affected_ranges": [
-        [
-          "0",
-          "3.1.0"
-        ],
-        [
-          "0",
-          "3.1.0"
-        ]
-      ],
-      "affected_versions": [
-        "<3.1.0"
-      ],
-      "severity": "high",
-      "confidence": "high",
-      "description": "Flowise: Cypher Injection in GraphCypherQAChain",
-      "remediation": "升級至 3.1.0+",
-      "source": "OSV",
-      "published": "2026-04-16T21:54:26Z",
-      "withdrawn": null
-    },
-    {
-      "cve_id": "CVE-2026-41272",
-      "osv_id": "GHSA-2x8m-83vc-6wv4",
-      "package": "flowise",
-      "affected_below": "3.1.0",
-      "affected_ranges": [
-        [
-          "0",
-          "3.1.0"
-        ],
-        [
-          "0",
-          "3.1.0"
-        ]
-      ],
-      "affected_versions": [
-        "<3.1.0"
-      ],
-      "severity": "high",
-      "confidence": "high",
-      "description": "Flowise: SSRF Protection Bypass (TOCTOU & Default Insecure)",
-      "remediation": "升級至 3.1.0+",
-      "source": "OSV",
-      "published": "2026-04-16T21:51:00Z",
-      "withdrawn": null
-    },
-    {
-      "cve_id": "CVE-2025-61687",
-      "osv_id": "GHSA-35g6-rrw3-v6xc",
-      "package": "flowise",
-      "affected_below": "3.0.8",
-      "affected_ranges": [
-        [
-          "3.0.7",
-          "3.0.8"
-        ]
-      ],
-      "affected_versions": [
-        "<3.0.8"
-      ],
-      "severity": "high",
-      "confidence": "high",
-      "description": "FlowiseAI/Flosise has File Upload vulnerability",
-      "remediation": "升級至 3.0.8+",
-      "source": "OSV",
-      "published": "2025-10-08T19:34:21Z",
-      "withdrawn": null
-    },
-    {
-      "cve_id": "CVE-2026-69254",
-      "osv_id": "GHSA-3769-jgqc-cxm7",
-      "package": "flowise",
-      "affected_below": "3.1.3",
-      "affected_ranges": [
-        [
-          "0",
-          "3.1.3"
-        ],
-        [
-          "0",
-          "3.1.3"
-        ]
-      ],
-      "affected_versions": [
-        "<3.1.3"
-      ],
-      "severity": "high",
-      "confidence": "high",
-      "description": "Flowise: RCE via NodeVM Sandbox Escape in executeJavaScriptCode() nodeVMOptions Override",
-      "remediation": "升級至 3.1.3+",
-      "source": "OSV",
-      "published": "2026-08-04T15:29:12Z",
-      "withdrawn": null
-    },
-    {
-      "cve_id": "CVE-2025-59528",
-      "osv_id": "GHSA-3gcm-f6qx-ff7p",
-      "package": "flowise",
-      "affected_below": "3.0.6",
-      "affected_ranges": [
-        [
-          "3.0.5",
-          "3.0.6"
-        ]
-      ],
-      "affected_versions": [
-        "<3.0.6"
-      ],
-      "severity": "critical",
-      "confidence": "high",
-      "description": "Flowise has Remote Code Execution vulnerability",
-      "remediation": "升級至 3.0.6+",
-      "source": "OSV",
-      "published": "2025-09-15T19:59:57Z",
-      "withdrawn": null
-    },
-    {
-      "cve_id": "CVE-2026-41264",
-      "osv_id": "GHSA-3hjv-c53m-58jj",
-      "package": "flowise",
-      "affected_below": "3.1.0",
-      "affected_ranges": [
-        [
-          "0",
-          "3.1.0"
-        ],
-        [
-          "0",
-          "3.1.0"
-        ]
-      ],
-      "affected_versions": [
-        "<3.1.0"
-      ],
-      "severity": "critical",
-      "confidence": "high",
-      "description": "Flowise: CSV Agent Prompt Injection Remote Code Execution Vulnerability",
-      "remediation": "升級至 3.1.0+",
-      "source": "OSV",
-      "published": "2026-04-21T20:19:52Z",
-      "withdrawn": null
-    },
-    {
-      "cve_id": "CVE-2026-41277",
-      "osv_id": "GHSA-3prp-9gf7-4rxx",
-      "package": "flowise",
-      "affected_below": "3.1.0",
-      "affected_ranges": [
-        [
-          "0",
-          "3.1.0"
-        ]
-      ],
-      "affected_versions": [
-        "<3.1.0"
-      ],
-      "severity": "high",
-      "confidence": "high",
-      "description": "Flowise: Mass Assignment in DocumentStore Create Endpoint Leads to Cross-Workspace Object Takeover (IDOR)",
-      "remediation": "升級至 3.1.0+",
-      "source": "OSV",
-      "published": "2026-04-17T21:34:16Z",
-      "withdrawn": null
-    },
-    {
-      "cve_id": "CVE-2026-41267",
-      "osv_id": "GHSA-48m6-ch88-55mj",
-      "package": "flowise",
-      "affected_below": "3.1.0",
-      "affected_ranges": [
-        [
-          "0",
-          "3.1.0"
-        ]
-      ],
-      "affected_versions": [
-        "<3.1.0"
-      ],
-      "severity": "high",
-      "confidence": "high",
-      "description": "Flowise: Improper Mass Assignment in Account Registration Enables Unauthorized Organization Association",
-      "remediation": "升級至 3.1.0+",
-      "source": "OSV",
-      "published": "2026-04-16T21:44:24Z",
-      "withdrawn": null
-    },
-    {
-      "cve_id": "CVE-2025-71331",
-      "osv_id": "GHSA-4fr9-3x69-36wv",
-      "package": "flowise",
-      "affected_below": "3.0.8",
-      "affected_ranges": [
-        [
-          "0",
-          "3.0.8"
-        ]
-      ],
-      "affected_versions": [
-        "<3.0.8"
-      ],
-      "severity": "high",
-      "confidence": "high",
-      "description": "Flowise vulnerable to XSS",
-      "remediation": "升級至 3.0.8+",
-      "source": "OSV",
-      "published": "2025-10-03T19:27:06Z",
-      "withdrawn": null
-    },
-    {
-      "cve_id": "CVE-2026-69264",
-      "osv_id": "GHSA-4j8x-x6v7-w9rq",
-      "package": "flowise",
-      "affected_below": "3.1.3",
-      "affected_ranges": [
-        [
-          "0",
-          "3.1.3"
-        ],
-        [
-          "0",
-          "3.1.3"
-        ]
-      ],
-      "affected_versions": [
-        "<3.1.3"
-      ],
-      "severity": "high",
-      "confidence": "high",
-      "description": "Flowise: RCE via CSVAgent csvFile data URI base64 segment is interpolated into Python source without validation",
-      "remediation": "升級至 3.1.3+",
-      "source": "OSV",
-      "published": "2026-08-04T17:43:48Z",
-      "withdrawn": null
-    },
-    {
-      "cve_id": "CVE-2026-41266",
-      "osv_id": "GHSA-4jpm-cgx2-8h37",
-      "package": "flowise",
-      "affected_below": "3.1.0",
-      "affected_ranges": [
-        [
-          "0",
-          "3.1.0"
-        ]
-      ],
-      "affected_versions": [
-        "<3.1.0"
-      ],
-      "severity": "high",
-      "confidence": "high",
-      "description": "Flowise: Sensitive Data Leak in public-chatbotConfig ",
-      "remediation": "升級至 3.1.0+",
-      "source": "OSV",
-      "published": "2026-04-16T21:44:49Z",
-      "withdrawn": null
-    },
-    {
-      "cve_id": "CVE-2026-70470",
-      "osv_id": "GHSA-52fh-8v99-63c2",
-      "package": "flowise",
-      "affected_below": "3.1.3",
-      "affected_ranges": [
-        [
-          "0",
-          "3.1.3"
-        ],
-        [
-          "0",
-          "3.1.3"
-        ]
-      ],
-      "affected_versions": [
-        "<3.1.3"
-      ],
-      "severity": "critical",
-      "confidence": "high",
-      "description": "Flowise: Pyodide validator Unicode homoglyph bypass leads to RCE",
-      "remediation": "升級至 3.1.3+",
-      "source": "OSV",
-      "published": "2026-08-04T17:31:09Z",
-      "withdrawn": null
-    },
-    {
-      "cve_id": "CVE-2026-56276",
-      "osv_id": "GHSA-59fh-9f3p-7m39",
-      "package": "flowise",
-      "affected_below": "3.1.2",
-      "affected_ranges": [
-        [
-          "0",
-          "3.1.2"
-        ]
-      ],
-      "affected_versions": [
-        "<3.1.2"
-      ],
-      "severity": "high",
-      "confidence": "high",
-      "description": "Flowise: Mass Assignment in PUT /api/v1/user Allows Authenticated Users to Override Password Hash and Bypass Password Change Verification",
-      "remediation": "升級至 3.1.2+",
-      "source": "OSV",
-      "published": "2026-05-20T15:44:40Z",
-      "withdrawn": null
-    },
-    {
-      "cve_id": "CVE-2024-58351",
-      "osv_id": "GHSA-5cph-wvm9-45gj",
-      "package": "flowise",
-      "affected_below": "2.1.4",
-      "affected_ranges": [
-        [
-          "0",
-          "2.1.4"
-        ]
-      ],
-      "affected_versions": [
-        "<2.1.4"
-      ],
-      "severity": "high",
-      "confidence": "high",
-      "description": "Flowise OverrideConfig security vulnerability",
-      "remediation": "升級至 2.1.4+",
-      "source": "OSV",
-      "published": "2024-11-21T22:21:03Z",
-      "withdrawn": null
-    },
-    {
-      "cve_id": "CVE-2026-30824",
-      "osv_id": "GHSA-5f53-522j-j454",
-      "package": "flowise",
-      "affected_below": "3.0.13",
-      "affected_ranges": [
-        [
-          "0",
-          "3.0.13"
-        ]
-      ],
-      "affected_versions": [
-        "<3.0.13"
-      ],
-      "severity": "high",
-      "confidence": "high",
-      "description": "Flowise Missing Authentication on NVIDIA NIM Endpoints",
-      "remediation": "升級至 3.0.13+",
-      "source": "OSV",
-      "published": "2026-03-06T22:21:38Z",
-      "withdrawn": null
-    },
-    {
-      "cve_id": "CVE-2026-41279",
-      "osv_id": "GHSA-5fw2-mwhh-9947",
-      "package": "flowise",
-      "affected_below": "3.1.0",
-      "affected_ranges": [
-        [
-          "0",
-          "3.1.0"
-        ]
-      ],
-      "affected_versions": [
-        "<3.1.0"
-      ],
-      "severity": "high",
-      "confidence": "high",
-      "description": "Flowise: Unauthenticated TTS endpoint accepts arbitrary credential IDs — enables API credit abuse via stored credentials",
-      "remediation": "升級至 3.1.0+",
-      "source": "OSV",
-      "published": "2026-04-17T21:35:14Z",
-      "withdrawn": null
-    },
-    {
-      "cve_id": "CVE-2026-46477",
-      "osv_id": "GHSA-5h9v-837x-m97r",
-      "package": "flowise",
-      "affected_below": "3.1.2",
-      "affected_ranges": [
-        [
-          "0",
-          "3.1.2"
-        ]
-      ],
-      "affected_versions": [
-        "<3.1.2"
-      ],
-      "severity": "high",
-      "confidence": "high",
-      "description": "FlowiseAI: Dataset create+update mass-assignment allows cross-workspace dataset takeover",
-      "remediation": "升級至 3.1.2+",
-      "source": "OSV",
-      "published": "2026-05-14T16:19:39Z",
-      "withdrawn": null
-    },
-    {
-      "cve_id": "CVE-2026-42863",
-      "osv_id": "GHSA-5wxp-qjgq-fx6m",
-      "package": "flowise",
-      "affected_below": "3.1.2",
-      "affected_ranges": [
-        [
-          "0",
-          "3.1.2"
-        ]
-      ],
-      "affected_versions": [
-        "<3.1.2"
-      ],
-      "severity": "high",
-      "confidence": "high",
-      "description": "FlowiseAI has Mass Assignment in Chatflow Update Endpoint that Allows Cross-Workspace AgentFlow Reassignment",
-      "remediation": "升級至 3.1.2+",
-      "source": "OSV",
-      "published": "2026-05-14T14:54:28Z",
-      "withdrawn": null
-    },
-    {
-      "cve_id": "CVE-2026-70477",
-      "osv_id": "GHSA-5xvg-pmgg-3mxr",
-      "package": "flowise",
-      "affected_below": "3.1.3",
-      "affected_ranges": [
-        [
-          "0",
-          "3.1.3"
-        ],
-        [
-          "0",
-          "3.1.3"
-        ]
-      ],
-      "affected_versions": [
-        "<3.1.3"
-      ],
-      "severity": "critical",
-      "confidence": "high",
-      "description": "Flowise: CSV Agent Prompt Injection Remote Code Execution Vulnerability",
-      "remediation": "升級至 3.1.3+",
-      "source": "OSV",
-      "published": "2026-08-04T19:29:26Z",
-      "withdrawn": null
-    },
-    {
-      "cve_id": "CVE-2025-71336",
-      "osv_id": "GHSA-6933-jpx5-q87q",
-      "package": "flowise",
-      "affected_below": "3.0.6",
-      "affected_ranges": [
-        [
-          "2.2.7-patch.1",
-          "3.0.6"
-        ]
-      ],
-      "affected_versions": [
-        "<3.0.6"
-      ],
-      "severity": "critical",
-      "confidence": "high",
-      "description": "Flowise has unsandboxed remote code execution via Custom MCP",
-      "remediation": "升級至 3.0.6+",
-      "source": "OSV",
-      "published": "2025-09-15T20:30:30Z",
-      "withdrawn": null
-    },
-    {
-      "cve_id": "CVE-2026-41273",
-      "osv_id": "GHSA-6f7g-v4pp-r667",
-      "package": "flowise",
-      "affected_below": "3.1.0",
-      "affected_ranges": [
-        [
-          "0",
-          "3.1.0"
-        ]
-      ],
-      "affected_versions": [
-        "<3.1.0"
-      ],
-      "severity": "high",
-      "confidence": "high",
-      "description": "Flowise: Unauthenticated OAuth 2.0 Access Token Disclosure via Public Chatflow in Flowise",
-      "remediation": "升級至 3.1.0+",
-      "source": "OSV",
-      "published": "2026-04-16T21:52:46Z",
-      "withdrawn": null
-    },
-    {
-      "cve_id": "CVE-2026-42861",
-      "osv_id": "GHSA-6fw7-3q8r-m5vj",
-      "package": "flowise",
-      "affected_below": "3.1.2",
-      "affected_ranges": [
-        [
-          "0",
-          "3.1.2"
-        ]
-      ],
-      "affected_versions": [
-        "<3.1.2"
-      ],
-      "severity": "high",
-      "confidence": "high",
-      "description": "FlowiseAI has Mass Assignment in Variable Update Endpoint that Allows Cross-Workspace Resource Reassignment",
-      "remediation": "升級至 3.1.2+",
-      "source": "OSV",
-      "published": "2026-05-14T14:52:24Z",
-      "withdrawn": null
-    },
-    {
-      "cve_id": "CVE-2026-41271",
-      "osv_id": "GHSA-6r77-hqx7-7vw8",
-      "package": "flowise",
-      "affected_below": "3.1.0",
-      "affected_ranges": [
-        [
-          "0",
-          "3.1.0"
-        ],
-        [
-          "0",
-          "3.1.0"
-        ]
-      ],
-      "affected_versions": [
-        "<3.1.0"
-      ],
-      "severity": "high",
-      "confidence": "high",
-      "description": "Flowise:  APIChain Prompt Injection SSRF in GET/POST API Chains",
-      "remediation": "升級至 3.1.0+",
-      "source": "OSV",
-      "published": "2026-04-16T21:52:11Z",
-      "withdrawn": null
-    },
-    {
-      "cve_id": "CVE-2026-69258",
-      "osv_id": "GHSA-6vh2-wg4h-4vwj",
-      "package": "flowise",
-      "affected_below": "3.1.3",
-      "affected_ranges": [
-        [
-          "0",
-          "3.1.3"
-        ]
-      ],
-      "affected_versions": [
-        "<3.1.3"
-      ],
-      "severity": "critical",
-      "confidence": "high",
-      "description": "Flowise: Unauthenticated Property Injection into Flow Execution Context via Ungated `overrideConfig` Spread in Prediction API",
-      "remediation": "升級至 3.1.3+",
-      "source": "OSV",
-      "published": "2026-08-04T15:56:11Z",
-      "withdrawn": null
-    },
-    {
-      "cve_id": "CVE-2024-31621",
-      "osv_id": "GHSA-6wp6-22x5-rr3w",
-      "package": "flowise",
-      "affected_below": "1.8.1",
-      "affected_ranges": [
-        [
-          "0",
-          "1.8.1"
-        ]
-      ],
-      "affected_versions": [
-        "<1.8.1"
-      ],
-      "severity": "high",
-      "confidence": "high",
-      "description": "Flowise vulnerable to code injection via api/v1",
-      "remediation": "升級至 1.8.1+",
-      "source": "OSV",
-      "published": "2024-04-29T18:30:45Z",
-      "withdrawn": null
-    },
-    {
-      "cve_id": "CVE-2026-46476",
-      "osv_id": "GHSA-728h-4mwj-f2p4",
-      "package": "flowise",
-      "affected_below": "3.1.2",
-      "affected_ranges": [
-        [
-          "0",
-          "3.1.2"
-        ]
-      ],
-      "affected_versions": [
-        "<3.1.2"
-      ],
-      "severity": "high",
-      "confidence": "high",
-      "description": "FlowiseAI: CustomTemplate create+update mass-assignment allows cross-workspace template takeover",
-      "remediation": "升級至 3.1.2+",
-      "source": "OSV",
-      "published": "2026-05-14T16:19:32Z",
-      "withdrawn": null
-    },
-    {
-      "cve_id": "CVE-2026-46475",
-      "osv_id": "GHSA-78pr-c5x5-jggc",
-      "package": "flowise",
-      "affected_below": "3.1.2",
-      "affected_ranges": [
-        [
-          "0",
-          "3.1.2"
-        ]
-      ],
-      "affected_versions": [
-        "<3.1.2"
-      ],
-      "severity": "high",
-      "confidence": "high",
-      "description": "FlowiseAI: Assistant create+update mass-assignment allows cross-workspace assistant takeover",
-      "remediation": "升級至 3.1.2+",
-      "source": "OSV",
-      "published": "2026-05-14T16:19:28Z",
-      "withdrawn": null
-    },
-    {
-      "cve_id": "CVE-2025-57164",
-      "osv_id": "GHSA-7944-7c6r-55vv",
-      "package": "flowise",
-      "affected_below": "3.0.6",
-      "affected_ranges": [
-        [
-          "3.0.5",
-          "3.0.6"
-        ]
-      ],
-      "affected_versions": [
-        "<3.0.6"
-      ],
-      "severity": "critical",
-      "confidence": "high",
-      "description": "FlowiseAI Pre-Auth Arbitrary Code Execution",
-      "remediation": "升級至 3.0.6+",
-      "source": "OSV",
-      "published": "2025-09-15T19:51:08Z",
-      "withdrawn": null
-    },
-    {
-      "cve_id": "CVE-2026-46443",
-      "osv_id": "GHSA-7g73-99r4-m4mj",
-      "package": "flowise",
-      "affected_below": "3.1.2",
-      "affected_ranges": [
-        [
-          "0",
-          "3.1.2"
-        ]
-      ],
-      "affected_versions": [
-        "<3.1.2"
-      ],
-      "severity": "high",
-      "confidence": "high",
-      "description": "FlowiseAI Vulnerable to Credential Data Leak",
-      "remediation": "升級至 3.1.2+",
-      "source": "OSV",
-      "published": "2026-05-14T14:58:12Z",
-      "withdrawn": null
-    },
-    {
-      "cve_id": "CVE-2026-46478",
-      "osv_id": "GHSA-7j65-65cr-6644",
-      "package": "flowise",
-      "affected_below": "3.1.2",
-      "affected_ranges": [
-        [
-          "0",
-          "3.1.2"
-        ]
-      ],
-      "affected_versions": [
-        "<3.1.2"
-      ],
-      "severity": "high",
-      "confidence": "high",
-      "description": "FlowiseAI: DatasetRow create+update mass-assignment allows cross-workspace row takeover",
-      "remediation": "升級至 3.1.2+",
-      "source": "OSV",
-      "published": "2026-05-14T16:19:44Z",
-      "withdrawn": null
-    },
-    {
-      "cve_id": "GHSA-88pr-878c-24wf",
-      "osv_id": "GHSA-88pr-878c-24wf",
-      "package": "flowise",
-      "affected_below": "3.1.3",
-      "affected_ranges": [
-        [
-          "0",
-          "3.1.3"
-        ],
-        [
-          "0",
-          "3.1.3"
-        ]
-      ],
-      "affected_versions": [
-        "<3.1.3"
-      ],
-      "severity": "high",
-      "confidence": "high",
-      "description": "Flowise: Authenticated arbitrary file write in the `S3 Directory` document loader via unsanitized S3 object keys                                                                                        ",
-      "remediation": "升級至 3.1.3+",
-      "source": "OSV",
-      "published": "2026-08-04T17:43:45Z",
-      "withdrawn": null
-    },
-    {
-      "cve_id": "CVE-2026-73603",
-      "osv_id": "GHSA-8gj2-2cvc-6xx7",
-      "package": "flowise",
-      "affected_below": "3.1.4",
-      "affected_ranges": [
-        [
-          "0",
-          "3.1.4"
-        ]
-      ],
-      "affected_versions": [
-        "<3.1.4"
-      ],
-      "severity": "high",
-      "confidence": "high",
-      "description": "Flowise: Unauthenticated Credential Abuse via Text-to-Speech Endpoint Allows Unauthorized Use of Private Chatflow TTS Credentials",
-      "remediation": "升級至 3.1.4+",
-      "source": "OSV",
-      "published": "2026-08-04T19:19:44Z",
-      "withdrawn": null
-    },
-    {
-      "cve_id": "CVE-2026-70471",
-      "osv_id": "GHSA-8r8h-6vcc-xhrv",
-      "package": "flowise",
-      "affected_below": "3.1.3",
-      "affected_ranges": [
-        [
-          "0",
-          "3.1.3"
-        ]
-      ],
-      "affected_versions": [
-        "<3.1.3"
-      ],
-      "severity": "high",
-      "confidence": "high",
-      "description": "Flowise: RBAC Bypass Leading to Unauthorized Workspace Variables Disclosure",
-      "remediation": "升級至 3.1.3+",
-      "source": "OSV",
-      "published": "2026-08-04T17:43:36Z",
-      "withdrawn": null
-    },
-    {
-      "cve_id": "CVE-2025-50538",
-      "osv_id": "GHSA-964p-j4gg-mhwc",
-      "package": "flowise",
-      "affected_below": "3.0.8",
-      "affected_ranges": [
-        [
-          "0",
-          "3.0.8"
-        ]
-      ],
-      "affected_versions": [
-        "<3.0.8"
-      ],
-      "severity": "critical",
-      "confidence": "high",
-      "description": "Flowise is vulnerable to stored XSS via \"View Messages\" allows credential theft in FlowiseAI admin panel",
-      "remediation": "升級至 3.0.8+",
-      "source": "OSV",
-      "published": "2025-10-03T21:47:37Z",
-      "withdrawn": null
-    },
-    {
-      "cve_id": "CVE-2025-71324",
-      "osv_id": "GHSA-99pg-hqvx-r4gf",
-      "package": "flowise",
-      "affected_below": "3.0.6",
-      "affected_ranges": [
-        [
-          "3.0.5",
-          "3.0.6"
-        ]
-      ],
-      "affected_versions": [
-        "<3.0.6"
-      ],
-      "severity": "critical",
-      "confidence": "high",
-      "description": "Flowise has an Arbitrary File Read",
-      "remediation": "升級至 3.0.6+",
-      "source": "OSV",
-      "published": "2025-09-15T20:00:39Z",
-      "withdrawn": null
-    },
-    {
-      "cve_id": "CVE-2026-56275",
-      "osv_id": "GHSA-9hrv-gvrv-6gf2",
-      "package": "flowise",
-      "affected_below": "3.1.0",
-      "affected_ranges": [
-        [
-          "0",
-          "3.1.0"
-        ],
-        [
-          "0",
-          "3.1.0"
-        ]
-      ],
-      "affected_versions": [
-        "<3.1.0"
-      ],
-      "severity": "high",
-      "confidence": "high",
-      "description": "Flowise Execute Flow function has an SSRF vulnerability",
-      "remediation": "升級至 3.1.0+",
-      "source": "OSV",
-      "published": "2026-04-16T21:23:17Z",
-      "withdrawn": null
-    },
-    {
-      "cve_id": "CVE-2026-46442",
-      "osv_id": "GHSA-9rvc-vf7m-pgm2",
-      "package": "flowise",
-      "affected_below": "3.1.2",
-      "affected_ranges": [
-        [
-          "0",
-          "3.1.2"
-        ]
-      ],
-      "affected_versions": [
-        "<3.1.2"
-      ],
-      "severity": "high",
-      "confidence": "high",
-      "description": "FlowiseAI: Authenticated Host RCE via POST /api/v1/node-custom-function and NodeVM Sandbox Escape",
-      "remediation": "升級至 3.1.2+",
-      "source": "OSV",
-      "published": "2026-05-14T14:57:53Z",
-      "withdrawn": null
-    },
-    {
-      "cve_id": "CVE-2026-41137",
-      "osv_id": "GHSA-9wc7-mj3f-74xv",
-      "package": "flowise",
-      "affected_below": "3.1.0",
-      "affected_ranges": [
-        [
-          "0",
-          "3.1.0"
-        ],
-        [
-          "0",
-          "3.1.0"
-        ]
-      ],
-      "affected_versions": [
-        "<3.1.0"
-      ],
-      "severity": "high",
-      "confidence": "high",
-      "description": "Flowise: Code Injection in CSVAgent leads to Authenticated RCE",
-      "remediation": "升級至 3.1.0+",
-      "source": "OSV",
-      "published": "2026-04-16T21:44:15Z",
-      "withdrawn": null
-    },
-    {
-      "cve_id": "CVE-2026-56268",
-      "osv_id": "GHSA-c2c9-mfw7-p8hw",
-      "package": "flowise",
-      "affected_below": "3.1.2",
-      "affected_ranges": [
-        [
-          "0",
-          "3.1.2"
-        ]
-      ],
-      "affected_versions": [
-        "<3.1.2"
-      ],
-      "severity": "high",
-      "confidence": "high",
-      "description": "Flowise: Cross-Workspace Chatflow Disclosure via chatflows/apikey Endpoint Returns All Unprotected Chatflows",
-      "remediation": "升級至 3.1.2+",
-      "source": "OSV",
-      "published": "2026-05-20T15:45:19Z",
-      "withdrawn": null
-    },
-    {
-      "cve_id": "CVE-2026-69257",
-      "osv_id": "GHSA-c6xh-wv4j-ppv5",
-      "package": "flowise",
-      "affected_below": "3.1.3",
-      "affected_ranges": [
-        [
-          "0",
-          "3.1.3"
-        ]
-      ],
-      "affected_versions": [
-        "<3.1.3"
-      ],
-      "severity": "high",
-      "confidence": "high",
-      "description": "Flowise: SSRF Protection Bypass via IPv4-Mapped IPv6 Addresses",
-      "remediation": "升級至 3.1.3+",
-      "source": "OSV",
-      "published": "2026-08-04T15:51:58Z",
-      "withdrawn": null
-    },
-    {
-      "cve_id": "CVE-2026-40933",
-      "osv_id": "GHSA-c9gw-hvqq-f33r",
-      "package": "flowise",
-      "affected_below": "3.1.0",
-      "affected_ranges": [
-        [
-          "0",
-          "3.1.0"
-        ],
-        [
-          "0",
-          "3.1.0"
-        ]
-      ],
-      "affected_versions": [
-        "<3.1.0"
-      ],
-      "severity": "critical",
-      "confidence": "high",
-      "description": "Flowise: Authenticated RCE Via MCP Adapters",
-      "remediation": "升級至 3.1.0+",
-      "source": "OSV",
-      "published": "2026-04-16T21:18:17Z",
-      "withdrawn": null
-    },
-    {
-      "cve_id": "CVE-2026-70472",
-      "osv_id": "GHSA-chm3-vqcf-52rx",
-      "package": "flowise",
-      "affected_below": "3.1.3",
-      "affected_ranges": [
-        [
-          "0",
-          "3.1.3"
-        ]
-      ],
-      "affected_versions": [
-        "<3.1.3"
-      ],
-      "severity": "high",
-      "confidence": "high",
-      "description": "Flowise: Cross-workspace credential IDOR in openai-assistants-vector-store",
-      "remediation": "升級至 3.1.3+",
-      "source": "OSV",
-      "published": "2026-08-04T17:51:48Z",
-      "withdrawn": null
-    },
-    {
-      "cve_id": "CVE-2026-41268",
-      "osv_id": "GHSA-cvrr-qhgw-2mm6",
-      "package": "flowise",
-      "affected_below": "3.1.0",
-      "affected_ranges": [
-        [
-          "0",
-          "3.1.0"
-        ],
-        [
-          "0",
-          "3.1.0"
-        ]
-      ],
-      "affected_versions": [
-        "<3.1.0"
-      ],
-      "severity": "high",
-      "confidence": "high",
-      "description": "Flowise: Parameter Override Bypass Remote Command Execution",
-      "remediation": "升級至 3.1.0+",
-      "source": "OSV",
-      "published": "2026-04-16T21:46:39Z",
-      "withdrawn": null
-    },
-    {
-      "cve_id": "CVE-2026-30823",
-      "osv_id": "GHSA-cwc3-p92j-g7qm",
-      "package": "flowise",
-      "affected_below": "3.0.13",
-      "affected_ranges": [
-        [
-          "0",
-          "3.0.13"
-        ]
-      ],
-      "affected_versions": [
-        "<3.0.13"
-      ],
-      "severity": "high",
-      "confidence": "high",
-      "description": "Flowise has IDOR leading to Account Takeover and Enterprise Feature Bypass via SSO Configuration",
-      "remediation": "升級至 3.0.13+",
-      "source": "OSV",
-      "published": "2026-03-06T22:20:50Z",
-      "withdrawn": null
-    },
-    {
-      "cve_id": "CVE-2026-41138",
-      "osv_id": "GHSA-f228-chmx-v6j6",
-      "package": "flowise",
-      "affected_below": "3.1.0",
-      "affected_ranges": [
-        [
-          "0",
-          "3.1.0"
-        ],
-        [
-          "0",
-          "3.1.0"
-        ]
-      ],
-      "affected_versions": [
-        "<3.1.0"
-      ],
-      "severity": "high",
-      "confidence": "high",
-      "description": "Flowise: Remote code execution vulnerability in AirtableAgent.ts caused by lack of input verification when using `Pandas`.",
-      "remediation": "升級至 3.1.0+",
-      "source": "OSV",
-      "published": "2026-04-16T21:43:57Z",
-      "withdrawn": null
-    },
-    {
-      "cve_id": "CVE-2026-41276",
-      "osv_id": "GHSA-f6hc-c5jr-878p",
-      "package": "flowise",
-      "affected_below": "3.1.0",
-      "affected_ranges": [
-        [
-          "0",
-          "3.1.0"
-        ]
-      ],
-      "affected_versions": [
-        "<3.1.0"
-      ],
-      "severity": "critical",
-      "confidence": "high",
-      "description": "Flowise: resetPassword Authentication Bypass Vulnerability",
-      "remediation": "升級至 3.1.0+",
-      "source": "OSV",
-      "published": "2026-04-16T21:55:18Z",
-      "withdrawn": null
-    },
-    {
-      "cve_id": "CVE-2026-70475",
-      "osv_id": "GHSA-fm2f-4339-4p2f",
-      "package": "flowise",
-      "affected_below": "3.1.3",
-      "affected_ranges": [
-        [
-          "0",
-          "3.1.3"
-        ]
-      ],
-      "affected_versions": [
-        "<3.1.3"
-      ],
-      "severity": "high",
-      "confidence": "high",
-      "description": "Flowise: Missing Authorization on Execution Update Endpoint",
-      "remediation": "升級至 3.1.3+",
-      "source": "OSV",
-      "published": "2026-08-04T19:18:47Z",
-      "withdrawn": null
-    },
-    {
-      "cve_id": "CVE-2026-70473",
-      "osv_id": "GHSA-fr6g-7cq8-fg82",
-      "package": "flowise",
-      "affected_below": "3.1.3",
-      "affected_ranges": [
-        [
-          "0",
-          "3.1.3"
-        ]
-      ],
-      "affected_versions": [
-        "<3.1.3"
-      ],
-      "severity": "high",
-      "confidence": "high",
-      "description": "Flowise: Information Disclosure in GET /api/v1/upsert-history returns the entire server-wide upsert history",
-      "remediation": "升級至 3.1.3+",
-      "source": "OSV",
-      "published": "2026-08-04T17:57:27Z",
-      "withdrawn": null
-    },
-    {
-      "cve_id": "CVE-2026-31829",
-      "osv_id": "GHSA-fvcw-9w9r-pxc7",
-      "package": "flowise",
-      "affected_below": "3.0.13",
-      "affected_ranges": [
-        [
-          "0",
-          "3.0.13"
-        ],
-        [
-          "0",
-          "3.0.13"
-        ]
-      ],
-      "affected_versions": [
-        "<3.0.13"
-      ],
-      "severity": "high",
-      "confidence": "high",
-      "description": "Flowise affected by Server-Side Request Forgery (SSRF) in HTTP Node Leading to Internal Network Access",
-      "remediation": "升級至 3.0.13+",
-      "source": "OSV",
-      "published": "2026-03-11T00:24:05Z",
-      "withdrawn": null
-    },
-    {
-      "cve_id": "CVE-2026-69251",
-      "osv_id": "GHSA-g32j-mmxr-gfq5",
-      "package": "flowise",
-      "affected_below": "3.1.3",
-      "affected_ranges": [
-        [
-          "0",
-          "3.1.3"
-        ],
-        [
-          "0",
-          "3.1.3"
-        ]
-      ],
-      "affected_versions": [
-        "<3.1.3"
-      ],
-      "severity": "high",
-      "confidence": "high",
-      "description": "Flowise RCE via TypeORM DataSource",
-      "remediation": "升級至 3.1.3+",
-      "source": "OSV",
-      "published": "2026-08-04T14:28:04Z",
-      "withdrawn": null
-    },
-    {
-      "cve_id": "CVE-2026-70476",
-      "osv_id": "GHSA-gmmw-qg98-6j6p",
-      "package": "flowise",
-      "affected_below": "3.1.3",
-      "affected_ranges": [
-        [
-          "0",
-          "3.1.3"
-        ]
-      ],
-      "affected_versions": [
-        "<3.1.3"
-      ],
-      "severity": "critical",
-      "confidence": "high",
-      "description": "Flowise: Broken Access Control in Stripe Subscription Endpoints Allows Cross-Tenant Billing Manipulation",
-      "remediation": "升級至 3.1.3+",
-      "source": "OSV",
-      "published": "2026-08-04T19:24:07Z",
-      "withdrawn": null
-    },
-    {
-      "cve_id": "CVE-2026-46444",
-      "osv_id": "GHSA-hmg2-jjjx-jcp2",
-      "package": "flowise",
-      "affected_below": "3.1.2",
-      "affected_ranges": [
-        [
-          "0",
-          "3.1.2"
-        ]
-      ],
-      "affected_versions": [
-        "<3.1.2"
-      ],
-      "severity": "high",
-      "confidence": "high",
-      "description": "FlowiseAI: Vector Store No Permission Checks",
-      "remediation": "升級至 3.1.2+",
-      "source": "OSV",
-      "published": "2026-05-14T16:19:23Z",
-      "withdrawn": null
-    },
-    {
-      "cve_id": "CVE-2026-46441",
-      "osv_id": "GHSA-hp26-q66v-q2w7",
-      "package": "flowise",
-      "affected_below": "3.1.2",
-      "affected_ranges": [
-        [
-          "0",
-          "3.1.2"
-        ]
-      ],
-      "affected_versions": [
-        "<3.1.2"
-      ],
-      "severity": "high",
-      "confidence": "high",
-      "description": "FlowiseAI has Mass Assignment in Assistant Update Endpoint that Allows Cross-Workspace Resource Reassignment",
-      "remediation": "升級至 3.1.2+",
-      "source": "OSV",
-      "published": "2026-05-14T14:57:46Z",
-      "withdrawn": null
-    },
-    {
-      "cve_id": "CVE-2025-59527",
-      "osv_id": "GHSA-hr92-4q35-4j3m",
-      "package": "flowise",
-      "affected_below": "3.0.6",
-      "affected_ranges": [
-        [
-          "3.0.5",
-          "3.0.6"
-        ]
-      ],
-      "affected_versions": [
-        "<3.0.6"
-      ],
-      "severity": "high",
-      "confidence": "high",
-      "description": "FlowiseAI/Flowise has Server-Side Request Forgery (SSRF) vulnerability",
-      "remediation": "升級至 3.0.6+",
-      "source": "OSV",
-      "published": "2025-09-15T19:53:46Z",
-      "withdrawn": null
-    },
-    {
-      "cve_id": "GHSA-j44m-5v8f-gc9c",
-      "osv_id": "GHSA-j44m-5v8f-gc9c",
-      "package": "flowise",
-      "affected_below": "3.0.8",
-      "affected_ranges": [
-        [
-          "0",
-          "3.0.8"
-        ],
-        [
-          "0",
-          "3.0.8"
-        ]
-      ],
-      "affected_versions": [
-        "<3.0.8"
-      ],
-      "severity": "high",
-      "confidence": "high",
-      "description": "Flowise is vulnerable to arbitrary file exposure through its ReadFileTool",
-      "remediation": "升級至 3.0.8+",
-      "source": "OSV",
-      "published": "2025-10-10T22:55:09Z",
-      "withdrawn": null
-    },
-    {
-      "cve_id": "CVE-2026-30821",
-      "osv_id": "GHSA-j8g8-j7fc-43v6",
-      "package": "flowise",
-      "affected_below": "3.0.13",
-      "affected_ranges": [
-        [
-          "0",
-          "3.0.13"
-        ]
-      ],
-      "affected_versions": [
-        "<3.0.13"
-      ],
-      "severity": "critical",
-      "confidence": "high",
-      "description": "Flowise has Arbitrary File Upload via MIME Spoofing",
-      "remediation": "升級至 3.0.13+",
-      "source": "OSV",
-      "published": "2026-03-06T18:49:20Z",
-      "withdrawn": null
-    },
-    {
-      "cve_id": "CVE-2026-56267",
-      "osv_id": "GHSA-jc5m-wrp2-qq38",
-      "package": "flowise",
-      "affected_below": "3.0.13",
-      "affected_ranges": [
-        [
-          "0",
-          "3.0.13"
-        ]
-      ],
-      "affected_versions": [
-        "<3.0.13"
-      ],
-      "severity": "high",
-      "confidence": "high",
-      "description": "Flowise Vulnerable to PII Disclosure on Unauthenticated Forgot Password Endpoint",
-      "remediation": "升級至 3.0.13+",
-      "source": "OSV",
-      "published": "2026-03-05T21:58:02Z",
-      "withdrawn": null
-    },
-    {
-      "cve_id": "CVE-2025-61913",
-      "osv_id": "GHSA-jv9m-vf54-chjj",
-      "package": "flowise",
-      "affected_below": "3.0.8",
-      "affected_ranges": [
-        [
-          "0",
-          "3.0.8"
-        ],
-        [
-          "0",
-          "3.0.8"
-        ],
-        [
-          "0",
-          "3.0.8"
-        ]
-      ],
-      "affected_versions": [
-        "<3.0.8"
-      ],
-      "severity": "critical",
-      "confidence": "high",
-      "description": "Flowise is vulnerable to arbitrary file write through its WriteFileTool ",
-      "remediation": "升級至 3.0.8+",
-      "source": "OSV",
-      "published": "2025-10-09T15:21:39Z",
-      "withdrawn": null
-    },
-    {
-      "cve_id": "CVE-2024-9148",
-      "osv_id": "GHSA-m5p9-xvxj-64c8",
-      "package": "flowise",
-      "affected_below": "2.1.1",
-      "affected_ranges": [
-        [
-          "0",
-          "2.0.0"
-        ],
-        [
-          "0",
-          "2.1.1"
-        ]
-      ],
-      "affected_versions": [
-        "<2.0.0",
-        "<2.1.1"
-      ],
-      "severity": "critical",
-      "confidence": "high",
-      "description": "Flowise and Flowise Chat Embed vulnerable to Stored Cross-site Scripting",
-      "remediation": "升級至 2.1.1+",
-      "source": "OSV",
-      "published": "2024-09-25T03:30:36Z",
-      "withdrawn": null
-    },
-    {
-      "cve_id": "CVE-2026-56277",
-      "osv_id": "GHSA-m837-xvxr-vqwg",
-      "package": "flowise",
-      "affected_below": "3.1.2",
-      "affected_ranges": [
-        [
-          "0",
-          "3.1.2"
-        ]
-      ],
-      "affected_versions": [
-        "<3.1.2"
-      ],
-      "severity": "high",
-      "confidence": "high",
-      "description": "Flowise: Hardcoded CORS wildcard on TTS endpoint enables cross-origin credential abuse from any webpage",
-      "remediation": "升級至 3.1.2+",
-      "source": "OSV",
-      "published": "2026-05-20T15:38:02Z",
-      "withdrawn": null
-    },
-    {
-      "cve_id": "CVE-2026-56274",
-      "osv_id": "GHSA-m99r-2hxc-cp3q",
-      "package": "flowise",
-      "affected_below": "3.1.2",
-      "affected_ranges": [
-        [
-          "0",
-          "3.1.2"
-        ],
-        [
-          "0",
-          "3.1.2"
-        ]
-      ],
-      "affected_versions": [
-        "<3.1.2"
-      ],
-      "severity": "high",
-      "confidence": "high",
-      "description": "Flowise has an MCP Security Bypass that Enables RCE",
-      "remediation": "升級至 3.1.2+",
-      "source": "OSV",
-      "published": "2026-05-14T14:57:30Z",
-      "withdrawn": null
-    },
-    {
-      "cve_id": "CVE-2026-30822",
-      "osv_id": "GHSA-mq4r-h2gh-qv7x",
-      "package": "flowise",
-      "affected_below": "3.0.13",
-      "affected_ranges": [
-        [
-          "0",
-          "3.0.13"
-        ]
-      ],
-      "affected_versions": [
-        "<3.0.13"
-      ],
-      "severity": "high",
-      "confidence": "high",
-      "description": "Flowise Allows Mass Assignment in `/api/v1/leads` Endpoint",
-      "remediation": "升級至 3.0.13+",
-      "source": "OSV",
-      "published": "2026-03-06T22:19:14Z",
-      "withdrawn": null
-    },
-    {
-      "cve_id": "CVE-2026-46479",
-      "osv_id": "GHSA-mq53-pc65-wjc4",
-      "package": "flowise",
-      "affected_below": "3.1.2",
-      "affected_ranges": [
-        [
-          "0",
-          "3.1.2"
-        ]
-      ],
-      "affected_versions": [
-        "<3.1.2"
-      ],
-      "severity": "high",
-      "confidence": "high",
-      "description": "FlowiseAI: Evaluation create+update mass-assignment allows cross-workspace evaluation takeover",
-      "remediation": "升級至 3.1.2+",
-      "source": "OSV",
-      "published": "2026-05-14T16:19:49Z",
-      "withdrawn": null
-    },
-    {
-      "cve_id": "CVE-2026-69262",
-      "osv_id": "GHSA-p5w8-m249-4r4v",
-      "package": "flowise",
-      "affected_below": "3.1.3",
-      "affected_ranges": [
-        [
-          "0",
-          "3.1.3"
-        ]
-      ],
-      "affected_versions": [
-        "<3.1.3"
-      ],
-      "severity": "high",
-      "confidence": "high",
-      "description": "Flowise: `DELETE /api/v1/chatflows/:id` does not validate resource type, allowing `agentflows:delete` and `chatflows:delete` to delete each other’s flow type",
-      "remediation": "升級至 3.1.3+",
-      "source": "OSV",
-      "published": "2026-08-04T16:50:32Z",
-      "withdrawn": null
-    },
-    {
-      "cve_id": "CVE-2026-46440",
-      "osv_id": "GHSA-php6-83fg-gw3g",
-      "package": "flowise",
-      "affected_below": "3.1.2",
-      "affected_ranges": [
-        [
-          "0",
-          "3.1.2"
-        ]
-      ],
-      "affected_versions": [
-        "<3.1.2"
-      ],
-      "severity": "high",
-      "confidence": "high",
-      "description": "FlowiseAI Exposes Basic Auth Credentials via API",
-      "remediation": "升級至 3.1.2+",
-      "source": "OSV",
-      "published": "2026-05-14T14:54:46Z",
-      "withdrawn": null
-    },
-    {
-      "cve_id": "CVE-2025-71334",
-      "osv_id": "GHSA-q67q-549q-p849",
-      "package": "flowise",
-      "affected_below": "3.0.6",
-      "affected_ranges": [
-        [
-          "2.2.8",
-          "3.0.6"
-        ]
-      ],
-      "affected_versions": [
-        "<3.0.6"
-      ],
-      "severity": "critical",
-      "confidence": "high",
-      "description": "Flowise has arbitrary file access due to missing chat flow id validation",
-      "remediation": "升級至 3.0.6+",
-      "source": "OSV",
-      "published": "2025-09-15T20:11:39Z",
-      "withdrawn": null
-    },
-    {
-      "cve_id": "CVE-2026-70478",
-      "osv_id": "GHSA-qgvm-j2hm-6m38",
-      "package": "flowise",
-      "affected_below": "3.1.3",
-      "affected_ranges": [
-        [
-          "0",
-          "3.1.3"
-        ]
-      ],
-      "affected_versions": [
-        "<3.1.3"
-      ],
-      "severity": "critical",
-      "confidence": "high",
-      "description": "Flowise: Unauthenticated OAuth2 token refresh endpoint returns access tokens — enables token theft for any connected service",
-      "remediation": "升級至 3.1.3+",
-      "source": "OSV",
-      "published": "2026-08-04T19:37:36Z",
-      "withdrawn": null
-    },
-    {
-      "cve_id": "CVE-2026-43995",
-      "osv_id": "GHSA-qqvm-66q4-vf5c",
-      "package": "flowise",
-      "affected_below": "3.1.0",
-      "affected_ranges": [
-        [
-          "0",
-          "3.1.0"
-        ],
-        [
-          "0",
-          "3.1.0"
-        ]
-      ],
-      "affected_versions": [
-        "<3.1.0"
-      ],
-      "severity": "high",
-      "confidence": "high",
-      "description": "Flowise: SSRF Protection Bypass via Direct node-fetch / axios Usage (Patch Enforcement Failure)",
-      "remediation": "升級至 3.1.0+",
-      "source": "OSV",
-      "published": "2026-04-16T21:23:03Z",
-      "withdrawn": null
-    },
-    {
-      "cve_id": "CVE-2025-34267",
-      "osv_id": "GHSA-r4hh-pcgx-j5r2",
-      "package": "flowise",
-      "affected_below": "3.0.8",
-      "affected_ranges": [
-        [
-          "3.0.1",
-          "3.0.8"
-        ]
-      ],
-      "affected_versions": [
-        "<3.0.8"
-      ],
-      "severity": "high",
-      "confidence": "high",
-      "description": "Flowise: Authenticated Command Execution and Sandbox Bypass via Puppeteer and Playwright Packages",
-      "remediation": "升級至 3.0.8+",
-      "source": "OSV",
-      "published": "2025-10-14T21:30:47Z",
-      "withdrawn": null
-    },
-    {
-      "cve_id": "CVE-2026-69250",
-      "osv_id": "GHSA-r745-8hwv-h473",
-      "package": "flowise",
-      "affected_below": "3.1.3",
-      "affected_ranges": [
-        [
-          "0",
-          "3.1.3"
-        ]
-      ],
-      "affected_versions": [
-        "<3.1.3"
-      ],
-      "severity": "high",
-      "confidence": "high",
-      "description": "Flowise: Unauthenticated OAuth2 Refresh Enables Non-Blind SSRF and Secret Exfiltration",
-      "remediation": "升級至 3.1.3+",
-      "source": "OSV",
-      "published": "2026-08-04T14:20:49Z",
-      "withdrawn": null
-    },
-    {
-      "cve_id": "CVE-2026-41269",
-      "osv_id": "GHSA-rh7v-6w34-w2rr",
-      "package": "flowise",
-      "affected_below": "3.1.0",
-      "affected_ranges": [
-        [
-          "0",
-          "3.1.0"
-        ]
-      ],
-      "affected_versions": [
-        "<3.1.0"
-      ],
-      "severity": "high",
-      "confidence": "high",
-      "description": "Flowise: File Upload Validation Bypass in createAttachment",
-      "remediation": "升級至 3.1.0+",
-      "source": "OSV",
-      "published": "2026-04-16T21:49:28Z",
-      "withdrawn": null
-    },
-    {
-      "cve_id": "CVE-2026-41265",
-      "osv_id": "GHSA-v38x-c887-992f",
-      "package": "flowise",
-      "affected_below": "3.1.0",
-      "affected_ranges": [
-        [
-          "0",
-          "3.1.0"
-        ],
-        [
-          "0",
-          "3.1.0"
-        ]
-      ],
-      "affected_versions": [
-        "<3.1.0"
-      ],
-      "severity": "critical",
-      "confidence": "high",
-      "description": "Flowise: Airtable_Agent Code Injection Remote Code Execution Vulnerability",
-      "remediation": "升級至 3.1.0+",
-      "source": "OSV",
-      "published": "2026-04-18T00:46:04Z",
-      "withdrawn": null
-    },
-    {
-      "cve_id": "CVE-2026-69255",
-      "osv_id": "GHSA-vmv7-4m6c-3cg5",
-      "package": "flowise",
-      "affected_below": "3.1.3",
-      "affected_ranges": [
-        [
-          "0",
-          "3.1.3"
-        ],
-        [
-          "0",
-          "3.1.3"
-        ]
-      ],
-      "affected_versions": [
-        "<3.1.3"
-      ],
-      "severity": "critical",
-      "confidence": "high",
-      "description": "Flowise: CSV Agent Remote Code Execution via Pyodide Code Injection — Root Shell Verified",
-      "remediation": "升級至 3.1.3+",
-      "source": "OSV",
-      "published": "2026-08-04T15:40:28Z",
-      "withdrawn": null
-    },
-    {
-      "cve_id": "CVE-2026-41278",
-      "osv_id": "GHSA-w47f-j8rh-wx87",
-      "package": "flowise",
-      "affected_below": "3.1.0",
-      "affected_ranges": [
-        [
-          "0",
-          "3.1.0"
-        ]
-      ],
-      "affected_versions": [
-        "<3.1.0"
-      ],
-      "severity": "high",
-      "confidence": "high",
-      "description": "Flowise: Public chatflow endpoints return unsanitized flowData including plaintext API keys, passwords, and credential IDs",
-      "remediation": "升級至 3.1.0+",
-      "source": "OSV",
-      "published": "2026-04-17T21:34:30Z",
-      "withdrawn": null
-    },
-    {
-      "cve_id": "CVE-2026-56273",
-      "osv_id": "GHSA-w6v6-49gh-mc9w",
-      "package": "flowise",
-      "affected_below": "3.1.0",
-      "affected_ranges": [
-        [
-          "0",
-          "3.1.0"
-        ],
-        [
-          "0",
-          "3.1.0"
-        ]
-      ],
-      "affected_versions": [
-        "<3.1.0"
-      ],
-      "severity": "high",
-      "confidence": "high",
-      "description": "Flowise: Path Traversal in Vector Store basePath",
-      "remediation": "升級至 3.1.0+",
-      "source": "OSV",
-      "published": "2026-04-16T21:22:49Z",
-      "withdrawn": null
-    },
-    {
-      "cve_id": "CVE-2026-70474",
-      "osv_id": "GHSA-wch5-xp77-fxg4",
-      "package": "flowise",
-      "affected_below": "3.1.3",
-      "affected_ranges": [
-        [
-          "0",
-          "3.1.3"
-        ]
-      ],
-      "affected_versions": [
-        "<3.1.3"
-      ],
-      "severity": "high",
-      "confidence": "high",
-      "description": "Flowise: Cross-Workspace OAuth2 Credential Metadata Leak",
-      "remediation": "升級至 3.1.3+",
-      "source": "OSV",
-      "published": "2026-08-04T18:01:29Z",
-      "withdrawn": null
-    },
-    {
-      "cve_id": "CVE-2026-69253",
-      "osv_id": "GHSA-wg86-r78f-74mp",
-      "package": "flowise",
-      "affected_below": "3.1.3",
-      "affected_ranges": [
-        [
-          "0",
-          "3.1.3"
-        ],
-        [
-          "0",
-          "3.1.3"
-        ]
-      ],
-      "affected_versions": [
-        "<3.1.3"
-      ],
-      "severity": "high",
-      "confidence": "high",
-      "description": "Flowise Sandbox Escape to RCE",
-      "remediation": "升級至 3.1.3+",
-      "source": "OSV",
-      "published": "2026-08-04T15:13:33Z",
-      "withdrawn": null
-    },
-    {
-      "cve_id": "CVE-2025-58434",
-      "osv_id": "GHSA-wgpv-6j63-x5ph",
-      "package": "flowise",
-      "affected_below": "3.0.6",
-      "affected_ranges": [
-        [
-          "0",
-          "3.0.6"
-        ]
-      ],
-      "affected_versions": [
-        "<3.0.6"
-      ],
-      "severity": "critical",
-      "confidence": "high",
-      "description": "Flowise Cloud and Local Deployments have Unauthenticated Password Reset Token Disclosure that Leads to Account Takeover",
-      "remediation": "升級至 3.0.6+",
-      "source": "OSV",
-      "published": "2025-09-12T20:02:40Z",
-      "withdrawn": null
-    },
-    {
-      "cve_id": "CVE-2026-69252",
-      "osv_id": "GHSA-wp74-f5hh-5f3r",
-      "package": "flowise",
-      "affected_below": "3.1.3",
-      "affected_ranges": [
-        [
-          "0",
-          "3.1.3"
-        ]
-      ],
-      "affected_versions": [
-        "<3.1.3"
-      ],
-      "severity": "high",
-      "confidence": "high",
-      "description": "Flowise: Missing authorization on `/api/v1/files` allows low-privileged API keys to list and delete files across workspaces within the same organization",
-      "remediation": "升級至 3.1.3+",
-      "source": "OSV",
-      "published": "2026-08-04T14:54:03Z",
-      "withdrawn": null
-    },
-    {
-      "cve_id": "CVE-2026-30820",
-      "osv_id": "GHSA-wvhq-wp8g-c7vq",
-      "package": "flowise",
-      "affected_below": "3.0.13",
-      "affected_ranges": [
-        [
-          "0",
-          "3.0.13"
-        ]
-      ],
-      "affected_versions": [
-        "<3.0.13"
-      ],
-      "severity": "high",
-      "confidence": "high",
-      "description": "Flowise has Authorization Bypass via Spoofed x-request-from Header",
-      "remediation": "升級至 3.0.13+",
-      "source": "OSV",
-      "published": "2026-03-06T18:48:22Z",
-      "withdrawn": null
-    },
-    {
-      "cve_id": "CVE-2026-46480",
-      "osv_id": "GHSA-wxrr-jp8m-qq7f",
-      "package": "flowise",
-      "affected_below": "3.1.2",
-      "affected_ranges": [
-        [
-          "0",
-          "3.1.2"
-        ]
-      ],
-      "affected_versions": [
-        "<3.1.2"
-      ],
-      "severity": "high",
-      "confidence": "high",
-      "description": "FlowiseAI: Evaluator create+update mass-assignment allows cross-workspace evaluator takeover",
-      "remediation": "升級至 3.1.2+",
-      "source": "OSV",
-      "published": "2026-05-14T16:19:52Z",
-      "withdrawn": null
-    },
-    {
-      "cve_id": "CVE-2026-69259",
-      "osv_id": "GHSA-x3hf-7cj6-3r4m",
-      "package": "flowise",
-      "affected_below": "3.1.3",
-      "affected_ranges": [
-        [
-          "0",
-          "3.1.3"
-        ],
-        [
-          "0",
-          "3.1.3"
-        ]
-      ],
-      "affected_versions": [
-        "<3.1.3"
-      ],
-      "severity": "high",
-      "confidence": "high",
-      "description": "Flowise RCE via SQLite Record Manager Node",
-      "remediation": "升級至 3.1.3+",
-      "source": "OSV",
-      "published": "2026-08-04T16:05:10Z",
-      "withdrawn": null
-    },
-    {
-      "cve_id": "CVE-2026-42862",
-      "osv_id": "GHSA-x5v6-pj28-cwwm",
-      "package": "flowise",
-      "affected_below": "3.1.2",
-      "affected_ranges": [
-        [
-          "0",
-          "3.1.2"
-        ]
-      ],
-      "affected_versions": [
-        "<3.1.2"
-      ],
-      "severity": "high",
-      "confidence": "high",
-      "description": "FlowiseAI has Mass Assignment in Tool Update Endpoint that Allows Cross-Workspace Resource Reassignment",
-      "remediation": "升級至 3.1.2+",
-      "source": "OSV",
-      "published": "2026-05-14T14:52:40Z",
-      "withdrawn": null
-    },
-    {
-      "cve_id": "CVE-2026-41275",
-      "osv_id": "GHSA-x5w6-38gp-mrqh",
-      "package": "flowise",
-      "affected_below": "3.1.0",
-      "affected_ranges": [
-        [
-          "0",
-          "3.1.0"
-        ]
-      ],
-      "affected_versions": [
-        "<3.1.0"
-      ],
-      "severity": "high",
-      "confidence": "high",
-      "description": "Flowise: Password Reset Link Sent Over Unsecured HTTP",
-      "remediation": "升級至 3.1.0+",
-      "source": "OSV",
-      "published": "2026-04-16T21:53:16Z",
-      "withdrawn": null
-    },
-    {
-      "cve_id": "CVE-2026-69256",
-      "osv_id": "GHSA-x6vm-w76m-8j7g",
-      "package": "flowise",
-      "affected_below": "3.1.3",
-      "affected_ranges": [
-        [
-          "0",
-          "3.1.3"
-        ],
-        [
-          "0",
-          "3.1.3"
-        ]
-      ],
-      "affected_versions": [
-        "<3.1.3"
-      ],
-      "severity": "high",
-      "confidence": "high",
-      "description": "Flowise: Remote Code Execution Vulnerability in CSVAgent",
-      "remediation": "升級至 3.1.3+",
-      "source": "OSV",
-      "published": "2026-08-04T15:46:20Z",
-      "withdrawn": null
-    },
-    {
-      "cve_id": "CVE-2025-71335",
-      "osv_id": "GHSA-x7rp-qj2h-ghgw",
-      "package": "flowise",
-      "affected_below": "3.0.10",
-      "affected_ranges": [
-        [
-          "0",
-          "3.0.10"
-        ]
-      ],
-      "affected_versions": [
-        "<3.0.10"
-      ],
-      "severity": "high",
-      "confidence": "high",
-      "description": "Flowise Fails to Invalidate Existing Sessions After Password Changes",
-      "remediation": "升級至 3.0.10+",
-      "source": "OSV",
-      "published": "2025-11-14T20:50:36Z",
-      "withdrawn": null
-    },
-    {
-      "cve_id": "CVE-2026-69263",
-      "osv_id": "GHSA-xc48-889x-5qmw",
-      "package": "flowise",
-      "affected_below": "3.1.3",
-      "affected_ranges": [
-        [
-          "0",
-          "3.1.3"
-        ],
-        [
-          "0",
-          "3.1.3"
-        ]
-      ],
-      "affected_versions": [
-        "<3.1.3"
-      ],
-      "severity": "high",
-      "confidence": "high",
-      "description": "Flowise: CVE-2025-8943 Patch Bypass: npm_config_yes bypasses MCP environment variable blocklist (Unauthenticated RCE)",
-      "remediation": "升級至 3.1.3+",
-      "source": "OSV",
-      "published": "2026-08-04T17:09:48Z",
-      "withdrawn": null
-    },
-    {
-      "cve_id": "CVE-2026-41270",
-      "osv_id": "GHSA-xhmj-rg95-44hv",
-      "package": "flowise",
-      "affected_below": "3.1.0",
-      "affected_ranges": [
-        [
-          "0",
-          "3.1.0"
-        ],
-        [
-          "0",
-          "3.1.0"
-        ]
-      ],
-      "affected_versions": [
-        "<3.1.0"
-      ],
-      "severity": "high",
-      "confidence": "high",
-      "description": "Flowise: SSRF Protection Bypass via Unprotected Built-in HTTP Modules in Custom Function Sandbox",
-      "remediation": "升級至 3.1.0+",
-      "source": "OSV",
-      "published": "2026-04-16T21:50:12Z",
       "withdrawn": null
     }
   ],
