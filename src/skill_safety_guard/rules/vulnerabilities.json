@@ -1,7 +1,7 @@
 {
   "_comment": "由 OSV.dev 權威源自動更新（含手工種子條目）",
   "_schema_version": "1.0",
-  "_last_updated": "2026-10-05 04:30 UTC",
+  "_last_updated": "2026-10-06 05:16 UTC",
   "_source": "OSV.dev authoritative",
   "vulnerabilities": [
     {
@@ -235,6 +235,28 @@
       "withdrawn": null
     },
     {
+      "cve_id": "CVE-2026-7700",
+      "osv_id": "GHSA-9fpm-3445-2vx4",
+      "package": "langflow",
+      "affected_below": "1.10.3",
+      "affected_ranges": [
+        [
+          "1.3.0",
+          "1.10.3"
+        ]
+      ],
+      "affected_versions": [
+        "<1.10.3"
+      ],
+      "severity": "high",
+      "confidence": "high",
+      "description": "Langflow: Prompt injection in Langflow Smart Transform can lead to code execution",
+      "remediation": "升級至 1.10.3+",
+      "source": "OSV",
+      "published": "2026-10-05T22:30:41Z",
+      "withdrawn": null
+    },
+    {
       "cve_id": "CVE-2026-42048",
       "osv_id": "GHSA-9whx-c884-c68q",
       "package": "langflow",
@@ -306,6 +328,28 @@
       "withdrawn": null
     },
     {
+      "cve_id": "CVE-2026-8505",
+      "osv_id": "GHSA-cf6m-vc3m-7cgm",
+      "package": "langflow",
+      "affected_below": "1.9.1",
+      "affected_ranges": [
+        [
+          "1.7.0",
+          "1.9.1"
+        ]
+      ],
+      "affected_versions": [
+        "<1.9.1"
+      ],
+      "severity": "critical",
+      "confidence": "high",
+      "description": "Langflow: Unauthenticated Flow Execution via Webhook Authentication Bypass",
+      "remediation": "升級至 1.9.1+",
+      "source": "OSV",
+      "published": "2026-10-05T22:31:22Z",
+      "withdrawn": null
+    },
+    {
       "cve_id": "CVE-2025-68478",
       "osv_id": "GHSA-f43r-cc68-gpx4",
       "package": "langflow",
@@ -347,6 +391,28 @@
       "remediation": "升級至 1.9.0+",
       "source": "OSV",
       "published": "2026-03-19T17:46:43Z",
+      "withdrawn": null
+    },
+    {
+      "cve_id": "CVE-2026-9205",
+      "osv_id": "GHSA-jxw3-mjmx-3pqm",
+      "package": "langflow",
+      "affected_below": "1.10.1",
+      "affected_ranges": [
+        [
+          "0",
+          "1.10.1"
+        ]
+      ],
+      "affected_versions": [
+        "<1.10.1"
+      ],
+      "severity": "critical",
+      "confidence": "high",
+      "description": "Langflow: Weak Fernet Key via random.seed()",
+      "remediation": "升級至 1.10.1+",
+      "source": "OSV",
+      "published": "2026-10-05T22:31:35Z",
       "withdrawn": null
     },
     {
@@ -550,6 +616,28 @@
       "remediation": "升級至 1.9.0+",
       "source": "OSV",
       "published": "2026-03-17T20:05:05Z",
+      "withdrawn": null
+    },
+    {
+      "cve_id": "CVE-2026-51886",
+      "osv_id": "GHSA-w584-2h2r-2hvf",
+      "package": "langflow",
+      "affected_below": "1.10.1",
+      "affected_ranges": [
+        [
+          "1.7.2",
+          "1.10.1"
+        ]
+      ],
+      "affected_versions": [
+        "<1.10.1"
+      ],
+      "severity": "high",
+      "confidence": "high",
+      "description": "Langflow: Title Authenticated Remote Code Execution in  validate_code  via Malicious Decorators  Description",
+      "remediation": "升級至 1.10.1+",
+      "source": "OSV",
+      "published": "2026-10-05T22:31:00Z",
       "withdrawn": null
     },
     {
