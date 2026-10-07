@@ -1,7 +1,7 @@
 {
   "_comment": "由 OSV.dev 權威源自動更新（含手工種子條目）",
   "_schema_version": "1.0",
-  "_last_updated": "2026-10-06 05:16 UTC",
+  "_last_updated": "2026-10-07 04:45 UTC",
   "_source": "OSV.dev authoritative",
   "vulnerabilities": [
     {
@@ -213,6 +213,28 @@
       "withdrawn": null
     },
     {
+      "cve_id": "CVE-2026-10561",
+      "osv_id": "GHSA-8qpj-27x8-pwpq",
+      "package": "langflow",
+      "affected_below": "1.10.1",
+      "affected_ranges": [
+        [
+          "0",
+          "1.10.1"
+        ]
+      ],
+      "affected_versions": [
+        "<1.10.1"
+      ],
+      "severity": "critical",
+      "confidence": "high",
+      "description": "Langflow: PythonREPLComponent executes unsandboxed Python code, enabling authenticated RCE and privilege escalation",
+      "remediation": "升級至 1.10.1+",
+      "source": "OSV",
+      "published": "2026-10-06T13:38:28Z",
+      "withdrawn": null
+    },
+    {
       "cve_id": "CVE-2026-33760",
       "osv_id": "GHSA-9c59-2mvc-vfr8",
       "package": "langflow",
@@ -391,6 +413,42 @@
       "remediation": "升級至 1.9.0+",
       "source": "OSV",
       "published": "2026-03-19T17:46:43Z",
+      "withdrawn": null
+    },
+    {
+      "cve_id": "GHSA-j8f7-x8jm-wmm4",
+      "osv_id": "GHSA-j8f7-x8jm-wmm4",
+      "package": "langflow",
+      "affected_below": "1.10.3",
+      "affected_ranges": [
+        [
+          "0",
+          "1.10.3"
+        ],
+        [
+          "0",
+          "0.10.3"
+        ],
+        [
+          "0",
+          "1.10.3"
+        ],
+        [
+          "0",
+          "0.1.2"
+        ]
+      ],
+      "affected_versions": [
+        "<0.1.2",
+        "<0.10.3",
+        "<1.10.3"
+      ],
+      "severity": "high",
+      "confidence": "high",
+      "description": "Langflow: SSRF in URL-taking components (protection disabled by default / warn-only, not applied to RSS, SearXNG, Web Search, Home Assistant, Glean, Docling)",
+      "remediation": "升級至 1.10.3+",
+      "source": "OSV",
+      "published": "2026-10-06T13:39:57Z",
       "withdrawn": null
     },
     {
