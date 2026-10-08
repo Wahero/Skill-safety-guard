@@ -1,7 +1,7 @@
 {
   "_comment": "由 OSV.dev 權威源自動更新（含手工種子條目）",
   "_schema_version": "1.0",
-  "_last_updated": "2026-10-07 04:45 UTC",
+  "_last_updated": "2026-10-08 04:55 UTC",
   "_source": "OSV.dev authoritative",
   "vulnerabilities": [
     {
@@ -93,6 +93,28 @@
       "withdrawn": null
     },
     {
+      "cve_id": "CVE-2026-105741",
+      "osv_id": "GHSA-4f6c-2vvp-gw82",
+      "package": "langflow",
+      "affected_below": "1.10.3",
+      "affected_ranges": [
+        [
+          "1.5.0",
+          "1.10.3"
+        ]
+      ],
+      "affected_versions": [
+        "<1.10.3"
+      ],
+      "severity": "high",
+      "confidence": "high",
+      "description": "Langflow: IP Spoofing Bypass via `X-Forwarded-For` Allowing Remote Configuration Write",
+      "remediation": "升級至 1.10.3+",
+      "source": "OSV",
+      "published": "2026-10-07T16:18:23Z",
+      "withdrawn": null
+    },
+    {
       "cve_id": "CVE-2025-57760",
       "osv_id": "GHSA-4gv9-mp8m-592r",
       "package": "langflow",
@@ -117,6 +139,28 @@
       "remediation": "升級至 1.5.1+",
       "source": "OSV",
       "published": "2025-08-25T16:21:04Z",
+      "withdrawn": null
+    },
+    {
+      "cve_id": "CVE-2026-105699",
+      "osv_id": "GHSA-4hmc-cfm3-w43c",
+      "package": "langflow",
+      "affected_below": "1.9.1",
+      "affected_ranges": [
+        [
+          "1.6.8",
+          "1.9.1"
+        ]
+      ],
+      "affected_versions": [
+        "<1.9.1"
+      ],
+      "severity": "high",
+      "confidence": "high",
+      "description": "Langflow has Authenticated Cross-Project File Disclosure via Unscoped MCP Resource Handlers",
+      "remediation": "升級至 1.9.1+",
+      "source": "OSV",
+      "published": "2026-10-07T20:35:12Z",
       "withdrawn": null
     },
     {
@@ -696,6 +740,37 @@
       "remediation": "升級至 1.10.1+",
       "source": "OSV",
       "published": "2026-10-05T22:31:00Z",
+      "withdrawn": null
+    },
+    {
+      "cve_id": "CVE-2026-105697",
+      "osv_id": "GHSA-w794-rj3p-xv45",
+      "package": "langflow",
+      "affected_below": "1.10.3",
+      "affected_ranges": [
+        [
+          "1.1.2",
+          "1.10.3"
+        ],
+        [
+          "0.1.2",
+          "0.10.3"
+        ],
+        [
+          "0",
+          "1.10.3"
+        ]
+      ],
+      "affected_versions": [
+        "<0.10.3",
+        "<1.10.3"
+      ],
+      "severity": "critical",
+      "confidence": "high",
+      "description": "Langflow: OS command injection (RCE) via arbitrary command in MCP stdio server configuration",
+      "remediation": "升級至 1.10.3+",
+      "source": "OSV",
+      "published": "2026-10-07T20:36:35Z",
       "withdrawn": null
     },
     {
@@ -6659,6 +6734,32 @@
       "withdrawn": null
     },
     {
+      "cve_id": "CVE-2026-73483",
+      "osv_id": "GHSA-9gvv-qjj3-2p6g",
+      "package": "flowise",
+      "affected_below": "3.1.3",
+      "affected_ranges": [
+        [
+          "0",
+          "3.1.3"
+        ],
+        [
+          "0",
+          "3.1.3"
+        ]
+      ],
+      "affected_versions": [
+        "<3.1.3"
+      ],
+      "severity": "high",
+      "confidence": "high",
+      "description": "Flowise NodeVM sandbox escape via puppeteer allowlist - authenticated RCE and arbitrary file read via Chromium",
+      "remediation": "升級至 3.1.3+",
+      "source": "OSV",
+      "published": "2026-10-07T16:17:02Z",
+      "withdrawn": null
+    },
+    {
       "cve_id": "CVE-2026-56275",
       "osv_id": "GHSA-9hrv-gvrv-6gf2",
       "package": "flowise",
@@ -7601,6 +7702,32 @@
       "remediation": "升級至 3.1.0+",
       "source": "OSV",
       "published": "2026-04-16T21:22:49Z",
+      "withdrawn": null
+    },
+    {
+      "cve_id": "CVE-2026-73487",
+      "osv_id": "GHSA-w7x8-q2gp-5cgg",
+      "package": "flowise",
+      "affected_below": "3.1.3",
+      "affected_ranges": [
+        [
+          "0",
+          "3.1.3"
+        ],
+        [
+          "0",
+          "3.1.3"
+        ]
+      ],
+      "affected_versions": [
+        "<3.1.3"
+      ],
+      "severity": "critical",
+      "confidence": "high",
+      "description": "Flowise Prompt Injection to RCE and SSRF via CSV/Airtable Agent Python Validator Bypass",
+      "remediation": "升級至 3.1.3+",
+      "source": "OSV",
+      "published": "2026-10-07T16:17:21Z",
       "withdrawn": null
     },
     {
