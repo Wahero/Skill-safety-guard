@@ -1,7 +1,7 @@
 {
   "_comment": "由 OSV.dev 權威源自動更新（含手工種子條目）",
   "_schema_version": "1.0",
-  "_last_updated": "2026-10-23 03:43 UTC",
+  "_last_updated": "2026-10-24 03:37 UTC",
   "_source": "OSV.dev authoritative",
   "vulnerabilities": [
     {
@@ -674,6 +674,28 @@
       "remediation": "升級至 1.9.2+",
       "source": "OSV",
       "published": "2026-06-16T17:35:32Z",
+      "withdrawn": null
+    },
+    {
+      "cve_id": "CVE-2026-7873",
+      "osv_id": "GHSA-v798-mcc6-2m3m",
+      "package": "langflow",
+      "affected_below": "1.10.1.rc0",
+      "affected_ranges": [
+        [
+          "1.0.0",
+          "1.10.1.rc0"
+        ]
+      ],
+      "affected_versions": [
+        "<1.10.1.rc0"
+      ],
+      "severity": "critical",
+      "confidence": "high",
+      "description": "Langflow: Code Injection Vulnerability in Code Validation Endpoint",
+      "remediation": "升級至 1.10.1.rc0+",
+      "source": "OSV",
+      "published": "2026-06-30T21:31:44Z",
       "withdrawn": null
     },
     {
