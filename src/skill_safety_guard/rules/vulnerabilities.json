@@ -1,7 +1,7 @@
 {
   "_comment": "由 OSV.dev 權威源自動更新（含手工種子條目）",
   "_schema_version": "1.0",
-  "_last_updated": "2026-10-26 03:37 UTC",
+  "_last_updated": "2026-10-27 04:01 UTC",
   "_source": "OSV.dev authoritative",
   "vulnerabilities": [
     {
@@ -2231,6 +2231,28 @@
       "remediation": "升級至 0.11.0+",
       "source": "OSV",
       "published": "2026-08-04T19:40:48Z",
+      "withdrawn": null
+    },
+    {
+      "cve_id": "GHSA-w466-2wfc-8g58",
+      "osv_id": "GHSA-w466-2wfc-8g58",
+      "package": "open-webui",
+      "affected_below": "0.5.8",
+      "affected_ranges": [
+        [
+          "0",
+          "0.5.8"
+        ]
+      ],
+      "affected_versions": [
+        "<0.5.8"
+      ],
+      "severity": "high",
+      "confidence": "high",
+      "description": "Open WebUI has vulnerable dependency on starlette via fastapi",
+      "remediation": "升級至 0.5.8+",
+      "source": "OSV",
+      "published": "2025-03-20T12:32:44Z",
       "withdrawn": null
     },
     {
